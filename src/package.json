@@ -8,6 +8,7 @@
     "build": "npx tsc && npx sass website/styles/"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "sqlite3": "^5.0.2"
   },
   "devDependencies": {
