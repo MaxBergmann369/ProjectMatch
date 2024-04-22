@@ -202,6 +202,40 @@ export class Database {
         });
     }
 
+    static async getProjectMembersByProjectId(projectId: number): Promise<ProjectMember[]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM ProjectMember WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const projectMembers: ProjectMember[] = (rows as any[]).map(row => ({
+                        id: row.id,
+                        projectId: row.projectId,
+                        userId: row.userId
+                    }));
+                    resolve(projectMembers);
+                }
+            });
+        });
+    }
+
+    static async getProjectsWhereUserIsMember(userId: number): Promise<ProjectMember[]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM ProjectMember WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const projectMembers: ProjectMember[] = (rows as any[]).map(row => ({
+                        id: row.id,
+                        projectId: row.projectId,
+                        userId: row.userId
+                    }));
+                    resolve(projectMembers);
+                }
+            });
+        });
+    }
+
     static async getFlamesByUserId(userId: number): Promise<Flame[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM Flame WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
