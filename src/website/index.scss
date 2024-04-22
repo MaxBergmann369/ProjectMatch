@@ -1,11 +1,36 @@
+@font-face {
+  font-family: 'Carlito';
+  src: url('resources/fonts/Carlito-Regular.ttf') format('truetype');
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Carlito';
+  src: url('resources/fonts/Carlito-Italic.ttf') format('truetype');
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Carlito';
+  src: url('resources/fonts/Carlito-Bold.ttf') format('truetype');
+  font-weight: bold;
+}
+@font-face {
+  font-family: 'Carlito';
+  src: url('resources/fonts/Carlito-BoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+}
+
 
 body {
   margin: 0;
   padding: 0;
   background-repeat: no-repeat;
   background-size: 100%;
-  background-image: url("./resources/test-bg.png");
-  color: wheat;
+  background-image: url("./resources/alternate.jpg");
+  color: white;
+  background-color: black;
+    font-family: 'Carlito', sans-serif;
+
 }
 
 .topRow {
@@ -21,6 +46,7 @@ body {
   font-family: Calibri, sans-serif;
 }
 
+
 .topRight {
   display: flex;
   flex-flow: row;
@@ -30,16 +56,14 @@ body {
 }
 
 .btn {
-  border: 1px solid whitesmoke;
+  border: 1px solid white;
   font-size: 1.5rem;
 }
 
 #language {
-  font-family: Calibri, sans-serif;
 }
 
 #logIn {
-  font-family: Calibri, sans-serif;
 }
 
 .center {
@@ -48,9 +72,13 @@ body {
   justify-content: center;
   align-items: center;
   margin-top: 35vh;
+  h1{
+    font-size: 5rem;
+  }
 }
 
 .title {
+    font-size: 3rem;
 
 }
 
