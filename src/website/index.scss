@@ -1,0 +1,59 @@
+
+body {
+  margin: 0;
+  padding: 0;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-image: url("./resources/test-bg.png");
+  color: wheat;
+}
+
+.topRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: 10%;
+}
+
+#nav-title {
+  padding-left: 1rem;
+  font-family: Calibri, sans-serif;
+}
+
+.topRight {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  padding-right: 1rem;
+  gap: 1rem;
+}
+
+.btn {
+  border: 1px solid whitesmoke;
+  font-size: 1.5rem;
+}
+
+#language {
+  font-family: Calibri, sans-serif;
+}
+
+#logIn {
+  font-family: Calibri, sans-serif;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 35vh;
+}
+
+.title {
+
+}
+
+#createAcc {
+
+}
