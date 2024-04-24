@@ -1,14 +1,11 @@
-import e from "express";
-
 export interface User {
-    id: number;
+    ifId: string;
     username: string;
     firstname: string;
     lastname: string;
     birthdate: Date;
-    email: string;
-    password: string;
     permissions: number;
+    department: string;
 }
 
 export interface Project {
@@ -28,7 +25,7 @@ export interface ProjectMember {
     userId: number;
 }
 
-export interface Flame {
+export interface Like {
     id: number;
     projectId: number;
     userId: number;

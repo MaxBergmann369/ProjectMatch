@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 import {User} from "./models";
 
 export class ValUser {
@@ -16,14 +15,6 @@ export class ValUser {
         }
 
         if(user.birthdate === undefined || !this.validateBirthdate(user.birthdate)) {
-            return false;
-        }
-
-        if(user.email === undefined || !this.validateEmail(user.email)) {
-            return false;
-        }
-
-        if(user.password === undefined || user.password === "" || user.password.length < 8) {
             return false;
         }
 
@@ -47,25 +38,5 @@ export class ValUser {
         }
 
         return !isNaN(birthdate.getTime());
-    }
-
-    private static validateEmail(email: string): boolean {
-        let regexPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-        if (!email.match(regexPattern)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    static async encryptPassword(password: string): Promise<string> {
-        const saltRounds = 10; // Number of salt rounds for bcrypt
-
-        // Generate a salt
-        const salt = await bcrypt.genSalt(saltRounds);
-
-        // Hash the password with the salt
-        return await bcrypt.hash(password, salt);
     }
 }

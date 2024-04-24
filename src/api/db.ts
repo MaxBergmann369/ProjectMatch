@@ -4,7 +4,7 @@ import {
     Ability,
     ProjectAbility,
     Project,
-    Flame,
+    Like,
     UserAbility,
     Message,
     DirectChat,
@@ -19,26 +19,25 @@ export class Database {
     static createTables() {
     db.serialize(() => {
         db.run(`CREATE TABLE IF NOT EXISTS User (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ifId TEXT PRIMARY KEY,
             username TEXT,
             firstname TEXT,
             lastname TEXT,
             birthdate Date,
-            email TEXT,
-            password TEXT,
             permissions INTEGER
+            department TEXT,
         )`);
 
         db.run(`CREATE TABLE IF NOT EXISTS Project (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
-            ownerId INTEGER,
+            ownerId TEXT,
             Thumbnail TEXT,
             Description TEXT,
             DateOfCreation Date,
             Views INTEGER,
             Links TEXT,
-            FOREIGN KEY(ownerId) REFERENCES User(id)
+            FOREIGN KEY(ownerId) REFERENCES User(ifId)
         )`);
 
         db.run(`CREATE TABLE IF NOT EXISTS ProjectMember (
@@ -49,12 +48,12 @@ export class Database {
             FOREIGN KEY(projectId) REFERENCES Project(id)
         )`);
 
-        db.run(`CREATE TABLE IF NOT EXISTS Flame (
+        db.run(`CREATE TABLE IF NOT EXISTS Like (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             projectId INTEGER,
             userId INTEGER,
             FOREIGN KEY(projectId) REFERENCES Project(id),
-            FOREIGN KEY(userId) REFERENCES User(id)
+            FOREIGN KEY(userId) REFERENCES User(ifId)
         )`);
 
         db.run(`CREATE TABLE IF NOT EXISTS Notification (
@@ -63,14 +62,14 @@ export class Database {
             title TEXT,
             text TEXT,
             date Date,
-            FOREIGN KEY(userId) REFERENCES User(id)
+            FOREIGN KEY(userId) REFERENCES User(ifId)
         )`);
 
         db.run(`CREATE TABLE IF NOT EXISTS UserAbility (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userId INTEGER,
             abilityId INTEGER,
-            FOREIGN KEY(userId) REFERENCES User(id),
+            FOREIGN KEY(userId) REFERENCES User(ifId),
             FOREIGN KEY(abilityId) REFERENCES Ability(id)
         )`);
 
@@ -91,8 +90,8 @@ export class Database {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userId INTEGER,
             otherUserId INTEGER,
-            FOREIGN KEY(userId) REFERENCES User(id),
-            FOREIGN KEY(otherUserId) REFERENCES User(id)
+            FOREIGN KEY(userId) REFERENCES User(ifId),
+            FOREIGN KEY(otherUserId) REFERENCES User(ifId)
         )`);
 
         db.run(`CREATE TABLE IF NOT EXISTS Message (
@@ -102,7 +101,7 @@ export class Database {
             message TEXT,
             date Date,
             FOREIGN KEY(chatId) REFERENCES DirectChat(id),
-            FOREIGN KEY(userId) REFERENCES User(id)
+            FOREIGN KEY(userId) REFERENCES User(ifId)
         )`);
     });
     }
@@ -121,14 +120,13 @@ export class Database {
                     reject(err);
                 } else {
                     const users: User[] = (rows as any[]).map(row => ({
-                        id: row.id,
+                        ifId: row.ifId,
                         username: row.username,
                         firstname: row.firstname,
                         lastname: row.lastname,
                         birthdate: new Date(row.birthdate),
-                        email: row.email,
-                        password: row.password,
-                        permissions: row.permissions
+                        permissions: row.permissions,
+                        department: row.department
                     }));
                     resolve(users);
                 }
@@ -143,14 +141,13 @@ export class Database {
                     reject(err);
                 } else {
                     const user: User = (row as any).map(row => ({
-                        id: row.id,
+                        ifId: row.ifId,
                         username: row.username,
                         firstname: row.firstname,
                         lastname: row.lastname,
                         birthdate: new Date(row.birthdate),
-                        email: row.email,
-                        password: row.password,
-                        permissions: row.permissions
+                        permissions: row.permissions,
+                        department: row.department
                     }));
                     resolve(user);
                 }
@@ -236,13 +233,13 @@ export class Database {
         });
     }
 
-    static async getFlamesByUserId(userId: number): Promise<Flame[]> {
+    static async getLikesByUserId(userId: number): Promise<Like[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM Flame WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const flames: Flame[] = (rows as any[]).map(row => ({
+                    const flames: Like[] = (rows as any[]).map(row => ({
                         id: row.id,
                         projectId: row.projectId,
                         userId: row.userId
@@ -253,13 +250,13 @@ export class Database {
         });
     }
 
-    static async getFlamesByProjectId(projectId: number): Promise<Flame[]> {
+    static async getLikesByProjectId(projectId: number): Promise<Like[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM Flame WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const flames: Flame[] = (rows as any[]).map(row => ({
+                    const flames: Like[] = (rows as any[]).map(row => ({
                         id: row.id,
                         projectId: row.projectId,
                         userId: row.userId
@@ -344,10 +341,8 @@ export class Database {
             return false;
         }
 
-        let password = await ValUser.encryptPassword(user.password);
-
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO User (username, firstname, lastname, birthdate, email, password, permissions) VALUES (?, ?, ?, ?, ?, ?, ?)`, [user.username, user.firstname, user.lastname, user.birthdate, user.email, password, user.permissions], (err) => {
+            db.run(`INSERT INTO User (ifId, username, firstname, lastname, birthdate, permissions, department) VALUES (?, ?, ?, ?, ?, ?, ?)`, [user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.permissions, user.department], (err) => {
                 if (err) {
                     reject(err);
                 } else {
