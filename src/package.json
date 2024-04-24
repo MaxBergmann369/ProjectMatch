@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx ts-node api/app.ts"
+    "start": "npx ts-node app.ts"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
