@@ -1,3 +1,5 @@
+// region Fonts
+
 @font-face {
   font-family: 'Carlito';
   src: url('../resources/fonts/Carlito-Regular.ttf') format('truetype');
@@ -20,10 +22,14 @@
   font-weight: bold;
   font-style: italic;
 }
+// endregion
 
+// region Variables
 :root{
   --rounded: 2rem;
 }
+// endregion
+
 
 body {
   margin: 0;
@@ -43,19 +49,16 @@ body {
   justify-content: space-between;
   width: 100%;
   height: 10%;
-}
-
-#nav-title {
-  padding-left: 1rem;
-}
-
-
-.topRight {
-  display: flex;
-  flex-flow: row;
-  align-items: center;
-  padding-right: 1rem;
-  gap: 1rem;
+  h1{
+    padding-left: 1rem;
+  }
+  .topRight {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    padding-right: 1rem;
+    gap: 1rem;
+  }
 }
 
 .btn {
@@ -66,22 +69,15 @@ body {
   padding: 0.5rem 1rem;
   transition: 0.3s;
   background: black;
-}
-
-.btn:hover {
-  background: white;
+  &:hover {
+    background: white;
     color: black;
+  }
+  &:active {
+    transform: scale(0.95) translateY(0.1rem);
+  }
 }
 
-.btn:active {
-  transform: scale(0.95) translateY(0.1rem);
-}
-
-#language {
-}
-
-#logIn {
-}
 
 .center {
   display: flex;
@@ -92,13 +88,4 @@ body {
   h1{
     font-size: 5rem;
   }
-}
-
-.title {
-    font-size: 3rem;
-
-}
-
-#createAcc {
-
 }

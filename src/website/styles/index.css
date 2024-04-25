@@ -41,12 +41,10 @@ body {
   width: 100%;
   height: 10%;
 }
-
-#nav-title {
+.topRow h1 {
   padding-left: 1rem;
 }
-
-.topRight {
+.topRow .topRight {
   display: flex;
   flex-flow: row;
   align-items: center;
@@ -63,12 +61,10 @@ body {
   transition: 0.3s;
   background: black;
 }
-
 .btn:hover {
   background: white;
   color: black;
 }
-
 .btn:active {
   transform: scale(0.95) translateY(0.1rem);
 }
@@ -82,10 +78,6 @@ body {
 }
 .center h1 {
   font-size: 5rem;
-}
-
-.title {
-  font-size: 3rem;
 }
 
 /*# sourceMappingURL=index.css.map */
