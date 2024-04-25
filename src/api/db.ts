@@ -340,6 +340,42 @@ export class Database {
         });
     }
 
+    static async getDirectChatsByUserId(userId: number): Promise<DirectChat[]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM DirectChat WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const directChats: DirectChat[] = (rows as any[]).map(row => ({
+                        id: row.id,
+                        userId: row.userId,
+                        otherUserId: row.otherUserId
+                    }));
+                    resolve(directChats);
+                }
+            });
+        });
+    }
+
+    static async getMessagesByChatId(chatId: number): Promise<Message[]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM Message WHERE chatId = ?`, [chatId], (err, rows: unknown[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const messages: Message[] = (rows as any[]).map(row => ({
+                        id: row.id,
+                        chatId: row.chatId,
+                        userId: row.userId,
+                        message: row.message,
+                        date: new Date(row.date)
+                    }));
+                    resolve(messages);
+                }
+            });
+        });
+    }
+
     //#endregionFromD
 
     //#region InsertDataToDB
