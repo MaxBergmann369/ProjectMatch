@@ -32,11 +32,12 @@ export class Database {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             ownerId TEXT,
-            Thumbnail TEXT,
-            Description TEXT,
-            DateOfCreation Date,
-            Views INTEGER,
-            Links TEXT,
+            thumbnail TEXT,
+            description TEXT,
+            dateOfCreation Date,
+            views INTEGER,
+            links TEXT,
+            maxMembers INTEGER,
             FOREIGN KEY(ownerId) REFERENCES User(ifId)
         )`);
 
@@ -165,11 +166,12 @@ export class Database {
                         id: row.id,
                         name: row.name,
                         ownerId: row.ownerId,
-                        Thumbnail: row.Thumbnail,
-                        Description: row.Description,
-                        DateOfCreation: new Date(row.DateOfCreation),
-                        Views: row.Views,
-                        Links: row.Links
+                        thumbnail: row.thumbnail,
+                        description: row.description,
+                        dateOfCreation: new Date(row.dateOfCreation),
+                        views: row.views,
+                        links: row.links,
+                        maxMembers: row.maxMembers
                     }));
                     resolve(projects);
                 }
