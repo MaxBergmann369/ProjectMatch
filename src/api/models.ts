@@ -4,6 +4,7 @@ export interface User {
     firstname: string;
     lastname: string;
     birthdate: Date;
+    biografie: string;
     permissions: number;
     department: string;
 }

@@ -24,6 +24,7 @@ export class Database {
             firstname TEXT,
             lastname TEXT,
             birthdate Date,
+            biografie TEXT,
             permissions INTEGER
             department TEXT,
         )`);
@@ -126,6 +127,7 @@ export class Database {
                         firstname: row.firstname,
                         lastname: row.lastname,
                         birthdate: new Date(row.birthdate),
+                        biografie: row.biografie,
                         permissions: row.permissions,
                         department: row.department
                     }));
