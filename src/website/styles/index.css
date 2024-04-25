@@ -1,26 +1,25 @@
 @font-face {
-  font-family: 'Carlito';
-  src: url('resources/fonts/Carlito-Regular.ttf') format('truetype');
+  font-family: "Carlito";
+  src: url("../resources/fonts/Carlito-Regular.ttf") format("truetype");
   font-style: normal;
 }
 @font-face {
-  font-family: 'Carlito';
-  src: url('resources/fonts/Carlito-Italic.ttf') format('truetype');
+  font-family: "Carlito";
+  src: url("../resources/fonts/Carlito-Italic.ttf") format("truetype");
   font-style: italic;
 }
 @font-face {
-  font-family: 'Carlito';
-  src: url('resources/fonts/Carlito-Bold.ttf') format('truetype');
+  font-family: "Carlito";
+  src: url("../resources/fonts/Carlito-Bold.ttf") format("truetype");
   font-weight: bold;
 }
 @font-face {
-  font-family: 'Carlito';
-  src: url('resources/fonts/Carlito-BoldItalic.ttf') format('truetype');
+  font-family: "Carlito";
+  src: url("../resources/fonts/Carlito-BoldItalic.ttf") format("truetype");
   font-weight: bold;
   font-style: italic;
 }
-
-:root{
+:root {
   --rounded: 2rem;
 }
 
@@ -29,11 +28,10 @@ body {
   padding: 0;
   background-repeat: no-repeat;
   background-size: 100%;
-  background-image: url("./resources/alternate.jpg");
+  background-image: url("../resources/alternate.jpg");
   color: white;
   background-color: black;
-    font-family: 'Carlito', sans-serif;
-
+  font-family: "Carlito", sans-serif;
 }
 
 .topRow {
@@ -47,7 +45,6 @@ body {
 #nav-title {
   padding-left: 1rem;
 }
-
 
 .topRight {
   display: flex;
@@ -69,17 +66,11 @@ body {
 
 .btn:hover {
   background: white;
-    color: black;
+  color: black;
 }
 
 .btn:active {
   transform: scale(0.95) translateY(0.1rem);
-}
-
-#language {
-}
-
-#logIn {
 }
 
 .center {
@@ -88,16 +79,13 @@ body {
   justify-content: center;
   align-items: center;
   margin-top: 35vh;
-  h1{
-    font-size: 5rem;
-  }
+}
+.center h1 {
+  font-size: 5rem;
 }
 
 .title {
-    font-size: 3rem;
-
+  font-size: 3rem;
 }
 
-#createAcc {
-
-}
+/*# sourceMappingURL=index.css.map */
