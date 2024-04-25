@@ -86,6 +86,8 @@ export class Database {
         db.run(`CREATE TABLE IF NOT EXISTS Ability (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
+            parentId INTEGER,
+            FOREIGN KEY(parentId) REFERENCES Ability(id)
         )`);
 
         db.run(`CREATE TABLE IF NOT EXISTS DirectChat (
@@ -303,7 +305,8 @@ export class Database {
                         } else {
                             const abilities: Ability[] = (rows as any[]).map(row => ({
                                 id: row.id,
-                                name: row.name
+                                name: row.name,
+                                parentId: row.parentId
                             }));
                             resolve(abilities);
                         }
@@ -326,7 +329,8 @@ export class Database {
                         } else {
                             const abilities: Ability[] = (rows as any[]).map(row => ({
                                 id: row.id,
-                                name: row.name
+                                name: row.name,
+                                parentId: row.parentId
                             }));
                             resolve(abilities);
                         }
@@ -340,13 +344,9 @@ export class Database {
 
     //#region InsertDataToDB
 
-    static async addUser(user: User): Promise<boolean> {
-        if(!ValUser.isValid(user)) {
-            return false;
-        }
-
+    static async addUser(ifId: number, username: string, firstname: string, lastname: string, birthdate: Date, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO User (ifId, username, firstname, lastname, birthdate, permissions, department) VALUES (?, ?, ?, ?, ?, ?, ?)`, [user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.permissions, user.department], (err) => {
+            db.run(`INSERT INTO User (ifId, username, firstname, lastname, birthdate, permissions, department) VALUES (?, ?, ?, ?, ?, ?, ?)`, [ifId, username, firstname, lastname, birthdate, permissions, department], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -356,6 +356,264 @@ export class Database {
         });
     }
 
+    static async addProject(name: string, ownerId: number, thumbnail: string, description: string, dateOfCreation: Date, views: number, links: string, maxMembers: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`INSERT INTO Project (name, ownerId, thumbnail, description, dateOfCreation, views, links, maxMembers) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [name, ownerId, thumbnail, description, dateOfCreation, views, links, maxMembers], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async addProjectMember(userId: number, projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`INSERT INTO ProjectMember (userId, projectId) VALUES (?, ?)`, [userId, projectId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async addLike(userId: number, projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`INSERT INTO Like (userId, projectId) VALUES (?, ?)`, [userId, projectId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async addNotification(userId: number, title: string, text: string, date: Date): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`INSERT INTO Notification (userId, title, text, date) VALUES (?, ?, ?, ?)`, [userId, title, text, date], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async addUserAbility(userId: number, abilityId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`INSERT INTO UserAbility (userId, abilityId) VALUES (?, ?)`, [userId, abilityId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`INSERT INTO ProjectAbility (projectId, abilityId) VALUES (?, ?)`, [projectId, abilityId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async addAbility(name: string, parentId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`INSERT INTO Ability (name, parentId) VALUES (?, ?)`, [name, parentId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async addDirectChat(userId: number, otherUserId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`INSERT INTO DirectChat (userId, otherUserId) VALUES (?, ?)`, [userId, otherUserId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async addMessage(chatId: number, userId: number, message: string, date: Date): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`INSERT INTO Message (chatId, userId, message, date) VALUES (?, ?, ?, ?)`, [chatId, userId, message, date], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    //#endregion
+
+    //#region UpdateDataInDB
+
+    static async updateUser(ifId: number, username: string, firstname: string, lastname: string, birthdate: Date, permissions: number, department: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, birthdate = ?, permissions = ?, department = ? WHERE ifId = ?`, [username, firstname, lastname, birthdate, permissions, department, ifId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async updateProject(id: number, name: string, ownerId: number, thumbnail: string, description: string, dateOfCreation: Date, views: number, links: string, maxMembers: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`UPDATE Project SET name = ?, ownerId = ?, thumbnail = ?, description = ?, dateOfCreation = ?, views = ?, links = ?, maxMembers = ? WHERE id = ?`, [name, ownerId, thumbnail, description, dateOfCreation, views, links, maxMembers, id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async updateMessage(id: number, chatId: number, userId: number, message: string, date: Date): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`UPDATE Message SET chatId = ?, userId = ?, message = ?, date = ? WHERE id = ?`, [chatId, userId, message, date, id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+    //#endregion
+
+    //#region DeleteDataFromDB
+
+    static async deleteUser(ifId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM User WHERE ifId = ?`, [ifId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteProject(id: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM Project WHERE id = ?`, [id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteProjectMember(id: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM ProjectMember WHERE id = ?`, [id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteLike(id: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM Like WHERE id = ?`, [id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteMessage(id: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM Message WHERE id = ?`, [id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteDirectChat(id: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM DirectChat WHERE id = ?`, [id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteNotification(id: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM Notification WHERE id = ?`, [id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteUserAbility(userId: number, abilityId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM UserAbility WHERE userId = ? AND abilityId = ?`, [userId, abilityId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM ProjectAbility WHERE projectId = ? AND abilityId = ?`, [projectId, abilityId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
 
     //#endregion
 }
