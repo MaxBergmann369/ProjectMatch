@@ -12,11 +12,12 @@ export interface Project {
     id: number;
     name: string;
     ownerId: number;
-    Thumbnail: string;
-    Description: string;
-    DateOfCreation: Date;
-    Views: number;
-    Links: string;
+    thumbnail: string;
+    description: string;
+    dateOfCreation: Date;
+    views: number;
+    links: string;
+    maxMembers: number;
 }
 
 export interface ProjectMember {
