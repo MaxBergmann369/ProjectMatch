@@ -1,28 +1,54 @@
 import {User} from "./models";
 
 export class ValUser {
-    static isValid(user: User): boolean {
-        if(user.username === undefined || user.username === "" || user.username.length > 20) {
+    static isValid(ifId: string, username: string, firstname: string, lastname: string,
+                   birthdate: Date, biografie: string, permissions: number, department: string): boolean {
+        if(!this.isIFValid(ifId)) {
             return false;
         }
 
-        if(user.firstname === undefined || user.firstname === "" || user.firstname.length > 20) {
+        if(username === undefined || username === "" || username.length > 20 || username.length < 4) {
             return false;
         }
 
-        if(user.lastname === undefined || user.lastname === "" || user.lastname.length > 20) {
+        if(firstname === undefined || firstname === "" || firstname.length > 20 || firstname.length < 1) {
             return false;
         }
 
-        if(user.birthdate === undefined || !this.validateBirthdate(user.birthdate)) {
+        if(lastname === undefined || lastname === "" || lastname.length > 20 || lastname.length < 1) {
             return false;
         }
 
-        if(user.permissions === undefined || user.permissions < 0) {
+        if(birthdate === undefined || !this.validateBirthdate(birthdate)) {
             return false;
         }
 
-        return !this.containsForbiddenWords(user.username, user.firstname, user.lastname);
+        if(permissions === undefined || permissions < 0) {
+            return false;
+        }
+
+        if(department === undefined || department === "" || department.length > 20 || department.length < 1) {
+            return false;
+        }
+
+        return !this.containsForbiddenWords(username, firstname, lastname);
+    }
+
+
+    private static isIFValid(ifId: string): boolean {
+        if(ifId === undefined) {
+            return false;
+        }
+
+        if(ifId.length !== 8) {
+            return false;
+        }
+
+        if(!ifId.startsWith("IF")) {
+            return false;
+        }
+
+        return !isNaN(Number(ifId.substring(2)));
     }
 
     private static containsForbiddenWords(username: string, firstname: string, lastname: string): boolean {

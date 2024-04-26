@@ -17,97 +17,97 @@ const db = new sqlite3.Database('projectMatch.db');
 
 export class Database {
     static createTables() {
-    db.serialize(() => {
-        db.run(`CREATE TABLE IF NOT EXISTS User (
+        db.serialize(() => {
+            db.run(`CREATE TABLE IF NOT EXISTS User (
             ifId TEXT PRIMARY KEY,
             username TEXT,
             firstname TEXT,
             lastname TEXT,
-            birthdate Date,
+            birthdate TEXT,
             biografie TEXT,
-            permissions INTEGER
-            department TEXT,
+            permissions INTEGER,
+            department TEXT
         )`);
 
-        db.run(`CREATE TABLE IF NOT EXISTS Project (
+            db.run(`CREATE TABLE IF NOT EXISTS Project (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             ownerId TEXT,
             thumbnail TEXT,
             description TEXT,
-            dateOfCreation Date,
+            dateOfCreation TEXT,
             views INTEGER,
             links TEXT,
             maxMembers INTEGER,
             FOREIGN KEY(ownerId) REFERENCES User(ifId)
         )`);
 
-        db.run(`CREATE TABLE IF NOT EXISTS ProjectMember (
+            db.run(`CREATE TABLE IF NOT EXISTS ProjectMember (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userId INTEGER,
+            userId TEXT,
             projectId INTEGER,
-            FOREIGN KEY(userId) REFERENCES User(id),
+            FOREIGN KEY(userId) REFERENCES User(ifId),
             FOREIGN KEY(projectId) REFERENCES Project(id)
         )`);
 
-        db.run(`CREATE TABLE IF NOT EXISTS Like (
+            db.run(`CREATE TABLE IF NOT EXISTS Like (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             projectId INTEGER,
-            userId INTEGER,
+            userId TEXT,
             FOREIGN KEY(projectId) REFERENCES Project(id),
             FOREIGN KEY(userId) REFERENCES User(ifId)
         )`);
 
-        db.run(`CREATE TABLE IF NOT EXISTS Notification (
+            db.run(`CREATE TABLE IF NOT EXISTS Notification (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userId INTEGER,
+            userId TEXT,
             title TEXT,
             text TEXT,
-            date Date,
+            date TEXT,
             FOREIGN KEY(userId) REFERENCES User(ifId)
         )`);
 
-        db.run(`CREATE TABLE IF NOT EXISTS UserAbility (
+            db.run(`CREATE TABLE IF NOT EXISTS UserAbility (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userId INTEGER,
+            userId TEXT,
             abilityId INTEGER,
             FOREIGN KEY(userId) REFERENCES User(ifId),
             FOREIGN KEY(abilityId) REFERENCES Ability(id)
         )`);
 
-        db.run(`CREATE TABLE IF NOT EXISTS ProjectAbility (
+            db.run(`CREATE TABLE IF NOT EXISTS ProjectAbility (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             projectId INTEGER,
             abilityId INTEGER,
             FOREIGN KEY(projectId) REFERENCES Project(id),
-            FOREIGN KEY(abilityId) REFERENCES
+            FOREIGN KEY(abilityId) REFERENCES Ability(id)
         )`);
 
-        db.run(`CREATE TABLE IF NOT EXISTS Ability (
+            db.run(`CREATE TABLE IF NOT EXISTS Ability (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             parentId INTEGER,
             FOREIGN KEY(parentId) REFERENCES Ability(id)
         )`);
 
-        db.run(`CREATE TABLE IF NOT EXISTS DirectChat (
+            db.run(`CREATE TABLE IF NOT EXISTS DirectChat (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userId INTEGER,
-            otherUserId INTEGER,
+            userId TEXT,
+            otherUserId TEXT,
             FOREIGN KEY(userId) REFERENCES User(ifId),
             FOREIGN KEY(otherUserId) REFERENCES User(ifId)
         )`);
 
-        db.run(`CREATE TABLE IF NOT EXISTS Message (
+            db.run(`CREATE TABLE IF NOT EXISTS Message (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             chatId INTEGER,
-            userId INTEGER,
+            userId TEXT,
             message TEXT,
-            date Date,
+            date TEXT,
             FOREIGN KEY(chatId) REFERENCES DirectChat(id),
             FOREIGN KEY(userId) REFERENCES User(ifId)
         )`);
-    });
+        });
     }
 
     static initData() {
@@ -139,21 +139,22 @@ export class Database {
         });
     }
 
-    static async getUser(id: number): Promise<User> {
+    static async getUser(ifId: string): Promise<User | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM User WHERE id = ?`, [id], (err, row: unknown) => {
+            db.get(`SELECT * FROM User WHERE ifId = ?`, [ifId], (err, row: any) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const user: User = (row as any).map(row => ({
+                    const user: User = {
                         ifId: row.ifId,
                         username: row.username,
                         firstname: row.firstname,
                         lastname: row.lastname,
                         birthdate: new Date(row.birthdate),
+                        biografie: row.biografie,
                         permissions: row.permissions,
                         department: row.department
-                    }));
+                    };
                     resolve(user);
                 }
             });
@@ -380,9 +381,9 @@ export class Database {
 
     //#region InsertDataToDB
 
-    static async addUser(ifId: number, username: string, firstname: string, lastname: string, birthdate: Date, permissions: number, department: string): Promise<boolean> {
+    static async addUser(ifId: string, username: string, firstname: string, lastname: string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO User (ifId, username, firstname, lastname, birthdate, permissions, department) VALUES (?, ?, ?, ?, ?, ?, ?)`, [ifId, username, firstname, lastname, birthdate, permissions, department], (err) => {
+            db.run(`INSERT INTO User VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [ifId, username, firstname, lastname, birthdate, biografie, permissions, department], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -392,7 +393,7 @@ export class Database {
         });
     }
 
-    static async addProject(name: string, ownerId: number, thumbnail: string, description: string, dateOfCreation: Date, views: number, links: string, maxMembers: number): Promise<boolean> {
+    static async addProject(name: string, ownerId: number, thumbnail: string, description: string, dateOfCreation: string, views: number, links: string, maxMembers: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO Project (name, ownerId, thumbnail, description, dateOfCreation, views, links, maxMembers) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [name, ownerId, thumbnail, description, dateOfCreation, views, links, maxMembers], (err) => {
                 if (err) {
@@ -428,7 +429,7 @@ export class Database {
         });
     }
 
-    static async addNotification(userId: number, title: string, text: string, date: Date): Promise<boolean> {
+    static async addNotification(userId: number, title: string, text: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO Notification (userId, title, text, date) VALUES (?, ?, ?, ?)`, [userId, title, text, date], (err) => {
                 if (err) {
@@ -488,7 +489,7 @@ export class Database {
         });
     }
 
-    static async addMessage(chatId: number, userId: number, message: string, date: Date): Promise<boolean> {
+    static async addMessage(chatId: number, userId: number, message: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO Message (chatId, userId, message, date) VALUES (?, ?, ?, ?)`, [chatId, userId, message, date], (err) => {
                 if (err) {
@@ -504,9 +505,9 @@ export class Database {
 
     //#region UpdateDataInDB
 
-    static async updateUser(ifId: number, username: string, firstname: string, lastname: string, birthdate: Date, permissions: number, department: string): Promise<boolean> {
+    static async updateUser(ifId: string, username: string, firstname: string, lastname: string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, birthdate = ?, permissions = ?, department = ? WHERE ifId = ?`, [username, firstname, lastname, birthdate, permissions, department, ifId], (err) => {
+            db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, birthdate = ?, biografie = ?, permissions = ?, department = ? WHERE ifId = ?`, [username, firstname, lastname, birthdate, biografie, permissions, department, ifId], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -516,7 +517,7 @@ export class Database {
         });
     }
 
-    static async updateProject(id: number, name: string, ownerId: number, thumbnail: string, description: string, dateOfCreation: Date, views: number, links: string, maxMembers: number): Promise<boolean> {
+    static async updateProject(id: number, name: string, ownerId: number, thumbnail: string, description: string, dateOfCreation: string, views: number, links: string, maxMembers: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`UPDATE Project SET name = ?, ownerId = ?, thumbnail = ?, description = ?, dateOfCreation = ?, views = ?, links = ?, maxMembers = ? WHERE id = ?`, [name, ownerId, thumbnail, description, dateOfCreation, views, links, maxMembers, id], (err) => {
                 if (err) {
@@ -528,7 +529,7 @@ export class Database {
         });
     }
 
-    static async updateMessage(id: number, chatId: number, userId: number, message: string, date: Date): Promise<boolean> {
+    static async updateMessage(id: number, chatId: number, userId: number, message: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`UPDATE Message SET chatId = ?, userId = ?, message = ?, date = ? WHERE id = ?`, [chatId, userId, message, date, id], (err) => {
                 if (err) {
@@ -543,7 +544,7 @@ export class Database {
 
     //#region DeleteDataFromDB
 
-    static async deleteUser(ifId: number): Promise<boolean> {
+    static async deleteUser(ifId: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`DELETE FROM User WHERE ifId = ?`, [ifId], (err) => {
                 if (err) {
