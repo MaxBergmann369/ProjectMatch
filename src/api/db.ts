@@ -609,7 +609,7 @@ export class Database {
                     const successViews = await this.deleteViewsByUserId(ifId);
                     const successLikes = await this.deleteLikesByUserId(ifId);
                     const successNotifications = await this.deleteNotificationsByUserId(ifId);
-                    const successDirectChats = await this.deleteDirectChatsByUserId(ifId); // Added this line
+                    const successDirectChats = await this.deleteDirectChatsByUserId(ifId);
 
                     if (successAbilities && successProjects && successViews && successLikes && successNotifications && successDirectChats) {
                         db.run(`DELETE FROM User WHERE ifId = ?`, [ifId], (deleteErr) => {

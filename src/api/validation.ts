@@ -36,15 +36,7 @@ export class ValUser {
 
 
     private static isIFValid(ifId: string): boolean {
-        if(ifId === undefined) {
-            return false;
-        }
-
-        if(ifId.length !== 8) {
-            return false;
-        }
-
-        if(!ifId.startsWith("IF")) {
+        if(ifId === undefined || ifId.length !== 8 || !ifId.startsWith("IF")) {
             return false;
         }
 
@@ -55,11 +47,11 @@ export class ValUser {
         //TODO: Add more forbidden words from file
         let forbiddenWords: string[] = ["admin", "moderator", "user", "root", "guest", "login", "register", "password", "username", "firstname", "lastname", "email", "birthdate", "permissions"];
 
-        return forbiddenWords.some(word => username.includes(word)) || forbiddenWords.some(word => firstname.includes(word)) || forbiddenWords.some(word => lastname.includes(word));
+        return forbiddenWords.some(word => username.toLowerCase().includes(word)) || forbiddenWords.some(word => firstname.toLowerCase().includes(word)) || forbiddenWords.some(word => lastname.toLowerCase().includes(word));
     }
 
     private static validateBirthdate(birthdate: Date): boolean {
-        if (birthdate === undefined) {
+        if (birthdate === undefined || birthdate === null || birthdate.getFullYear() < new Date().getFullYear() - 100 || birthdate.getFullYear() > new Date().getFullYear() - 10){
             return false;
         }
 

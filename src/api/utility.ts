@@ -59,6 +59,5 @@ export class Utility {
         }
     }
 
-
     /* end region User */
 }
