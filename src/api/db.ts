@@ -608,9 +608,10 @@ export class Database {
                     const successProjects = await this.deleteProjectMembersByUserId(ifId);
                     const successViews = await this.deleteViewsByUserId(ifId);
                     const successLikes = await this.deleteLikesByUserId(ifId);
-                    const successNotifications = await this.deleteNotificationsByUserId(ifId); // Added this line
+                    const successNotifications = await this.deleteNotificationsByUserId(ifId);
+                    const successDirectChats = await this.deleteDirectChatsByUserId(ifId); // Added this line
 
-                    if (successAbilities && successProjects && successViews && successLikes && successNotifications) {
+                    if (successAbilities && successProjects && successViews && successLikes && successNotifications && successDirectChats) {
                         db.run(`DELETE FROM User WHERE ifId = ?`, [ifId], (deleteErr) => {
                             if (deleteErr) {
                                 db.run("ROLLBACK", rollbackErr => {
@@ -647,6 +648,18 @@ export class Database {
                             reject(error);
                         }
                     });
+                }
+            });
+        });
+    }
+
+    static async deleteDirectChatsByUserId(userId: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM DirectChat WHERE userId = ?`, [userId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
                 }
             });
         });
@@ -854,7 +867,60 @@ export class Database {
 
     static async deleteDirectChat(id: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`DELETE FROM DirectChat WHERE id = ?`, [id], (err) => {
+            db.run("BEGIN TRANSACTION", async (beginErr) => {
+                if (beginErr) {
+                    reject(beginErr);
+                    return;
+                }
+
+                try {
+                    const successMessages = await this.deleteMessagesByChatId(id);
+
+                    if (successMessages) {
+                        db.run(`DELETE FROM DirectChat WHERE id = ?`, [id], (deleteErr) => {
+                            if (deleteErr) {
+                                db.run("ROLLBACK", rollbackErr => {
+                                    if (rollbackErr) {
+                                        reject(rollbackErr);
+                                    } else {
+                                        resolve(false);
+                                    }
+                                });
+                            } else {
+                                db.run("COMMIT", commitErr => {
+                                    if (commitErr) {
+                                        reject(commitErr);
+                                    } else {
+                                        resolve(true);
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        db.run("ROLLBACK", rollbackErr => {
+                            if (rollbackErr) {
+                                reject(rollbackErr);
+                            } else {
+                                resolve(false);
+                            }
+                        });
+                    }
+                } catch (error) {
+                    db.run("ROLLBACK", rollbackErr => {
+                        if (rollbackErr) {
+                            reject(rollbackErr);
+                        } else {
+                            reject(error);
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    static async deleteMessagesByChatId(chatId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM Message WHERE chatId = ?`, [chatId], (err) => {
                 if (err) {
                     reject(err);
                 } else {
