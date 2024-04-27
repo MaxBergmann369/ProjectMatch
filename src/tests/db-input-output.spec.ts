@@ -19,9 +19,13 @@ describe('database-test-user', () => {
     }
 
     test('add-user-invalid-ifId', async() => {
-        await Utility.addUser('12345678', user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        const success = await Utility.addUser('12345678', user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        expect(success).toBeFalsy();
+
         let dbUser: User | null = await Utility.getUser('12345678');
         expect(dbUser).toBeNull();
+
+        await Utility.deleteUser('12345678');
 
         await Utility.addUser('IF12345', user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
         dbUser = await Utility.getUser('IF12345');

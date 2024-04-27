@@ -4,6 +4,7 @@ import {
     Ability,
     ProjectAbility,
     Project,
+    View,
     Like,
     UserAbility,
     Message,
@@ -36,7 +37,6 @@ export class Database {
             thumbnail TEXT,
             description TEXT,
             dateOfCreation TEXT,
-            views INTEGER,
             links TEXT,
             maxMembers INTEGER,
             FOREIGN KEY(ownerId) REFERENCES User(ifId)
@@ -51,6 +51,14 @@ export class Database {
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS Like (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            projectId INTEGER,
+            userId TEXT,
+            FOREIGN KEY(projectId) REFERENCES Project(id),
+            FOREIGN KEY(userId) REFERENCES User(ifId)
+        )`);
+
+            db.run(`CREATE TABLE IF NOT EXISTS View (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             projectId INTEGER,
             userId TEXT,
@@ -144,6 +152,8 @@ export class Database {
             db.get(`SELECT * FROM User WHERE ifId = ?`, [ifId], (err, row: any) => {
                 if (err) {
                     reject(err);
+                } else if (!row) {
+                    resolve(null);
                 } else {
                     const user: User = {
                         ifId: row.ifId,
@@ -174,7 +184,6 @@ export class Database {
                         thumbnail: row.thumbnail,
                         description: row.description,
                         dateOfCreation: new Date(row.dateOfCreation),
-                        views: row.views,
                         links: row.links,
                         maxMembers: row.maxMembers
                     }));
@@ -184,21 +193,22 @@ export class Database {
         });
     }
 
-    static async getProject(id: number): Promise<Project> {
+    static async getProject(id: number): Promise<Project | null> {
         return new Promise((resolve, reject) => {
             db.get(`SELECT * FROM Project WHERE id = ?`, [id], (err, row: unknown) => {
                 if (err) {
                     reject(err);
+                } else if (!row) {
+                    resolve(null);
                 } else {
                     const project: Project = (row as any).map(row => ({
                         id: row.id,
                         name: row.name,
                         ownerId: row.ownerId,
-                        Thumbnail: row.Thumbnail,
-                        Description: row.Description,
-                        DateOfCreation: new Date(row.DateOfCreation),
-                        Views: row.Views,
-                        Links: row.Links
+                        thumbnail: row.thumbnail,
+                        description: row.description,
+                        dateOfCreation: new Date(row.DateOfCreation),
+                        links: row.Links
                     }));
                     resolve(project);
                 }
@@ -235,6 +245,35 @@ export class Database {
                         userId: row.userId
                     }));
                     resolve(projectMembers);
+                }
+            });
+        });
+    }
+
+    static async getViewsByUserId(userId: number): Promise<View[]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM View WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const views: View[] = (rows as any[]).map(row => ({
+                        id: row.id,
+                        projectId: row.projectId,
+                        userId: row.userId
+                    }));
+                    resolve(views);
+                }
+            });
+        });
+    }
+
+    static async getViewCount(projectId: number): Promise<number> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT COUNT(*) FROM View WHERE projectId = ?`, [projectId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row['COUNT(*)']);
                 }
             });
         });
@@ -393,9 +432,9 @@ export class Database {
         });
     }
 
-    static async addProject(name: string, ownerId: number, thumbnail: string, description: string, dateOfCreation: string, views: number, links: string, maxMembers: number): Promise<boolean> {
+    static async addProject(name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: string, links: string, maxMembers: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Project (name, ownerId, thumbnail, description, dateOfCreation, views, links, maxMembers) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [name, ownerId, thumbnail, description, dateOfCreation, views, links, maxMembers], (err) => {
+            db.run(`INSERT INTO Project (name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers) VALUES (?, ?, ?, ?, ?, ?, ?)`, [name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -405,7 +444,7 @@ export class Database {
         });
     }
 
-    static async addProjectMember(userId: number, projectId: number): Promise<boolean> {
+    static async addProjectMember(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO ProjectMember (userId, projectId) VALUES (?, ?)`, [userId, projectId], (err) => {
                 if (err) {
@@ -417,7 +456,19 @@ export class Database {
         });
     }
 
-    static async addLike(userId: number, projectId: number): Promise<boolean> {
+    static async addView(userId: string, projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`INSERT INTO View (userId, projectId) VALUES (?, ?)`, [userId, projectId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async addLike(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO Like (userId, projectId) VALUES (?, ?)`, [userId, projectId], (err) => {
                 if (err) {
@@ -429,7 +480,7 @@ export class Database {
         });
     }
 
-    static async addNotification(userId: number, title: string, text: string, date: string): Promise<boolean> {
+    static async addNotification(userId: string, title: string, text: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO Notification (userId, title, text, date) VALUES (?, ?, ?, ?)`, [userId, title, text, date], (err) => {
                 if (err) {
@@ -441,7 +492,7 @@ export class Database {
         });
     }
 
-    static async addUserAbility(userId: number, abilityId: number): Promise<boolean> {
+    static async addUserAbility(userId: string, abilityId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO UserAbility (userId, abilityId) VALUES (?, ?)`, [userId, abilityId], (err) => {
                 if (err) {
@@ -477,7 +528,7 @@ export class Database {
         });
     }
 
-    static async addDirectChat(userId: number, otherUserId: number): Promise<boolean> {
+    static async addDirectChat(userId: string, otherUserId: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO DirectChat (userId, otherUserId) VALUES (?, ?)`, [userId, otherUserId], (err) => {
                 if (err) {
@@ -489,7 +540,7 @@ export class Database {
         });
     }
 
-    static async addMessage(chatId: number, userId: number, message: string, date: string): Promise<boolean> {
+    static async addMessage(chatId: number, userId: string, message: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO Message (chatId, userId, message, date) VALUES (?, ?, ?, ?)`, [chatId, userId, message, date], (err) => {
                 if (err) {
@@ -517,9 +568,9 @@ export class Database {
         });
     }
 
-    static async updateProject(id: number, name: string, ownerId: number, thumbnail: string, description: string, dateOfCreation: string, views: number, links: string, maxMembers: number): Promise<boolean> {
+    static async updateProject(id: number, name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: string, links: string, maxMembers: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`UPDATE Project SET name = ?, ownerId = ?, thumbnail = ?, description = ?, dateOfCreation = ?, views = ?, links = ?, maxMembers = ? WHERE id = ?`, [name, ownerId, thumbnail, description, dateOfCreation, views, links, maxMembers, id], (err) => {
+            db.run(`UPDATE Project SET name = ?, ownerId = ?, thumbnail = ?, description = ?, dateOfCreation = ?, links = ?, maxMembers = ? WHERE id = ?`, [name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers, id], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -529,7 +580,7 @@ export class Database {
         });
     }
 
-    static async updateMessage(id: number, chatId: number, userId: number, message: string, date: string): Promise<boolean> {
+    static async updateMessage(id: number, chatId: number, userId: string, message: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`UPDATE Message SET chatId = ?, userId = ?, message = ?, date = ? WHERE id = ?`, [chatId, userId, message, date, id], (err) => {
                 if (err) {
@@ -546,7 +597,112 @@ export class Database {
 
     static async deleteUser(ifId: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`DELETE FROM User WHERE ifId = ?`, [ifId], (err) => {
+            db.run("BEGIN TRANSACTION", async (beginErr) => {
+                if (beginErr) {
+                    reject(beginErr);
+                    return;
+                }
+
+                try {
+                    const successAbilities = await this.deleteUserAbilitiesByUserId(ifId);
+                    const successProjects = await this.deleteProjectMembersByUserId(ifId);
+                    const successViews = await this.deleteViewsByUserId(ifId);
+                    const successLikes = await this.deleteLikesByUserId(ifId);
+                    const successNotifications = await this.deleteNotificationsByUserId(ifId); // Added this line
+
+                    if (successAbilities && successProjects && successViews && successLikes && successNotifications) {
+                        db.run(`DELETE FROM User WHERE ifId = ?`, [ifId], (deleteErr) => {
+                            if (deleteErr) {
+                                db.run("ROLLBACK", rollbackErr => {
+                                    if (rollbackErr) {
+                                        reject(rollbackErr);
+                                    } else {
+                                        resolve(false);
+                                    }
+                                });
+                            } else {
+                                db.run("COMMIT", commitErr => {
+                                    if (commitErr) {
+                                        reject(commitErr);
+                                    } else {
+                                        resolve(true);
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        db.run("ROLLBACK", rollbackErr => {
+                            if (rollbackErr) {
+                                reject(rollbackErr);
+                            } else {
+                                resolve(false);
+                            }
+                        });
+                    }
+                } catch (error) {
+                    db.run("ROLLBACK", rollbackErr => {
+                        if (rollbackErr) {
+                            reject(rollbackErr);
+                        } else {
+                            reject(error);
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    static async deleteNotificationsByUserId(userId: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM Notification WHERE userId = ?`, [userId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteUserAbilitiesByUserId(userId: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM UserAbility WHERE userId = ?`, [userId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteProjectMembersByUserId(userId: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM ProjectMember WHERE userId = ?`, [userId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteViewsByUserId(userId: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM View WHERE userId = ?`, [userId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteLikesByUserId(userId: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM Like WHERE userId = ?`, [userId], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -558,7 +714,99 @@ export class Database {
 
     static async deleteProject(id: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`DELETE FROM Project WHERE id = ?`, [id], (err) => {
+            db.run("BEGIN TRANSACTION", async (beginErr) => {
+                if (beginErr) {
+                    reject(beginErr);
+                    return;
+                }
+
+                try {
+                    const successMembers = await this.deleteProjectMembersByProjectId(id);
+                    const successViews = await this.deleteViewsByProjectId(id);
+                    const successLikes = await this.deleteLikesByProjectId(id);
+                    const successAbilities = await this.deleteProjectAbilitiesByProjectId(id);
+
+                    if (successMembers && successViews && successLikes && successAbilities) {
+                        db.run(`DELETE FROM Project WHERE id = ?`, [id], (deleteErr) => {
+                            if (deleteErr) {
+                                db.run("ROLLBACK", rollbackErr => {
+                                    if (rollbackErr) {
+                                        reject(rollbackErr);
+                                    } else {
+                                        resolve(false);
+                                    }
+                                });
+                            } else {
+                                db.run("COMMIT", commitErr => {
+                                    if (commitErr) {
+                                        reject(commitErr);
+                                    } else {
+                                        resolve(true);
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        db.run("ROLLBACK", rollbackErr => {
+                            if (rollbackErr) {
+                                reject(rollbackErr);
+                            } else {
+                                resolve(false);
+                            }
+                        });
+                    }
+                } catch (error) {
+                    db.run("ROLLBACK", rollbackErr => {
+                        if (rollbackErr) {
+                            reject(rollbackErr);
+                        } else {
+                            reject(error);
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    static async deleteProjectMembersByProjectId(projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM ProjectMember WHERE projectId = ?`, [projectId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteViewsByProjectId(projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM View WHERE projectId = ?`, [projectId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteLikesByProjectId(projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM Like WHERE projectId = ?`, [projectId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async deleteProjectAbilitiesByProjectId(projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`DELETE FROM ProjectAbility WHERE projectId = ?`, [projectId], (err) => {
                 if (err) {
                     reject(err);
                 } else {

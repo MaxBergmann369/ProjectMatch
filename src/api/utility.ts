@@ -22,9 +22,12 @@ export class Utility {
 
     static async getUser(ifId: string): Promise<User | null> {
         try {
-            return await Database.getUser(ifId);
-        }
-        catch (e) {
+            const user = await Database.getUser(ifId);
+            if (!user) {
+                return null;
+            }
+            return user;
+        } catch (e) {
             return null;
         }
     }

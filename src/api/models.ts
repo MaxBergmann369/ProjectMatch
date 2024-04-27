@@ -12,11 +12,10 @@ export interface User {
 export interface Project {
     id: number;
     name: string;
-    ownerId: number;
+    ownerId: string;
     thumbnail: string;
     description: string;
     dateOfCreation: Date;
-    views: number;
     links: string;
     maxMembers: number;
 }
@@ -24,18 +23,24 @@ export interface Project {
 export interface ProjectMember {
     id: number;
     projectId: number;
-    userId: number;
+    userId: string;
+}
+
+export interface View {
+    id: number;
+    projectId: number;
+    userId: string;
 }
 
 export interface Like {
     id: number;
     projectId: number;
-    userId: number;
+    userId: string;
 }
 
 export interface Notification {
     id: number;
-    userId: number;
+    userId: string;
     title: string;
     text: string;
     date: Date;
@@ -43,7 +48,7 @@ export interface Notification {
 
 export interface UserAbility {
     id: number;
-    userId: number;
+    userId: string;
     abilityId: number;
 }
 
@@ -61,14 +66,14 @@ export interface Ability {
 
 export interface DirectChat {
     id: number;
-    userId: number;
+    userId: string;
     otherUserId: number;
 }
 
 export interface Message {
     id: number;
     chatId: number;
-    userId: number;
+    userId: string;
     message: string;
     date: Date;
 }
