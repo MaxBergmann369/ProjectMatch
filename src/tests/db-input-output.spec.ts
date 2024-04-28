@@ -1,5 +1,5 @@
 import {Utility} from "../api/utility";
-import {User} from "../api/models";
+import {Project, User} from "../api/models";
 
 describe('database-test-user', () => {
 
@@ -19,6 +19,7 @@ describe('database-test-user', () => {
         department: "Informatik"
     }
 
+    /* region addUser */
     // Test cases for ifId
     test('add-user-invalid-ifId', async() => {
         const success = await Utility.addUser('12345678', user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
@@ -171,13 +172,340 @@ describe('database-test-user', () => {
         users = await Utility.getUsers();
         expect(users.length).toBe(0);
     });
+
+    /* endregion */
+
+    /* region updateUser */
+
+    test('update-user-invalid-ifId', async() => {
+        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
+        let dbUser: User | null = await Utility.getUser(ifId);
+
+        expect(dbUser).not.toBeNull();
+
+        const updatedUser: User = {
+            ifId: 'IF12345',
+            username: "test1234",
+            firstname: "Maximilian",
+            lastname: "Muster",
+            birthdate: new Date(date.toDateString()),
+            biografie: "Test",
+            permissions: 1,
+            department: "Informatik"
+        }
+
+        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+
+        expect(success).toBeFalsy();
+
+        dbUser = await Utility.getUser(ifId);
+
+        expect(user).toEqual(dbUser);
+
+        await Utility.deleteUser(user.ifId);
+        await Utility.deleteUser(updatedUser.ifId);
+    });
+
+    test('update-user-invalid-username', async() => {
+        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
+        let dbUser: User | null = await Utility.getUser(ifId);
+
+        expect(dbUser).not.toBeNull();
+
+        const updatedUser: User = {
+            ifId: ifId,
+            username: "usr",
+            firstname: "Maximilian",
+            lastname: "Muster",
+            birthdate: new Date(date.toDateString()),
+            biografie: "Test",
+            permissions: 1,
+            department: "Informatik"
+        }
+
+        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+
+        expect(success).toBeFalsy();
+
+        dbUser = await Utility.getUser(ifId);
+
+        expect(user).toEqual(dbUser);
+
+        await Utility.deleteUser(user.ifId);
+        await Utility.deleteUser(updatedUser.ifId);
+    });
+
+    test('update-user-invalid-firstname', async() => {
+        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
+        let dbUser: User | null = await Utility.getUser(ifId);
+
+        expect(dbUser).not.toBeNull();
+
+        const updatedUser: User = {
+            ifId: ifId,
+            username: "test1234",
+            firstname: "",
+            lastname: "Muster",
+            birthdate: new Date(date.toDateString()),
+            biografie: "Test",
+            permissions: 1,
+            department: "Informatik"
+        }
+
+        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+
+        expect(success).toBeFalsy();
+
+        dbUser = await Utility.getUser(ifId);
+
+        expect(user).toEqual(dbUser);
+
+        await Utility.deleteUser(user.ifId);
+        await Utility.deleteUser(updatedUser.ifId);
+    });
+
+    test('update-user-invalid-lastname', async() => {
+        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
+        let dbUser: User | null = await Utility.getUser(ifId);
+
+        expect(dbUser).not.toBeNull();
+
+        const updatedUser: User = {
+            ifId: ifId,
+            username: "test1234",
+            firstname: "Maximilian",
+            lastname: "",
+            birthdate: new Date(date.toDateString()),
+            biografie: "Test",
+            permissions: 1,
+            department: "Informatik"
+        }
+
+        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+
+        expect(success).toBeFalsy();
+
+        dbUser = await Utility.getUser(ifId);
+
+        expect(user).toEqual(dbUser);
+
+        await Utility.deleteUser(user.ifId);
+        await Utility.deleteUser(updatedUser.ifId);
+    });
+
+    test('update-user-invalid-birthdate', async() => {
+        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
+        let dbUser: User | null = await Utility.getUser(ifId);
+
+        expect(dbUser).not.toBeNull();
+
+        const updatedUser: User = {
+            ifId: ifId,
+            username: "test1234",
+            firstname: "Maximilian",
+            lastname: "Muster",
+            birthdate: null,
+            biografie: "Test",
+            permissions: 1,
+            department: "Informatik"
+        }
+
+        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+
+        expect(success).toBeFalsy();
+
+        dbUser = await Utility.getUser(ifId);
+
+        expect(user).toEqual(dbUser);
+
+        await Utility.deleteUser(user.ifId);
+        await Utility.deleteUser(updatedUser.ifId);
+    });
+
+    test('update-user-invalid-permissions', async() => {
+        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
+        let dbUser: User | null = await Utility.getUser(ifId);
+
+        expect(dbUser).not.toBeNull();
+
+        const updatedUser: User = {
+            ifId: ifId,
+            username: "test1234",
+            firstname: "Maximilian",
+            lastname: "Muster",
+            birthdate: new Date(date.toDateString()),
+            biografie: "Test",
+            permissions: -1,
+            department: "Informatik"
+        }
+
+        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+
+        expect(success).toBeFalsy();
+
+        dbUser = await Utility.getUser(ifId);
+
+        expect(user).toEqual(dbUser);
+
+        await Utility.deleteUser(user.ifId);
+        await Utility.deleteUser(updatedUser.ifId);
+    });
+
+    test('update-user-invalid-department', async() => {
+        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
+        let dbUser: User | null = await Utility.getUser(ifId);
+
+        expect(dbUser).not.toBeNull();
+
+        const updatedUser: User = {
+            ifId: ifId,
+            username: "test1234",
+            firstname: "Maximilian",
+            lastname: "Muster",
+            birthdate: new Date(date.toDateString()),
+            biografie: "Test",
+            permissions: 1,
+            department: ""
+        }
+
+        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+
+        expect(success).toBeFalsy();
+
+        dbUser = await Utility.getUser(ifId);
+
+        expect(user).toEqual(dbUser);
+
+        await Utility.deleteUser(user.ifId);
+        await Utility.deleteUser(updatedUser.ifId);
+    });
+
+    test('update-user-valid', async() => {
+        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
+        let dbUser: User | null = await Utility.getUser(ifId);
+
+        expect(dbUser).not.toBeNull();
+
+        const updatedUser: User = {
+            ifId: ifId,
+            username: "test1234",
+            firstname: "Maximilian",
+            lastname: "Muster",
+            birthdate: new Date(date.toDateString()),
+            biografie: "Test",
+            permissions: 1,
+            department: "Informatik"
+        }
+
+        await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+
+        dbUser = await Utility.getUser(ifId);
+
+        expect(updatedUser).toEqual(dbUser);
+
+        await Utility.deleteUser(user.ifId);
+        await Utility.deleteUser(updatedUser.ifId);
+    });
+
+    /* endregion */
+
+    /* region addUserAbility */
+
+    test('add-user-ability-invalid-ifId', async() => {
+        const success = await Utility.addUserAbility('12345678', 1);
+        expect(success).toBeFalsy();
+    });
+
+    test('add-user-ability-invalid-abilityId', async() => {
+        const success = await Utility.addUserAbility(ifId, -1);
+        expect(success).toBeFalsy();
+    });
+
+    test('add-user-ability-valid', async() => {
+        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
+        let dbUser: User | null = await Utility.getUser(ifId);
+
+        expect(dbUser).not.toBeNull();
+
+        const success = await Utility.addUserAbility(ifId, 1);
+
+        expect(success).toBeTruthy();
+
+        await Utility.deleteUser(ifId);
+    });
+
+    /* endregion */
 });
 
+describe('database-test-project', () => {
+    const ifId: string = 'IF210053';
+    const project: Project = {
+        id: null,
+        name: 'test',
+        ownerId: ifId,
+        thumbnail: '',
+        description: '',
+        dateOfCreation: null,
+        links: 'https://www.google.com;https://www.youtube.com',
+        maxMembers: 5
+    }
+
+    test('add-project-invalid-name', async() => {
+        // Invalid name: empty
+        const success1 = await Utility.addProject('', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success1).toBeFalsy();
+
+        // Invalid name: length > 20
+        const success2 = await Utility.addProject('verylongprojectname1234567890', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success2).toBeFalsy();
+    });
+
+    test('add-project-invalid-ownerId', async() => {
+        // Invalid ownerId: empty
+        const success1 = await Utility.addProject(project.name, '', project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success1).toBeFalsy();
+
+        // Invalid ownerId: length < 8
+        const success2 = await Utility.addProject(project.name, 'IF12345', project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success2).toBeFalsy();
+
+        // Invalid ownerId: length > 8
+        const success3 = await Utility.addProject(project.name, 'IF1234567', project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success3).toBeFalsy();
+    });
+
+    test('add-project-invalid-thumbnail', async() => {
+        // Invalid thumbnail: length > 255
+        const success1 = await Utility.addProject(project.name, project.ownerId, 'verylongthumbnail1234567890'.repeat(25), project.description, project.links, project.maxMembers);
+        expect(success1).toBeFalsy();
+
+    });
+});
+
+/* region Help-Functions */
 async function deleteUser(ifId: string) {
     const dbUser: User | null = await Utility.getUser(ifId);
-    const success = await Utility.deleteUser(ifId);
-
-    expect(success).toBeTruthy();
+    await Utility.deleteUser(ifId);
 
     expect(dbUser).toBeNull();
 }
+
+async function deleteProject(id: number, ownerId: string) {
+    const dbProject: Project | null = await Utility.getProject(id);
+    const success = await Utility.deleteProject(id);
+
+    expect(success).toBeTruthy();
+
+    expect(dbProject).toBeNull();
+}
+
+/* endregion */

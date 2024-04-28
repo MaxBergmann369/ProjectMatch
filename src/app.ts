@@ -15,6 +15,7 @@ const server = http.createServer(app);
 const port: number = 3000;
 
 Database.createTables();
+Database.initData();
 
 server.listen(port, () => {
     console.log(`Server listening on port ${port}`);

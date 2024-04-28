@@ -35,7 +35,7 @@ export class ValUser {
     }
 
 
-    private static isIFValid(ifId: string): boolean {
+    static isIFValid(ifId: string): boolean {
         if(ifId === undefined || ifId.length !== 8 || !ifId.startsWith("IF")) {
             return false;
         }
@@ -56,5 +56,44 @@ export class ValUser {
         }
 
         return !isNaN(birthdate.getTime());
+    }
+}
+
+export class ValProject {
+    static isValid(name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: Date, links: string, maxMembers: number): boolean {
+
+        if(name === undefined || name === "" || name.length > 30 || name.length < 1) {
+            return false;
+        }
+
+        if(ValUser.isIFValid(ownerId)){
+            return false;
+        }
+
+        if(thumbnail === undefined || thumbnail === "" || thumbnail.length > 20 || thumbnail.length < 1) {
+            return false;
+        }
+
+        if(description === undefined || description === "" || description.length > 1000 || description.length < 1) {
+            return false;
+        }
+
+        if(dateOfCreation === undefined || !this.validateDate(dateOfCreation)) {
+            return false;
+        }
+
+        if(links.length > 1000 || links.length < 0) {
+            return false;
+        }
+
+        return !(maxMembers === undefined || maxMembers < 1);
+    }
+
+    private static validateDate(date: Date): boolean {
+        if (date === undefined || date === null || date.getFullYear() < 2000 || date.getFullYear() > new Date().getFullYear()){
+            return false;
+        }
+
+        return !isNaN(date.getTime());
     }
 }

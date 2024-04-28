@@ -21,97 +21,97 @@ export class Database {
         db.serialize(() => {
             db.run(`CREATE TABLE IF NOT EXISTS User (
             ifId TEXT PRIMARY KEY,
-            username TEXT,
-            firstname TEXT,
-            lastname TEXT,
-            birthdate TEXT,
+            username TEXT NOT NULL,
+            firstname TEXT NOT NULL,
+            lastname TEXT NOT NULL,
+            birthdate TEXT NOT NULL,
             biografie TEXT,
-            permissions INTEGER,
-            department TEXT
+            permissions INTEGER NOT NULL,
+            department TEXT NOT NULL
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS Project (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            ownerId TEXT,
-            thumbnail TEXT,
+            name TEXT NOT NULL,
+            ownerId TEXT NOT NULL,
+            thumbnail TEXT NOT NULL,
             description TEXT,
-            dateOfCreation TEXT,
+            dateOfCreation TEXT NOT NULL,
             links TEXT,
-            maxMembers INTEGER,
+            maxMembers INTEGER NOT NULL,
             FOREIGN KEY(ownerId) REFERENCES User(ifId)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS ProjectMember (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userId TEXT,
-            projectId INTEGER,
+            userId TEXT NOT NULL,
+            projectId INTEGER NOT NULL,
             FOREIGN KEY(userId) REFERENCES User(ifId),
             FOREIGN KEY(projectId) REFERENCES Project(id)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS Like (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            projectId INTEGER,
-            userId TEXT,
+            projectId INTEGER NOT NULL,
+            userId TEXT NOT NULL,
             FOREIGN KEY(projectId) REFERENCES Project(id),
             FOREIGN KEY(userId) REFERENCES User(ifId)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS View (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            projectId INTEGER,
-            userId TEXT,
+            projectId INTEGER NOT NULL,
+            userId TEXT NOT NULL,
             FOREIGN KEY(projectId) REFERENCES Project(id),
             FOREIGN KEY(userId) REFERENCES User(ifId)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS Notification (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userId TEXT,
-            title TEXT,
-            text TEXT,
-            date TEXT,
+            userId TEXT NOT NULL,
+            title TEXT NOT NULL,
+            text TEXT NOT NULL,
+            date TEXT NOT NULL,
             FOREIGN KEY(userId) REFERENCES User(ifId)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS UserAbility (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userId TEXT,
-            abilityId INTEGER,
+            userId TEXT NOT NULL,
+            abilityId INTEGER NOT NULL,
             FOREIGN KEY(userId) REFERENCES User(ifId),
             FOREIGN KEY(abilityId) REFERENCES Ability(id)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS ProjectAbility (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            projectId INTEGER,
-            abilityId INTEGER,
+            projectId INTEGER NOT NULL,
+            abilityId INTEGER NOT NULL,
             FOREIGN KEY(projectId) REFERENCES Project(id),
             FOREIGN KEY(abilityId) REFERENCES Ability(id)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS Ability (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
+            name TEXT NOT NULL,
             parentId INTEGER,
-            FOREIGN KEY(parentId) REFERENCES Ability(id)
+            FOREIGN KEY(parentId) REFERENCES Ability(id) ON DELETE SET NULL
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS DirectChat (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userId TEXT,
-            otherUserId TEXT,
+            userId TEXT NOT NULL,
+            otherUserId TEXT NOT NULL,
             FOREIGN KEY(userId) REFERENCES User(ifId),
             FOREIGN KEY(otherUserId) REFERENCES User(ifId)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS Message (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            chatId INTEGER,
-            userId TEXT,
-            message TEXT,
-            date TEXT,
+            chatId INTEGER NOT NULL,
+            userId TEXT NOT NULL,
+            message TEXT NOT NULL,
+            date TEXT NOT NULL,
             FOREIGN KEY(chatId) REFERENCES DirectChat(id),
             FOREIGN KEY(userId) REFERENCES User(ifId)
         )`);
@@ -119,8 +119,102 @@ export class Database {
     }
 
     static initData() {
-        //admin account
+        db.serialize(() => {
+            //add Abilities
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Programming", NULL)`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Design", NULL)`);
 
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Java", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("C#", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Python", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("HTML", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("CSS", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("JavaScript", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("TypeScript", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("SQL", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("C++", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("C", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Ruby", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("PHP", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Kotlin", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Go", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Assembly", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Rust", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("F#", (SELECT id FROM Ability WHERE name = "Programming"))`);
+
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Photoshop", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Illustrator", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Gimp", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("After Effects", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Premiere Pro", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Video-Editing", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("3D-Design", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("2D-Design", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("UI/UX", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Web-Design", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Logo-Design", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Animation", (SELECT id FROM Ability WHERE name = "Design"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Character-Design", (SELECT id FROM Ability WHERE name = "Design"))`);
+
+            // Java
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Spring", (SELECT id FROM Ability WHERE name = "Java"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Selenium", (SELECT id FROM Ability WHERE name = "Java"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("JavaFX", (SELECT id FROM Ability WHERE name = "Java"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("JavaEE", (SELECT id FROM Ability WHERE name = "Java"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("JavaSE", (SELECT id FROM Ability WHERE name = "Java"))`);
+
+            // C#
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("ASP.NET", (SELECT id FROM Ability WHERE name = "C#"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("ASP.NET Core", (SELECT id FROM Ability WHERE name = "C#"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Unity", (SELECT id FROM Ability WHERE name = "C#"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("WPF", (SELECT id FROM Ability WHERE name = "C#"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("UWP", (SELECT id FROM Ability WHERE name = "C#"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Xamarin", (SELECT id FROM Ability WHERE name = "C#"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Blazor", (SELECT id FROM Ability WHERE name = "C#"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Selenium", (SELECT id FROM Ability WHERE name = "C#"))`);
+
+            // Python
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("PyQt", (SELECT id FROM Ability WHERE name = "Python"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Tkinter", (SELECT id FROM Ability WHERE name = "Python"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Pygame", (SELECT id FROM Ability WHERE name = "Python"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Tensorflow", (SELECT id FROM Ability WHERE name = "Python"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("PyTorch", (SELECT id FROM Ability WHERE name = "Python"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Pandas", (SELECT id FROM Ability WHERE name = "Python"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Numpy", (SELECT id FROM Ability WHERE name = "Python"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Selenium", (SELECT id FROM Ability WHERE name = "Python"))`);
+
+            // JavaScript
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("React", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Angular", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Node.js", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Express", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("jQuery", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Cypress", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Jest", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
+
+            // Typescript
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Angular", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("React", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Node.js", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Express", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("NestJS", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Jest", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Webpack", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
+
+            // SQL
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("MySQL", (SELECT id FROM Ability WHERE name = "SQL"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("SQLite", (SELECT id FROM Ability WHERE name = "SQL"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("MongoDB", (SELECT id FROM Ability WHERE name = "SQL"))`);
+
+            // C++
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Qt", (SELECT id FROM Ability WHERE name = "C++"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("OpenGL", (SELECT id FROM Ability WHERE name = "C++"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("DirectX", (SELECT id FROM Ability WHERE name = "C++"))`);
+
+            // Kotlin
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Android", (SELECT id FROM Ability WHERE name = "Kotlin"))`);
+            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Spring", (SELECT id FROM Ability WHERE name = "Kotlin"))`);
+        });
     }
 
     //#region GetDataFromDB
@@ -193,6 +287,20 @@ export class Database {
         });
     }
 
+    static async getProjectIdBy(ownerId: string, name: string): Promise<number | null> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT id FROM Project WHERE ownerId = ? AND name = ?`, [ownerId, name], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else if (!row) {
+                    resolve(null);
+                } else {
+                    resolve(row.id);
+                }
+            });
+        });
+    }
+
     static async getProject(id: number): Promise<Project | null> {
         return new Promise((resolve, reject) => {
             db.get(`SELECT * FROM Project WHERE id = ?`, [id], (err, row: unknown) => {
@@ -233,26 +341,53 @@ export class Database {
         });
     }
 
-    static async getProjectsWhereUserIsMember(userId: number): Promise<ProjectMember[]> {
+    static async getProjectsWhereUserIsMember(userId: number): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM ProjectMember WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM ProjectMember WHERE userId = ?)`, [userId], (err, rows: unknown[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const projectMembers: ProjectMember[] = (rows as any[]).map(row => ({
+                    const projects: Project[] = (rows as any[]).map(row => ({
                         id: row.id,
-                        projectId: row.projectId,
-                        userId: row.userId
+                        name: row.name,
+                        ownerId: row.ownerId,
+                        thumbnail: row.thumbnail,
+                        description: row.description,
+                        dateOfCreation: new Date(row.dateOfCreation),
+                        links: row.links,
+                        maxMembers: row.maxMembers
                     }));
-                    resolve(projectMembers);
+                    resolve(projects);
                 }
             });
         });
     }
 
-    static async getViewsByUserId(userId: number): Promise<View[]> {
+    static async getLikedProjectsByUserId(userId: string): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM View WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM Like WHERE userId = ?)`, [userId], (err, rows: unknown[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const projects: Project[] = (rows as any[]).map(row => ({
+                        id: row.id,
+                        name: row.name,
+                        ownerId: row.ownerId,
+                        thumbnail: row.thumbnail,
+                        description: row.description,
+                        dateOfCreation: new Date(row.dateOfCreation),
+                        links: row.links,
+                        maxMembers: row.maxMembers
+                    }));
+                    resolve(projects);
+                }
+            });
+        });
+    }
+
+    static async getViewsByProjectId(projectId: number): Promise<View[]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM View WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -332,7 +467,7 @@ export class Database {
         });
     }
 
-    static async getUsersAbilitiesByUserId(userId: number): Promise<Ability[]> {
+    static async getUserAbilitiesByUserId(userId: string): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT abilityId FROM UserAbility WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
                 if (err) {
@@ -356,7 +491,7 @@ export class Database {
         });
     }
 
-    static getProjectsAbilitiesByProjectId(projectId: number): Promise<Ability[]> {
+    static getProjectAbilitiesByProjectId(projectId: number): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT abilityId FROM ProjectAbility WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
                 if (err) {
@@ -568,9 +703,9 @@ export class Database {
         });
     }
 
-    static async updateProject(id: number, name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: string, links: string, maxMembers: number): Promise<boolean> {
+    static async updateProject(id: number, name: string, ownerId: string, thumbnail: string, description: string, links: string, maxMembers: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`UPDATE Project SET name = ?, ownerId = ?, thumbnail = ?, description = ?, dateOfCreation = ?, links = ?, maxMembers = ? WHERE id = ?`, [name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers, id], (err) => {
+            db.run(`UPDATE Project SET name = ?, ownerId = ?, thumbnail = ?, description = ?, links = ?, maxMembers = ? WHERE id = ?`, [name, ownerId, thumbnail, description, links, maxMembers, id], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -829,9 +964,9 @@ export class Database {
         });
     }
 
-    static async deleteProjectMember(id: number): Promise<boolean> {
+    static async deleteProjectMember(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`DELETE FROM ProjectMember WHERE id = ?`, [id], (err) => {
+            db.run(`DELETE FROM ProjectMember WHERE userId = ? AND projectId = ?`, [userId, projectId], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -841,9 +976,9 @@ export class Database {
         });
     }
 
-    static async deleteLike(id: number): Promise<boolean> {
+    static async deleteLike(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`DELETE FROM Like WHERE id = ?`, [id], (err) => {
+            db.run(`DELETE FROM Like WHERE userId = ? AND projectId = ?`, [userId, projectId], (err) => {
                 if (err) {
                     reject(err);
                 } else {
