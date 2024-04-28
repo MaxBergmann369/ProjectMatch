@@ -78,7 +78,7 @@ export class Utility {
     /* region UserAbility */
     static async addUserAbility(userId: string, abilityId: number): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!ValUser.isIFValid(userId) || abilityId < 1) {
                 return false;
             }
 
