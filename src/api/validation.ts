@@ -86,7 +86,7 @@ export class ValProject {
             return false;
         }
 
-        return !(maxMembers === undefined || maxMembers < 1);
+        return !(maxMembers === undefined || maxMembers < 1 || maxMembers > 10);
     }
 
     private static validateDate(date: Date): boolean {
@@ -95,5 +95,25 @@ export class ValProject {
         }
 
         return !isNaN(date.getTime());
+    }
+}
+
+export class ValMessage {
+    static isValid(senderId: string, message: string): boolean {
+        if (!ValUser.isIFValid(senderId)) {
+            return false;
+        }
+
+        if (message === undefined || message === "" || message.length > 500 || message.length < 1) {
+            return false;
+        }
+
+        return !this.containsForbiddenWords(message);
+    }
+
+    private static containsForbiddenWords(message: string): boolean {
+        const forbiddenWords: string[] = ["admin", "moderator", "user", "root", "guest", "login", "register", "password", "username", "firstname", "lastname", "email", "birthdate", "permissions"];
+
+        return forbiddenWords.some(word => message.toLowerCase().includes(word));
     }
 }
