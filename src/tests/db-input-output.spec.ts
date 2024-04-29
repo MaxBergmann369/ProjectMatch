@@ -501,7 +501,7 @@ async function deleteUser(ifId: string) {
 
 async function deleteProject(id: number, ownerId: string) {
     const dbProject: Project | null = await Utility.getProject(id);
-    const success = await Utility.deleteProject(id);
+    const success = await Utility.deleteProject(ownerId, id);
 
     expect(success).toBeTruthy();
 

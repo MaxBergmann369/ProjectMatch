@@ -67,7 +67,7 @@ export interface Ability {
 export interface DirectChat {
     id: number;
     userId: string;
-    otherUserId: number;
+    otherUserId: string;
 }
 
 export interface Message {

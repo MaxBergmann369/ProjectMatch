@@ -265,6 +265,18 @@ export class Database {
         });
     }
 
+    static async isNotificationOwner(userId: string, notificationId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM Notification WHERE userId = ? AND id = ?`, [userId, notificationId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row !== undefined);
+                }
+            });
+        });
+    }
+
     static async getProjects(): Promise<Project[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM Project`, (err, rows: unknown[]) => {
@@ -319,6 +331,18 @@ export class Database {
                         links: row.Links
                     }));
                     resolve(project);
+                }
+            });
+        });
+    }
+
+    static async isUserOwnerOfProject(userId: string, projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM Project WHERE id = ? AND ownerId = ?`, [projectId, userId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row !== undefined);
                 }
             });
         });
@@ -448,7 +472,7 @@ export class Database {
         });
     }
 
-    static async getNotificationsByUserId(userId: number): Promise<Notification[]> {
+    static async getNotificationsByUserId(userId: string): Promise<Notification[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM Notification WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
                 if (err) {
@@ -515,7 +539,7 @@ export class Database {
         });
     }
 
-    static async getDirectChatsByUserId(userId: number): Promise<DirectChat[]> {
+    static async getDirectChatsByUserId(userId: string): Promise<DirectChat[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM DirectChat WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
                 if (err) {
@@ -527,6 +551,25 @@ export class Database {
                         otherUserId: row.otherUserId
                     }));
                     resolve(directChats);
+                }
+            });
+        });
+    }
+
+    static async getDirectChatByUserIds(userId: string, otherUserId: string): Promise<DirectChat | null> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM DirectChat WHERE userId = ? AND otherUserId = ?`, [userId, otherUserId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else if (!row) {
+                    resolve(null);
+                } else {
+                    const directChat: DirectChat = {
+                        id: row.id,
+                        userId: row.userId,
+                        otherUserId: row.otherUserId
+                    };
+                    resolve(directChat);
                 }
             });
         });
@@ -715,9 +758,9 @@ export class Database {
         });
     }
 
-    static async updateMessage(id: number, chatId: number, userId: string, message: string, date: string): Promise<boolean> {
+    static async updateMessage(id: number, chatId: number, userId: string, message: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`UPDATE Message SET chatId = ?, userId = ?, message = ?, date = ? WHERE id = ?`, [chatId, userId, message, date, id], (err) => {
+            db.run(`UPDATE Message SET chatId = ?, userId = ?, message = ? WHERE id = ?`, [chatId, userId, message, id], (err) => {
                 if (err) {
                     reject(err);
                 } else {

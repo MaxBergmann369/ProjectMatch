@@ -1,7 +1,7 @@
 
 import {Database} from "./db";
 import {ValProject, ValUser} from "./validation";
-import {Ability, Project, ProjectMember, User, View} from "./models";
+import {Ability, DirectChat, Message, Notification, Project, ProjectMember, User, View} from "./models";
 
 export class Utility {
 
@@ -104,6 +104,62 @@ export class Utility {
 
     /* endregion */
 
+    /* region Notification */
+
+    static async addNotification(userId: string, title: string, text: string): Promise<boolean> {
+        try {
+            if(!ValUser.isIFValid(userId) || title.length < 1 || title.length > 50 || text.length < 1 || text.length > 500) {
+                return false;
+            }
+
+            return await Database.addNotification(userId, title, text, new Date(Date.now()).toDateString());
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    static async getNotifications(userId: string): Promise<Notification[] | null> {
+        try {
+            if(!ValUser.isIFValid(userId)) {
+                return null;
+            }
+
+            return await Database.getNotificationsByUserId(userId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static async deleteNotification(userId: string, notificationId: number): Promise<boolean> {
+        try {
+            if(!await this.isNotificationOwner(userId, notificationId)) {
+                return false;
+            }
+
+            return await Database.deleteNotification(notificationId);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    static async isNotificationOwner(userId: string, notificationId: number): Promise<boolean> {
+        try {
+            if(!ValUser.isIFValid(userId) || notificationId < 1) {
+                return false;
+            }
+
+            return await Database.isNotificationOwner(userId, notificationId);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    /* endregion */
+
     /* region Project */
 
     /* region Base */
@@ -144,9 +200,26 @@ export class Utility {
         }
     }
 
-    static async deleteProject(id: number): Promise<boolean> {
+    static async deleteProject(userId: string, projectId: number): Promise<boolean> {
         try {
-            return await Database.deleteProject(id);
+            if(!await this.isUserOwnerOfProject(userId, projectId)) {
+                return false;
+            }
+
+            return await Database.deleteProject(projectId);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    static async isUserOwnerOfProject(userId: string, projectId: number): Promise<boolean> {
+        try {
+            if(!ValUser.isIFValid(userId) || projectId < 1) {
+                return false;
+            }
+
+            return await Database.isUserOwnerOfProject(userId, projectId);
         }
         catch (e) {
             return false;
@@ -284,8 +357,8 @@ export class Utility {
     }
     /* endregion */
 
-    /* region Ability */
-    static async addAbilityToProject(projectId: number, abilityId: number): Promise<boolean> {
+    /* region ProjectAbility */
+    static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
         try {
             return await Database.addProjectAbility(projectId, abilityId);
         }
@@ -311,6 +384,130 @@ export class Utility {
             return false;
         }
     }
+    /* endregion */
+
+    /* endregion */
+
+    /* region DirectChat */
+
+    /* region Chat */
+
+    static async addDirectChat(userId: string, otherUserId: string): Promise<boolean> {
+        try {
+            if(!ValUser.isIFValid(userId) || !ValUser.isIFValid(otherUserId)) {
+                return false;
+            }
+
+            const chat = await Database.getDirectChatByUserIds(userId, otherUserId);
+
+            if(chat !== null) {
+                return false;
+            }
+
+            return await Database.addDirectChat(userId, otherUserId);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    static async getDirectChats(userId: string): Promise<DirectChat[]> {
+        try {
+            if(!ValUser.isIFValid(userId)) {
+                return null;
+            }
+
+            return await Database.getDirectChatsByUserId(userId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static async getDirectChat(userId: string, otherUserId: string): Promise<DirectChat | null> {
+        try {
+            if(!ValUser.isIFValid(userId) || !ValUser.isIFValid(otherUserId)) {
+                return null;
+            }
+
+            return await Database.getDirectChatByUserIds(userId, otherUserId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static async deleteDirectChat(userId: string, otherUserId: string): Promise<boolean> {
+        try {
+            if(!ValUser.isIFValid(userId) || !ValUser.isIFValid(otherUserId)) {
+                return false;
+            }
+
+            const chat = await Database.getDirectChatByUserIds(userId, otherUserId);
+
+            if(chat === null || chat.userId !== userId || chat.otherUserId !== otherUserId) {
+                return false;
+            }
+
+            return await Database.deleteDirectChat(chat.id);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    /* endregion */
+
+    /* region Message */
+
+    static async addMessage(chatId: number, userId: string, message: string): Promise<boolean> {
+        try {
+            if(!ValUser.isIFValid(userId) || message.length < 1 || message.length > 500) {
+                return false;
+            }
+
+            return await Database.addMessage(chatId, userId, message, new Date(Date.now()).toDateString());
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    static async getMessages(chatId: number): Promise<Message[]> {
+        try {
+            return await Database.getMessagesByChatId(chatId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static async updateMessage(messageId: number, chatId: number, userId: string, message: string): Promise<boolean> {
+        try {
+            if(!ValUser.isIFValid(userId) || messageId < 1 || chatId < 1 || message.length < 1 || message.length > 500) {
+                return false;
+            }
+
+            return await Database.updateMessage(messageId, chatId, userId, message);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    static async deleteMessage(userId: string, messageId: number): Promise<boolean> {
+        try {
+            if(!ValUser.isIFValid(userId) || messageId < 1) {
+                return false;
+            }
+
+            return await Database.deleteMessage(messageId);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
     /* endregion */
 
     /* endregion */

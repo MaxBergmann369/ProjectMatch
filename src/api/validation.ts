@@ -1,4 +1,3 @@
-import {User} from "./models";
 
 export class ValUser {
     static isValid(ifId: string, username: string, firstname: string, lastname: string,
