@@ -65,7 +65,7 @@ export class ValProject {
             return false;
         }
 
-        if(ValUser.isIFValid(ownerId)){
+        if(!ValUser.isIFValid(ownerId)){
             return false;
         }
 

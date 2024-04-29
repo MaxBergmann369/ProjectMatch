@@ -315,21 +315,22 @@ export class Database {
 
     static async getProject(id: number): Promise<Project | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM Project WHERE id = ?`, [id], (err, row: unknown) => {
+            db.get(`SELECT * FROM Project WHERE id = ?`, [id], (err, row: any) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {
                     resolve(null);
                 } else {
-                    const project: Project = (row as any).map(row => ({
+                    const project: Project = {
                         id: row.id,
                         name: row.name,
                         ownerId: row.ownerId,
                         thumbnail: row.thumbnail,
                         description: row.description,
-                        dateOfCreation: new Date(row.DateOfCreation),
-                        links: row.Links
-                    }));
+                        dateOfCreation: new Date(row.dateOfCreation),
+                        links: row.links,
+                        maxMembers: row.maxMembers
+                    };
                     resolve(project);
                 }
             });
@@ -343,6 +344,40 @@ export class Database {
                     reject(err);
                 } else {
                     resolve(row !== undefined);
+                }
+            });
+        });
+    }
+
+    static async getProjectsByOwnerId(ownerId: string): Promise<Project[]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM Project WHERE ownerId = ?`, [ownerId], (err, rows: unknown[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const projects: Project[] = (rows as any[]).map(row => ({
+                        id: row.id,
+                        name: row.name,
+                        ownerId: row.ownerId,
+                        thumbnail: row.thumbnail,
+                        description: row.description,
+                        dateOfCreation: new Date(row.dateOfCreation),
+                        links: row.links,
+                        maxMembers: row.maxMembers
+                    }));
+                    resolve(projects);
+                }
+            });
+        });
+    }
+
+    static async getAmountOfProjectsByOwnerId(ownerId: string): Promise<number> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT COUNT(*) FROM Project WHERE ownerId = ?`, [ownerId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row['COUNT(*)']);
                 }
             });
         });

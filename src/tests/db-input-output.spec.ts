@@ -452,43 +452,178 @@ describe('database-test-project', () => {
         id: null,
         name: 'test',
         ownerId: ifId,
-        thumbnail: '',
-        description: '',
+        thumbnail: 'image.png',
+        description: 'some description',
         dateOfCreation: null,
         links: 'https://www.google.com;https://www.youtube.com',
         maxMembers: 5
     }
 
+    /* region addProject */
     test('add-project-invalid-name', async() => {
         // Invalid name: empty
         const success1 = await Utility.addProject('', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        await deleteProjectByName('', project.ownerId);
         expect(success1).toBeFalsy();
 
         // Invalid name: length > 20
-        const success2 = await Utility.addProject('verylongprojectname1234567890', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        const success2 = await Utility.addProject('verylongprojectname1234567890verylongprojectname1234567890', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        await deleteProjectByName('verylongprojectname1234567890verylongprojectname1234567890', project.ownerId);
+        expect(success2).toBeFalsy();
+    });
+
+    test('add-project-name-already-exists', async() => {
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success1).toBeTruthy();
+
+        const success2 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        await deleteProjectByName(project.name, project.ownerId);
         expect(success2).toBeFalsy();
     });
 
     test('add-project-invalid-ownerId', async() => {
         // Invalid ownerId: empty
         const success1 = await Utility.addProject(project.name, '', project.thumbnail, project.description, project.links, project.maxMembers);
+        await deleteProjectByName(project.name, '');
         expect(success1).toBeFalsy();
 
         // Invalid ownerId: length < 8
         const success2 = await Utility.addProject(project.name, 'IF12345', project.thumbnail, project.description, project.links, project.maxMembers);
+        await deleteProjectByName(project.name, 'IF12345');
         expect(success2).toBeFalsy();
 
         // Invalid ownerId: length > 8
         const success3 = await Utility.addProject(project.name, 'IF1234567', project.thumbnail, project.description, project.links, project.maxMembers);
+        await deleteProjectByName(project.name, 'IF1234567');
         expect(success3).toBeFalsy();
     });
 
     test('add-project-invalid-thumbnail', async() => {
         // Invalid thumbnail: length > 255
         const success1 = await Utility.addProject(project.name, project.ownerId, 'verylongthumbnail1234567890'.repeat(25), project.description, project.links, project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        expect(success1).toBeFalsy();
+    });
+
+    test('add-project-invalid-description', async() => {
+        // Invalid description: empty
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, '', project.links, project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
         expect(success1).toBeFalsy();
 
+        // Invalid description: length > 1000
+        const success2 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, 'verylongdescription1234567890'.repeat(100), project.links, project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        expect(success2).toBeFalsy();
     });
+
+    test('add-project-invalid-links', async() => {
+        // Invalid links: length > 1000
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, 'https://www.google.com;'.repeat(100), project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        expect(success1).toBeFalsy();
+    });
+
+    test('add-project-invalid-maxMembers', async() => {
+        // Invalid maxMembers: < 1
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, 0);
+        await deleteProjectByName(project.name, project.ownerId);
+        expect(success1).toBeFalsy();
+
+        // Invalid maxMembers: > 10
+        const success2 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, 11);
+        await deleteProjectByName(project.name, project.ownerId);
+        expect(success2).toBeFalsy();
+    });
+
+    test('add-project-valid', async() => {
+        const success = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        expect(success).toBeTruthy();
+    });
+
+    /* endregion */
+
+    /* region updateProject */
+    test('update-project-invalid-id', async() => {
+        const success = await Utility.updateProject(0, project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        expect(success).toBeFalsy();
+    });
+
+    test('update-project-invalid-ownerId', async() => {
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success1).toBeTruthy();
+
+        const success2 = await Utility.updateProject(1, project.name, '', project.thumbnail, project.description, project.links, project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        await deleteProjectByName(project.name, '');
+        expect(success2).toBeFalsy();
+    });
+
+    test('update-project-invalid-name', async() => {
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success1).toBeTruthy();
+
+        const success2 = await Utility.updateProject(1, '', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        await deleteProjectByName('', project.ownerId);
+        expect(success2).toBeFalsy();
+
+    });
+
+    test('update-project-invalid-thumbnail', async() => {
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success1).toBeTruthy();
+
+        const success2 = await Utility.updateProject(1, project.name, project.ownerId, 'verylongthumbnail1234567890'.repeat(25), project.description, project.links, project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        expect(success2).toBeFalsy();
+    });
+
+    test('update-project-invalid-description', async() => {
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success1).toBeTruthy();
+
+        const success2 = await Utility.updateProject(1, project.name, project.ownerId, project.thumbnail, '', project.links, project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        expect(success2).toBeFalsy();
+    });
+
+    test('update-project-invalid-links', async() => {
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success1).toBeTruthy();
+
+        const success2 = await Utility.updateProject(1, project.name, project.ownerId, project.thumbnail, project.description, 'https://www.google.com;'.repeat(100), project.maxMembers);
+        await deleteProjectByName(project.name, project.ownerId);
+        expect(success2).toBeFalsy();
+    });
+
+    test('update-project-invalid-maxMembers', async() => {
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success1).toBeTruthy();
+
+        const success2 = await Utility.updateProject(1, project.name, project.ownerId, project.thumbnail, project.description, project.links, 0);
+        expect(success2).toBeFalsy();
+
+        const success3 = await Utility.updateProject(1, project.name, project.ownerId, project.thumbnail, project.description, project.links, 11);
+        expect(success3).toBeFalsy();
+
+        await deleteProjectByName(project.name, project.ownerId);
+    });
+
+    test('update-project-valid', async() => {
+        const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        expect(success1).toBeTruthy();
+
+        const success2 = await Utility.updateProject(1, 'test123', project.ownerId, 'newImage.png', 'some other', 'github.com;google.com', 6);
+        await deleteProjectByName(project.name, project.ownerId);
+        await deleteProjectByName('test123', project.ownerId);
+        expect(success2).toBeTruthy();
+    });
+
+    /* endregion */
 });
 
 /* region Help-Functions */
@@ -501,11 +636,14 @@ async function deleteUser(ifId: string) {
 
 async function deleteProject(id: number, ownerId: string) {
     const dbProject: Project | null = await Utility.getProject(id);
-    const success = await Utility.deleteProject(ownerId, id);
-
-    expect(success).toBeTruthy();
+    await Utility.deleteProject(ownerId, id);
 
     expect(dbProject).toBeNull();
+}
+
+async function deleteProjectByName(name: string, ownerId: string) {
+    const id: number = await Utility.getProjectId(ownerId, name);
+    await Utility.deleteProject(ownerId, id);
 }
 
 /* endregion */

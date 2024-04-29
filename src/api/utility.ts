@@ -167,7 +167,11 @@ export class Utility {
         try {
             const date = new Date(Date.now());
 
-            if(!ValProject.isValid(name, ownerId, thumbnail, description, date, links, maxMembers)) {
+            if(!ValProject.isValid(name, ownerId, thumbnail, description, date, links, maxMembers) || await this.getAmountOfProjects(ownerId) >= 5){
+                return false;
+            }
+
+            if(await this.alreadyProjectWithSameName(ownerId, name, 0)) {
                 return false;
             }
 
@@ -187,13 +191,47 @@ export class Utility {
         }
     }
 
+    static async getAmountOfProjects(ownerId:string): Promise<number> {
+        try {
+            return await Database.getAmountOfProjectsByOwnerId(ownerId);
+        }
+        catch (e) {
+            return -1;
+        }
+    }
+
     static async updateProject(id: number, name: string, ownerId: string, thumbnail: string, description: string, links: string, maxMembers: number): Promise<boolean> {
         try {
             if(!ValProject.isValid(name, ownerId, thumbnail, description, new Date(Date.now()), links, maxMembers) || id < 1) {
                 return false;
             }
 
+            if(await this.alreadyProjectWithSameName(ownerId, name, id)) {
+                return false;
+            }
+
             return await Database.updateProject(id, name, ownerId, thumbnail, description, links, maxMembers);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    static async alreadyProjectWithSameName(ownerId: string, projectName: string, id: number): Promise<boolean> {
+        try {
+            if(!ValUser.isIFValid(ownerId) || projectName.length < 1 || projectName.length > 30) {
+                return false;
+            }
+
+            const projects = await Database.getProjectsByOwnerId(ownerId);
+
+            for(const project of projects) {
+                if(project.name === projectName && project.id !== id) {
+                    return true;
+                }
+            }
+
+            return false;
         }
         catch (e) {
             return false;
