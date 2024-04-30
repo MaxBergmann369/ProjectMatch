@@ -574,6 +574,42 @@ export class Database {
         });
     }
 
+    static async getAbilities(): Promise<Ability[]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM Ability`, (err, rows: unknown[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const abilities: Ability[] = (rows as any[]).map(row => ({
+                        id: row.id,
+                        name: row.name,
+                        parentId: row.parentId
+                    }));
+                    resolve(abilities);
+                }
+            });
+        });
+    }
+
+    static async getAbilityById(abilityId: number): Promise<Ability | null> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM Ability WHERE id = ?`, [abilityId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else if (!row) {
+                    resolve(null);
+                } else {
+                    const ability: Ability = {
+                        id: row.id,
+                        name: row.name,
+                        parentId: row.parentId
+                    };
+                    resolve(ability);
+                }
+            });
+        });
+    }
+
     static async getDirectChatsByUserId(userId: string): Promise<DirectChat[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM DirectChat WHERE userId = ?`, [userId], (err, rows: unknown[]) => {

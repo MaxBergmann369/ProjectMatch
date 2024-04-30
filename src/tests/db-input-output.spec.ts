@@ -437,10 +437,8 @@ describe('database-test-user', () => {
         expect(dbUser).not.toBeNull();
 
         const success = await Utility.addUserAbility(ifId, 1);
-
-        expect(success).toBeTruthy();
-
         await Utility.deleteUser(ifId);
+        expect(success).toBeTruthy();
     });
 
     /* endregion */
@@ -477,7 +475,6 @@ describe('database-test-project', () => {
         expect(success1).toBeTruthy();
 
         const success2 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
-        await deleteProjectByName(project.name, project.ownerId);
         await deleteProjectByName(project.name, project.ownerId);
         expect(success2).toBeFalsy();
     });
@@ -538,6 +535,8 @@ describe('database-test-project', () => {
     });
 
     test('add-project-valid', async() => {
+        await deleteProjectByName(project.name, project.ownerId);
+
         const success = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         await deleteProjectByName(project.name, project.ownerId);
         expect(success).toBeTruthy();
@@ -624,6 +623,126 @@ describe('database-test-project', () => {
     });
 
     /* endregion */
+
+    /* region addProjectAbility */
+
+    test('add-project-ability-invalid-projectId', async() => {
+        const success = await Utility.addProjectAbility(0, 1);
+        expect(success).toBeFalsy();
+    });
+
+    test('add-project-ability-invalid-abilityId', async() => {
+        const success = await Utility.addProjectAbility(1, -1);
+        expect(success).toBeFalsy();
+    });
+
+    test('add-project-ability-valid', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+
+        const projectId = await Utility.getProjectId(project.name, project.ownerId);
+
+        const success = await Utility.addProjectAbility(projectId, 1);
+        await deleteProjectByName(project.name, project.ownerId);
+        await deleteUser(ifId);
+        await Utility.deleteAbilityFromProject(projectId, 1);
+        expect(success).toBeTruthy();
+    });
+
+    /* endregion */
+
+    /* region addProjectMember */
+
+    test('add-project-member-invalid-projectId', async() => {
+        const success = await Utility.addProjectMember(0, ifId);
+        expect(success).toBeFalsy();
+    });
+
+    test('add-project-member-invalid-userId', async() => {
+        const success = await Utility.addProjectMember(1, '');
+        await Utility.deleteProjectMember(1, '');
+        expect(success).toBeFalsy();
+    });
+
+    test('add-project-member-valid', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+
+        const projectId = await Utility.getProjectId(project.name, project.ownerId);
+
+        const success = await Utility.addProjectMember(projectId, ifId);
+        await Utility.deleteProjectMember(projectId, ifId);
+        await deleteProjectByName(project.name, project.ownerId);
+        await Utility.deleteUser(ifId);
+        expect(success).toBeTruthy();
+    });
+
+    /* endregion */
+
+    /* region addLike */
+
+    test('add-like-invalid-projectId', async() => {
+        const success = await Utility.addLike(0, ifId);
+        expect(success).toBeFalsy();
+    });
+
+    test('add-like-invalid-userId', async() => {
+        const success = await Utility.addLike(1, '');
+        const projectId = await Utility.getProjectId(project.name, project.ownerId);
+        await Utility.deleteLike(projectId, '');
+        expect(success).toBeFalsy();
+    });
+
+    test('add-like-valid', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+
+        const projectId = await Utility.getProjectId(project.name, project.ownerId);
+
+        const success = await Utility.addLike(projectId, ifId);
+        const dbLike = await Utility.getLikes(projectId);
+
+        expect(dbLike.length).toBe(1);
+
+        await Utility.deleteLike(projectId, ifId);
+        await deleteProjectByName(project.name, project.ownerId);
+        await Utility.deleteUser(ifId);
+        expect(success).toBeTruthy();
+    });
+
+    /* endregion */
+
+    /* region addView */
+
+    test('add-view-invalid-projectId', async() => {
+        const success = await Utility.addView(0, ifId);
+        expect(success).toBeFalsy();
+    });
+
+    test('add-view-invalid-userId', async() => {
+        const success = await Utility.addView(1, '');
+        await Utility.deleteViews(1);
+        expect(success).toBeFalsy();
+    });
+
+    test('add-view-valid', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+
+        const projectId = await Utility.getProjectId(project.name, project.ownerId);
+
+        const success = await Utility.addView(projectId, ifId);
+        const dbView = await Utility.getViews(projectId);
+
+        expect(dbView.length).toBe(1);
+
+        await Utility.deleteViews(projectId);
+        await deleteProjectByName(project.name, project.ownerId);
+        await Utility.deleteUser(ifId);
+        expect(success).toBeTruthy();
+    });
+
+    /* endregion */
 });
 
 /* region Help-Functions */
@@ -634,6 +753,8 @@ async function deleteUser(ifId: string) {
     expect(dbUser).toBeNull();
 }
 
+
+
 async function deleteProject(id: number, ownerId: string) {
     const dbProject: Project | null = await Utility.getProject(id);
     await Utility.deleteProject(ownerId, id);
@@ -642,8 +763,7 @@ async function deleteProject(id: number, ownerId: string) {
 }
 
 async function deleteProjectByName(name: string, ownerId: string) {
-    const id: number = await Utility.getProjectId(ownerId, name);
-    await Utility.deleteProject(ownerId, id);
+    await Utility.deleteProjectByName(name, ownerId);
 }
 
 /* endregion */

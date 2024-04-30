@@ -1,7 +1,7 @@
 
 import {Database} from "./db";
 import {ValProject, ValUser} from "./validation";
-import {Ability, DirectChat, Message, Notification, Project, ProjectMember, User, View} from "./models";
+import {Ability, DirectChat, Like, Message, Notification, Project, ProjectMember, User, View} from "./models";
 
 export class Utility {
 
@@ -251,6 +251,25 @@ export class Utility {
         }
     }
 
+    static async deleteProjectByName(projectName: string, userId: string): Promise<boolean> {
+        try {
+            if(!ValUser.isIFValid(userId) || projectName.length < 1 || projectName.length > 30) {
+                return false;
+            }
+
+            const projectId = await this.getProjectId(userId, projectName);
+
+            if (projectId === null) {
+                return false;
+            }
+
+            return await this.deleteProject(userId, projectId);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
     static async isUserOwnerOfProject(userId: string, projectId: number): Promise<boolean> {
         try {
             if(!ValUser.isIFValid(userId) || projectId < 1) {
@@ -290,7 +309,7 @@ export class Utility {
     /* region ProjectMember */
     static async addProjectMember(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!ValUser.isIFValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
@@ -327,7 +346,7 @@ export class Utility {
     /* region Like */
     static async addLike(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!ValUser.isIFValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
@@ -338,7 +357,7 @@ export class Utility {
         }
     }
 
-    static async getLikes(projectId: number): Promise<ProjectMember[]> {
+    static async getLikes(projectId: number): Promise<Like[]> {
         try {
             return await Database.getLikesByProjectId(projectId);
         }
@@ -365,7 +384,7 @@ export class Utility {
     /* region View */
     static async addView(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!ValUser.isIFValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
@@ -398,6 +417,10 @@ export class Utility {
     /* region ProjectAbility */
     static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
         try {
+            if(abilityId < 1 || projectId < 1 || await Database.getProject(projectId) === null || await Database.getAbilityById(abilityId) === null){
+                return false;
+            }
+
             return await Database.addProjectAbility(projectId, abilityId);
         }
         catch (e) {
