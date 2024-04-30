@@ -476,6 +476,7 @@ describe('database-test-project', () => {
 
         const success2 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         await deleteProjectByName(project.name, project.ownerId);
+        await deleteProjectByName(project.name, project.ownerId);
         expect(success2).toBeFalsy();
     });
 
@@ -644,7 +645,7 @@ describe('database-test-project', () => {
 
         const success = await Utility.addProjectAbility(projectId, 1);
         await deleteProjectByName(project.name, project.ownerId);
-        await deleteUser(ifId);
+        await deleteUser(ifId, true);
         await Utility.deleteAbilityFromProject(projectId, 1);
         expect(success).toBeTruthy();
     });
@@ -706,7 +707,7 @@ describe('database-test-project', () => {
 
         await Utility.deleteLike(projectId, ifId);
         await deleteProjectByName(project.name, project.ownerId);
-        await Utility.deleteUser(ifId);
+        await deleteUser(ifId, true);
         expect(success).toBeTruthy();
     });
 
@@ -729,7 +730,7 @@ describe('database-test-project', () => {
         await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
         await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
 
-        const projectId = await Utility.getProjectId(project.name, project.ownerId);
+        const projectId: number = await Utility.getProjectId(project.name, project.ownerId);
 
         const success = await Utility.addView(projectId, ifId);
         const dbView = await Utility.getViews(projectId);
@@ -738,7 +739,7 @@ describe('database-test-project', () => {
 
         await Utility.deleteViews(projectId);
         await deleteProjectByName(project.name, project.ownerId);
-        await Utility.deleteUser(ifId);
+        await deleteUser(ifId, true);
         expect(success).toBeTruthy();
     });
 
@@ -746,11 +747,13 @@ describe('database-test-project', () => {
 });
 
 /* region Help-Functions */
-async function deleteUser(ifId: string) {
-    const dbUser: User | null = await Utility.getUser(ifId);
-    await Utility.deleteUser(ifId);
+async function deleteUser(ifId: string, flag:boolean = false) {
+    if(!flag) {
+        const dbUser: User | null = await Utility.getUser(ifId);
+        expect(dbUser).toBeNull();
+    }
 
-    expect(dbUser).toBeNull();
+    await Utility.deleteUser(ifId);
 }
 
 

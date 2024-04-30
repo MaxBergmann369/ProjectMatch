@@ -252,12 +252,12 @@ export class Utility {
     }
 
     static async deleteProjectByName(projectName: string, userId: string): Promise<boolean> {
-        try {
-            if(!ValUser.isIFValid(userId) || projectName.length < 1 || projectName.length > 30) {
+                    try {
+                        if(!ValUser.isIFValid(userId) || projectName.length < 1 || projectName.length > 30) {
                 return false;
             }
 
-            const projectId = await this.getProjectId(userId, projectName);
+            const projectId = await this.getProjectId(projectName, userId);
 
             if (projectId === null) {
                 return false;
@@ -283,9 +283,9 @@ export class Utility {
         }
     }
 
-    static async getProjectId(ownerId: string, projectName: string): Promise<number | null> {
+    static async getProjectId(projectName: string, ownerId: string): Promise<number | null> {
         try {
-            if(!ValUser.isIFValid(ownerId)) {
+            if(!ValUser.isIFValid(ownerId) || projectName.length < 1 || projectName.length > 30) {
                 return null;
             }
 
@@ -348,6 +348,15 @@ export class Utility {
         try {
             if(!ValUser.isIFValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
+            }
+
+            //Problems with getLikesByUserId
+            const likes = await Database.getLikesByUserId(userId);
+
+            for(const like of likes) {
+                if(like.projectId === projectId) {
+                    return false;
+                }
             }
 
             return await Database.addLike(userId, projectId);

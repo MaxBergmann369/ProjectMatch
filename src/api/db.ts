@@ -473,7 +473,7 @@ export class Database {
         });
     }
 
-    static async getLikesByUserId(userId: number): Promise<Like[]> {
+    static async getLikesByUserId(userId: string): Promise<Like[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM Flame WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
                 if (err) {
@@ -496,12 +496,12 @@ export class Database {
                 if (err) {
                     reject(err);
                 } else {
-                    const flames: Like[] = (rows as any[]).map(row => ({
+                    const likes: Like[] = (rows as any[]).map(row => ({
                         id: row.id,
                         projectId: row.projectId,
                         userId: row.userId
                     }));
-                    resolve(flames);
+                    resolve(likes);
                 }
             });
         });
