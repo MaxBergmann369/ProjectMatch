@@ -9,9 +9,10 @@
     "include": [
         "website/scripts/**/*.ts",
         "api/**/*.ts",
-        "/app.ts"
+        "./app.ts"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "website/scripts/**/dependencies.ts"
     ]
 }
