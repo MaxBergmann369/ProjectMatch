@@ -134,7 +134,7 @@ dist
 /src/website/styles/*.css.map
 
 # tsc output (we are using typescript only)
-/src/website/**/*.js
-/src/website/**/*.js.map
+/src/website/dist/*.js
+/src/website/dist/*.js.map
 /src/api/**/*.js
 /src/api/**/*.js.map
