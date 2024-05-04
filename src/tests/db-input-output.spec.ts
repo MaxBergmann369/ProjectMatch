@@ -773,6 +773,10 @@ describe('database-test-project', () => {
         const success = await Utility.addLike(projectId, ifId);
         const dbLike = await Utility.getLikes(projectId);
 
+        const dbProject = await Utility.getLikedProjectsByUserId(ifId);
+
+        expect(dbProject[0].name).toBe(project.name);
+
         expect(dbLike.length).toBe(1);
 
         await Utility.deleteLike(projectId, ifId);
@@ -804,6 +808,10 @@ describe('database-test-project', () => {
 
         const success = await Utility.addView(projectId, ifId);
         const dbView = await Utility.getViews(projectId);
+
+        const views = await Utility.getProjectViews(projectId);
+
+        expect(views).toBe(1);
 
         expect(dbView.length).toBe(1);
 

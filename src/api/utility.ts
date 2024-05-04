@@ -413,6 +413,19 @@ export class Utility {
         }
     }
 
+    static async getLikedProjectsByUserId(userId: string): Promise<Project[]> {
+        try {
+            if(!ValUser.isIFValid(userId)) {
+                return null;
+            }
+
+            return await Database.getLikedProjectsByUserId(userId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
     static async deleteLike(projectId: number, userId: string): Promise<boolean> {
         try {
             if(!ValUser.isIFValid(userId)) {
@@ -445,6 +458,15 @@ export class Utility {
     static async getViews(projectId: number): Promise<View[]> {
         try {
             return await Database.getViewsByProjectId(projectId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static async getProjectViews(projectId: number): Promise<number> {
+        try {
+            return await Database.getViewCount(projectId);
         }
         catch (e) {
             return null;

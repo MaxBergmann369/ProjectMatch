@@ -400,28 +400,6 @@ export class Database {
         });
     }
 
-    static async getProjectsWhereUserIsOwner(userId: string): Promise<Project[]> {
-        return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project WHERE ownerId = ?`, [userId], (err, rows: unknown[]) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    const projects: Project[] = (rows as any[]).map(row => ({
-                        id: row.id,
-                        name: row.name,
-                        ownerId: row.ownerId,
-                        thumbnail: row.thumbnail,
-                        description: row.description,
-                        dateOfCreation: new Date(row.dateOfCreation),
-                        links: row.links,
-                        maxMembers: row.maxMembers
-                    }));
-                    resolve(projects);
-                }
-            });
-        });
-    }
-
     static async getProjectsWhereUserIsMember(userId: string): Promise<Project[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM ProjectMember WHERE userId = ?)`, [userId], (err, rows: unknown[]) => {
