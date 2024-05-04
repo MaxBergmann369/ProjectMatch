@@ -451,14 +451,20 @@ describe('database-test-user', () => {
     });
 
     test('add-notification-invalid-title', async() => {
+        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
         const success = await Utility.addNotification(ifId, '', 'Test');
         await deleteNotification(ifId);
+        await deleteUser(ifId, true);
         expect(success).toBeFalsy();
     });
 
     test('add-notification-invalid-text', async() => {
+        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
         const success = await Utility.addNotification(ifId, 'Test', '');
         await deleteNotification(ifId);
+        await deleteUser(ifId, true);
         expect(success).toBeFalsy();
     });
 
@@ -470,8 +476,8 @@ describe('database-test-user', () => {
         expect(dbUser).not.toBeNull();
 
         const success = await Utility.addNotification(ifId, 'Test', 'Test');
-        await deleteUser(ifId, true);
         await deleteNotification(ifId);
+        await deleteUser(ifId, true);
         expect(success).toBeTruthy();
     });
 
@@ -480,6 +486,7 @@ describe('database-test-user', () => {
 
 describe('database-test-project', () => {
     const ifId: string = 'IF210053';
+    const ifId2: string = 'IF210063';
     const project: Project = {
         id: null,
         name: 'test',
@@ -506,12 +513,16 @@ describe('database-test-project', () => {
 
     test('add-project-name-already-exists', async() => {
         await deleteProjectByName(project.name, project.ownerId);
+
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
 
         const success2 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         await deleteProjectByName(project.name, project.ownerId);
         await deleteProjectByName(project.name, project.ownerId);
+        await deleteUser(ifId, true);
         expect(success2).toBeFalsy();
     });
 
@@ -573,8 +584,11 @@ describe('database-test-project', () => {
     test('add-project-valid', async() => {
         await deleteProjectByName(project.name, project.ownerId);
 
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         await deleteProjectByName(project.name, project.ownerId);
+        await deleteUser(ifId, true);
         expect(success).toBeTruthy();
     });
 
@@ -588,54 +602,71 @@ describe('database-test-project', () => {
     });
 
     test('update-project-invalid-ownerId', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
 
         const success2 = await Utility.updateProject(1, project.name, '', project.thumbnail, project.description, project.links, project.maxMembers);
         await deleteProjectByName(project.name, project.ownerId);
         await deleteProjectByName(project.name, '');
+        await deleteUser(ifId, true);
         expect(success2).toBeFalsy();
     });
 
     test('update-project-invalid-name', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
 
         const success2 = await Utility.updateProject(1, '', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         await deleteProjectByName(project.name, project.ownerId);
         await deleteProjectByName('', project.ownerId);
+        await deleteUser(ifId, true);
         expect(success2).toBeFalsy();
 
     });
 
     test('update-project-invalid-thumbnail', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
 
         const success2 = await Utility.updateProject(1, project.name, project.ownerId, 'verylongthumbnail1234567890'.repeat(25), project.description, project.links, project.maxMembers);
         await deleteProjectByName(project.name, project.ownerId);
+        await deleteUser(ifId, true);
         expect(success2).toBeFalsy();
     });
 
     test('update-project-invalid-description', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
 
         const success2 = await Utility.updateProject(1, project.name, project.ownerId, project.thumbnail, '', project.links, project.maxMembers);
         await deleteProjectByName(project.name, project.ownerId);
+        await deleteUser(ifId, true);
         expect(success2).toBeFalsy();
     });
 
     test('update-project-invalid-links', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
 
         const success2 = await Utility.updateProject(1, project.name, project.ownerId, project.thumbnail, project.description, 'https://www.google.com;'.repeat(100), project.maxMembers);
         await deleteProjectByName(project.name, project.ownerId);
+        await deleteUser(ifId, true);
         expect(success2).toBeFalsy();
     });
 
     test('update-project-invalid-maxMembers', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
 
@@ -646,15 +677,19 @@ describe('database-test-project', () => {
         expect(success3).toBeFalsy();
 
         await deleteProjectByName(project.name, project.ownerId);
+        await deleteUser(ifId, true);
     });
 
     test('update-project-valid', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
 
         const success2 = await Utility.updateProject(1, 'test123', project.ownerId, 'newImage.png', 'some other', 'github.com;google.com', 6);
         await deleteProjectByName(project.name, project.ownerId);
         await deleteProjectByName('test123', project.ownerId);
+        await deleteUser(ifId, true);
         expect(success2).toBeTruthy();
     });
 
@@ -779,6 +814,69 @@ describe('database-test-project', () => {
     });
 
     /* endregion */
+
+    /* region otherTests */
+    //test getProjectsWhereUserIsOwner
+    test('get-projects-where-user-is-owner', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
+        await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        await Utility.addProject('test2', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        await Utility.addProject('test3', ifId2, project.thumbnail, project.description, project.links, project.maxMembers);
+
+        const projects1 = await Utility.getProjectsWhereUserIsOwner(ifId);
+
+        expect(projects1.length).toBe(2);
+
+        const projects2 = await Utility.getProjectsWhereUserIsOwner(ifId2);
+
+        expect(projects2).toBe(null);
+
+        const projects3 = await Utility.getProjects();
+
+        expect(projects3.length).toBe(2);
+
+        await Utility.deleteProjectByName(project.name, project.ownerId);
+        await Utility.deleteProjectByName('test2', project.ownerId);
+        await Utility.deleteProjectByName('test3', ifId2);
+        await Utility.deleteUser(ifId);
+    });
+
+    //test getProjectsWhereUserIsMember
+    test('get-projects-where-user-is-member', async() => {
+        await Utility.addUser(ifId, 'test1223', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
+        await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        await Utility.addProject('test2', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
+        await Utility.addProject('test3', ifId2, project.thumbnail, project.description, project.links, project.maxMembers);
+
+        const projectId1 = await Utility.getProjectId(project.name, project.ownerId);
+        const projectId2 = await Utility.getProjectId('test2', project.ownerId);
+        const projectId3 = await Utility.getProjectId('test3', ifId2);
+
+        await Utility.addProjectMember(projectId1, ifId2);
+        await Utility.addProjectMember(projectId2, ifId2);
+        await Utility.addProjectMember(projectId3, ifId2);
+
+        const projects1 = await Utility.getProjectsWhereUserIsMember(ifId2);
+
+        expect(projects1.length).toBe(3);
+
+        const projects3 = await Utility.getProjects();
+
+        expect(projects3.length).toBe(3);
+
+        await Utility.deleteProjectMember(projectId1, ifId);
+        await Utility.deleteProjectMember(projectId2, ifId);
+        await Utility.deleteProjectMember(projectId3, ifId);
+        await Utility.deleteProjectByName(project.name, project.ownerId);
+        await Utility.deleteProjectByName('test2', project.ownerId);
+        await Utility.deleteProjectByName('test3', ifId2);
+        await Utility.deleteUser(ifId);
+    });
+
+
 });
 
 describe('database-test-chat', () => {
@@ -787,7 +885,7 @@ describe('database-test-chat', () => {
     const ifId2: string = 'IF210063';
     const ifId3: string = 'IF210073';
 
-   /* region addChat */
+    /* region addChat */
     test('add-chat-invalid-ifId', async() => {
          const success = await Utility.addDirectChat('ifId', ifId2);
          await Utility.deleteDirectChat('ifId', ifId2);
@@ -802,24 +900,70 @@ describe('database-test-chat', () => {
 
     test('add-chat-already-exists', async() => {
         await Utility.deleteDirectChat(ifId, ifId2);
+
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success = await Utility.addDirectChat(ifId, ifId2);
         expect(success).toBeTruthy();
 
         const success2 = await Utility.addDirectChat(ifId, ifId2);
         await Utility.deleteDirectChat(ifId, ifId2);
         await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
         expect(success2).toBeFalsy();
     });
 
     test('add-chat-valid', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success = await Utility.addDirectChat(ifId, ifId2);
         await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
         expect(success).toBeTruthy();
     });
+
+    test('add-multiple-chats', async() => {
+        await Utility.deleteDirectChat(ifId, ifId2);
+        await Utility.deleteDirectChat(ifId, ifId3);
+        await Utility.deleteDirectChat(ifId2, ifId3);
+
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId3, 'test12345', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
+        const success1 = await Utility.addDirectChat(ifId, ifId2);
+        expect(success1).toBeTruthy();
+
+        const success2 = await Utility.addDirectChat(ifId, ifId3);
+        expect(success2).toBeTruthy();
+
+        const success3 = await Utility.addDirectChat(ifId2, ifId3);
+        expect(success3).toBeTruthy();
+
+        const chats1 = await Utility.getDirectChats(ifId);
+        const chats2 = await Utility.getDirectChats(ifId2);
+        expect(chats1.length).toBe(2);
+        expect(chats2.length).toBe(2);
+
+        await Utility.deleteDirectChat(ifId, ifId2);
+        await Utility.deleteDirectChat(ifId, ifId3);
+        await Utility.deleteDirectChat(ifId2, ifId3);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
+        await deleteUser(ifId3, true);
+    });
+
     /* endregion */
 
     /* region addMessage */
     test('add-message-invalid-ifId', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
 
@@ -828,11 +972,16 @@ describe('database-test-chat', () => {
         const success = await Utility.addMessage(chat.id, 'Test', ifId2);
         await deleteMessage(ifId, ifId2);
         await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
 
         expect(success).toBeFalsy();
     });
 
     test('add-message-invalid-text', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
 
@@ -841,11 +990,16 @@ describe('database-test-chat', () => {
         const success = await Utility.addMessage(chat.id, ifId, '');
         await deleteMessage(ifId, ifId2);
         await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
 
         expect(success).toBeFalsy();
     });
 
     test('add-message-invalid-ifId2', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
 
@@ -854,11 +1008,16 @@ describe('database-test-chat', () => {
         const success = await Utility.addMessage(chat.id, ifId3, 'ifId');
         await deleteMessage(ifId, ifId2);
         await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
 
         expect(success).toBeFalsy();
     });
 
     test('add-message-valid', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
 
@@ -867,10 +1026,103 @@ describe('database-test-chat', () => {
         const success = await Utility.addMessage(chat.id, ifId, 'hello');
         await deleteMessage(ifId, ifId2);
         await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
+
         expect(success).toBeTruthy();
     });
 
     /* endregion */
+
+    /* region updateMessage */
+    test('update-message-invalid-id', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
+        const success1 = await Utility.addDirectChat(ifId, ifId2);
+        expect(success1).toBeTruthy();
+
+        const chat = await Utility.getDirectChat(ifId, ifId2);
+
+        const success = await Utility.updateMessage(0, chat.id, ifId, 'hello');
+        await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
+        expect(success).toBeFalsy();
+    });
+
+    test('update-message-invalid-chatId', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
+        const success1 = await Utility.addDirectChat(ifId, ifId2);
+        expect(success1).toBeTruthy();
+
+        const chat = await Utility.getDirectChat(ifId, ifId2);
+
+        const success = await Utility.updateMessage(1, 0, ifId, 'hello');
+        await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
+        expect(success).toBeFalsy();
+    });
+
+    test('update-message-invalid-ifId', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
+        const success1 = await Utility.addDirectChat(ifId, ifId2);
+        expect(success1).toBeTruthy();
+
+        const chat = await Utility.getDirectChat(ifId, ifId2);
+
+        const success = await Utility.updateMessage(1, chat.id, '', 'hello');
+        await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
+        expect(success).toBeFalsy();
+    });
+
+    test('update-message-invalid-text', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
+        const success1 = await Utility.addDirectChat(ifId, ifId2);
+        expect(success1).toBeTruthy();
+
+        const chat = await Utility.getDirectChat(ifId, ifId2);
+
+        const success = await Utility.updateMessage(1, chat.id, ifId, '');
+        await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
+        expect(success).toBeFalsy();
+    });
+
+    test('update-message-valid', async() => {
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+
+        const success1 = await Utility.addDirectChat(ifId, ifId2);
+        expect(success1).toBeTruthy();
+
+        const chat = await Utility.getDirectChat(ifId, ifId2);
+
+        const success = await Utility.addMessage(chat.id, ifId, 'hello');
+        expect(success).toBeTruthy();
+
+        const message = await Utility.getMessages(chat.id);
+
+        const success2 = await Utility.updateMessage(message[0].id, chat.id, ifId, 'hello world');
+        await Utility.deleteMessage(ifId, message[0].id);
+        await Utility.deleteDirectChat(ifId, ifId2);
+        await deleteUser(ifId, true);
+        await deleteUser(ifId2, true);
+        expect(success2).toBeTruthy();
+    });
+
+    /* endregion */
+
 });
 
 /* region Help-Functions */

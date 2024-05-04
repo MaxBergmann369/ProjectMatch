@@ -1,6 +1,6 @@
 
 import {Database} from "./db";
-import {ValNotification, ValProject, ValUser} from "./validation";
+import {ValMessage, ValNotification, ValProject, ValUser} from "./validation";
 import {Ability, DirectChat, Like, Message, Notification, Project, ProjectMember, User, View} from "./models";
 
 export class Utility {
@@ -78,7 +78,7 @@ export class Utility {
     /* region UserAbility */
     static async addUserAbility(userId: string, abilityId: number): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || abilityId < 1) {
+            if(!await ValUser.isUserValid(userId) || abilityId < 1) {
                 return false;
             }
 
@@ -91,7 +91,7 @@ export class Utility {
 
     static async getUserAbilities(userId: string): Promise<Ability[] | null> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!await ValUser.isUserValid(userId)) {
                 return null;
             }
 
@@ -109,6 +109,10 @@ export class Utility {
     static async addNotification(userId: string, title: string, text: string): Promise<boolean> {
         try {
             if(!ValNotification.isValid(userId, title, text)) {
+                return false;
+            }
+
+            if(!await ValUser.isUserValid(userId)) {
                 return false;
             }
 
@@ -171,6 +175,10 @@ export class Utility {
                 return false;
             }
 
+            if(!await ValUser.isUserValid(ownerId)) {
+                return false;
+            }
+
             if(await this.alreadyProjectWithSameName(ownerId, name, 0)) {
                 return false;
             }
@@ -203,6 +211,10 @@ export class Utility {
     static async updateProject(id: number, name: string, ownerId: string, thumbnail: string, description: string, links: string, maxMembers: number): Promise<boolean> {
         try {
             if(!ValProject.isValid(name, ownerId, thumbnail, description, new Date(Date.now()), links, maxMembers) || id < 1) {
+                return false;
+            }
+
+            if(!await ValUser.isUserValid(ownerId)) {
                 return false;
             }
 
@@ -252,8 +264,8 @@ export class Utility {
     }
 
     static async deleteProjectByName(projectName: string, userId: string): Promise<boolean> {
-                    try {
-                        if(!ValUser.isIFValid(userId) || projectName.length < 1 || projectName.length > 30) {
+        try {
+            if(!ValUser.isIFValid(userId) || projectName.length < 1 || projectName.length > 30) {
                 return false;
             }
 
@@ -283,6 +295,19 @@ export class Utility {
         }
     }
 
+    static async getProjectsWhereUserIsOwner(userId: string): Promise<Project[] | null> {
+        try {
+            if(!await ValUser.isUserValid(userId)) {
+                return null;
+            }
+
+            return await Database.getProjectsByOwnerId(userId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
     static async getProjectId(projectName: string, ownerId: string): Promise<number | null> {
         try {
             if(!ValUser.isIFValid(ownerId) || projectName.length < 1 || projectName.length > 30) {
@@ -309,7 +334,7 @@ export class Utility {
     /* region ProjectMember */
     static async addProjectMember(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
+            if(!await ValUser.isUserValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
@@ -323,6 +348,19 @@ export class Utility {
     static async getProjectMembers(projectId: number): Promise<ProjectMember[] | null> {
         try {
             return await Database.getProjectMembersByProjectId(projectId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static async getProjectsWhereUserIsMember(userId: string): Promise<Project[] | null> {
+        try {
+            if(!ValUser.isIFValid(userId)) {
+                return null;
+            }
+
+            return await Database.getProjectsWhereUserIsMember(userId);
         }
         catch (e) {
             return null;
@@ -346,7 +384,7 @@ export class Utility {
     /* region Like */
     static async addLike(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
+            if(!await ValUser.isUserValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
@@ -393,7 +431,7 @@ export class Utility {
     /* region View */
     static async addView(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
+            if(!await ValUser.isUserValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
@@ -464,7 +502,7 @@ export class Utility {
 
     static async addDirectChat(userId: string, otherUserId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || !ValUser.isIFValid(otherUserId)) {
+            if(!await ValUser.isUserValid(userId) || !await ValUser.isUserValid(otherUserId)) {
                 return false;
             }
 
@@ -532,7 +570,7 @@ export class Utility {
 
     static async addMessage(chatId: number, userId: string, message: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || message.length < 1 || message.length > 500) {
+            if(!ValMessage.isValid(userId, message) || chatId < 1){
                 return false;
             }
 
@@ -560,7 +598,7 @@ export class Utility {
 
     static async updateMessage(messageId: number, chatId: number, userId: string, message: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || messageId < 1 || chatId < 1 || message.length < 1 || message.length > 500) {
+            if(!ValMessage.isValid(userId, message) || messageId < 1 || chatId < 1){
                 return false;
             }
 

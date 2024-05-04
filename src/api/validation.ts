@@ -1,3 +1,4 @@
+import {Utility} from "./utility";
 
 export class ValUser {
     static isValid(ifId: string, username: string, firstname: string, lastname: string,
@@ -42,6 +43,16 @@ export class ValUser {
         return !isNaN(Number(ifId.substring(2)));
     }
 
+    static async isUserValid(ifId: string) {
+        if(!this.isIFValid(ifId)) {
+            return false;
+        }
+
+        const user = await Utility.getUser(ifId);
+
+        return user !== null;
+    }
+
     private static containsForbiddenWords(username: string, firstname: string, lastname: string): boolean {
         //TODO: Add more forbidden words from file
         let forbiddenWords: string[] = ["admin", "moderator", "user", "root", "guest", "login", "register", "password", "username", "firstname", "lastname", "email", "birthdate", "permissions"];
@@ -65,7 +76,7 @@ export class ValProject {
             return false;
         }
 
-        if(!ValUser.isIFValid(ownerId)){
+        if(!ValUser.isUserValid(ownerId)){
             return false;
         }
 
