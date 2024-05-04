@@ -442,6 +442,40 @@ describe('database-test-user', () => {
     });
 
     /* endregion */
+
+    /* region addNotification */
+
+    test('add-notification-invalid-userId', async() => {
+        const success = await Utility.addNotification('', 'Test', 'Test');
+        expect(success).toBeFalsy();
+    });
+
+    test('add-notification-invalid-title', async() => {
+        const success = await Utility.addNotification(ifId, '', 'Test');
+        await deleteNotification(ifId);
+        expect(success).toBeFalsy();
+    });
+
+    test('add-notification-invalid-text', async() => {
+        const success = await Utility.addNotification(ifId, 'Test', '');
+        await deleteNotification(ifId);
+        expect(success).toBeFalsy();
+    });
+
+    test('add-notification-valid', async() => {
+        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+
+        let dbUser: User | null = await Utility.getUser(ifId);
+
+        expect(dbUser).not.toBeNull();
+
+        const success = await Utility.addNotification(ifId, 'Test', 'Test');
+        await deleteUser(ifId, true);
+        await deleteNotification(ifId);
+        expect(success).toBeTruthy();
+    });
+
+    /* endregion */
 });
 
 describe('database-test-project', () => {
@@ -471,6 +505,7 @@ describe('database-test-project', () => {
     });
 
     test('add-project-name-already-exists', async() => {
+        await deleteProjectByName(project.name, project.ownerId);
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
 
@@ -746,6 +781,98 @@ describe('database-test-project', () => {
     /* endregion */
 });
 
+describe('database-test-chat', () => {
+
+    const ifId: string = 'IF210053';
+    const ifId2: string = 'IF210063';
+    const ifId3: string = 'IF210073';
+
+   /* region addChat */
+    test('add-chat-invalid-ifId', async() => {
+         const success = await Utility.addDirectChat('ifId', ifId2);
+         await Utility.deleteDirectChat('ifId', ifId2);
+         expect(success).toBeFalsy();
+    });
+
+    test('add-chat-invalid-ifId2', async() => {
+         const success = await Utility.addDirectChat(ifId, 'ifId');
+         await Utility.deleteDirectChat(ifId, 'ifId');
+         expect(success).toBeFalsy();
+    });
+
+    test('add-chat-already-exists', async() => {
+        await Utility.deleteDirectChat(ifId, ifId2);
+        const success = await Utility.addDirectChat(ifId, ifId2);
+        expect(success).toBeTruthy();
+
+        const success2 = await Utility.addDirectChat(ifId, ifId2);
+        await Utility.deleteDirectChat(ifId, ifId2);
+        await Utility.deleteDirectChat(ifId, ifId2);
+        expect(success2).toBeFalsy();
+    });
+
+    test('add-chat-valid', async() => {
+        const success = await Utility.addDirectChat(ifId, ifId2);
+        await Utility.deleteDirectChat(ifId, ifId2);
+        expect(success).toBeTruthy();
+    });
+    /* endregion */
+
+    /* region addMessage */
+    test('add-message-invalid-ifId', async() => {
+        const success1 = await Utility.addDirectChat(ifId, ifId2);
+        expect(success1).toBeTruthy();
+
+        const chat = await Utility.getDirectChat(ifId, ifId2);
+
+        const success = await Utility.addMessage(chat.id, 'Test', ifId2);
+        await deleteMessage(ifId, ifId2);
+        await Utility.deleteDirectChat(ifId, ifId2);
+
+        expect(success).toBeFalsy();
+    });
+
+    test('add-message-invalid-text', async() => {
+        const success1 = await Utility.addDirectChat(ifId, ifId2);
+        expect(success1).toBeTruthy();
+
+        const chat = await Utility.getDirectChat(ifId, ifId2);
+
+        const success = await Utility.addMessage(chat.id, ifId, '');
+        await deleteMessage(ifId, ifId2);
+        await Utility.deleteDirectChat(ifId, ifId2);
+
+        expect(success).toBeFalsy();
+    });
+
+    test('add-message-invalid-ifId2', async() => {
+        const success1 = await Utility.addDirectChat(ifId, ifId2);
+        expect(success1).toBeTruthy();
+
+        const chat = await Utility.getDirectChat(ifId, ifId2);
+
+        const success = await Utility.addMessage(chat.id, ifId3, 'ifId');
+        await deleteMessage(ifId, ifId2);
+        await Utility.deleteDirectChat(ifId, ifId2);
+
+        expect(success).toBeFalsy();
+    });
+
+    test('add-message-valid', async() => {
+        const success1 = await Utility.addDirectChat(ifId, ifId2);
+        expect(success1).toBeTruthy();
+
+        const chat = await Utility.getDirectChat(ifId, ifId2);
+
+        const success = await Utility.addMessage(chat.id, ifId, 'hello');
+        await deleteMessage(ifId, ifId2);
+        await Utility.deleteDirectChat(ifId, ifId2);
+        expect(success).toBeTruthy();
+    });
+
+    /* endregion */
+});
+
 /* region Help-Functions */
 async function deleteUser(ifId: string, flag:boolean = false) {
     if(!flag) {
@@ -767,6 +894,29 @@ async function deleteProject(id: number, ownerId: string) {
 
 async function deleteProjectByName(name: string, ownerId: string) {
     await Utility.deleteProjectByName(name, ownerId);
+}
+
+async function deleteNotification(userId: string) {
+    let dbNotification = await Utility.getNotifications(userId);
+
+    for(const notification of dbNotification) {
+        await Utility.deleteNotification(userId, notification.id);
+    }
+
+    dbNotification = await Utility.getNotifications(userId);
+    expect(dbNotification.length).toBe(0);
+}
+
+async function deleteMessage(userId: string, otherUserId: string) {
+    const chat = await Utility.getDirectChat(userId, otherUserId);
+    let dbMessage = await Utility.getMessages(chat.id);
+
+    for(const message of dbMessage) {
+        await Utility.deleteMessage(userId, message.id);
+    }
+
+    dbMessage = await Utility.getMessages(chat.id);
+    expect(dbMessage.length).toBe(0);
 }
 
 /* endregion */

@@ -475,16 +475,16 @@ export class Database {
 
     static async getLikesByUserId(userId: string): Promise<Like[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Flame WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Like WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const flames: Like[] = (rows as any[]).map(row => ({
+                    const likes: Like[] = (rows as any[]).map(row => ({
                         id: row.id,
                         projectId: row.projectId,
                         userId: row.userId
                     }));
-                    resolve(flames);
+                    resolve(likes);
                 }
             });
         });
@@ -492,7 +492,7 @@ export class Database {
 
     static async getLikesByProjectId(projectId: number): Promise<Like[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Flame WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Like WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -630,6 +630,25 @@ export class Database {
     static async getDirectChatByUserIds(userId: string, otherUserId: string): Promise<DirectChat | null> {
         return new Promise((resolve, reject) => {
             db.get(`SELECT * FROM DirectChat WHERE userId = ? AND otherUserId = ?`, [userId, otherUserId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else if (!row) {
+                    resolve(null);
+                } else {
+                    const directChat: DirectChat = {
+                        id: row.id,
+                        userId: row.userId,
+                        otherUserId: row.otherUserId
+                    };
+                    resolve(directChat);
+                }
+            });
+        });
+    }
+
+    static async getDirectChatById(chatId: number): Promise<DirectChat | null> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM DirectChat WHERE id = ?`, [chatId], (err, row: any) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {

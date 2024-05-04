@@ -1,6 +1,6 @@
 
 import {Database} from "./db";
-import {ValProject, ValUser} from "./validation";
+import {ValNotification, ValProject, ValUser} from "./validation";
 import {Ability, DirectChat, Like, Message, Notification, Project, ProjectMember, User, View} from "./models";
 
 export class Utility {
@@ -108,7 +108,7 @@ export class Utility {
 
     static async addNotification(userId: string, title: string, text: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || title.length < 1 || title.length > 50 || text.length < 1 || text.length > 500) {
+            if(!ValNotification.isValid(userId, title, text)) {
                 return false;
             }
 
@@ -533,6 +533,12 @@ export class Utility {
     static async addMessage(chatId: number, userId: string, message: string): Promise<boolean> {
         try {
             if(!ValUser.isIFValid(userId) || message.length < 1 || message.length > 500) {
+                return false;
+            }
+
+            const chat = await Database.getDirectChatById(chatId);
+
+            if(chat === null || (chat.userId !== userId && chat.otherUserId !== userId)) {
                 return false;
             }
 

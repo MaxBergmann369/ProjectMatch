@@ -97,6 +97,20 @@ export class ValProject {
     }
 }
 
+export class ValNotification {
+    static isValid(userId: string, title: string, text: string): boolean {
+        if(!ValUser.isIFValid(userId)){
+            return false;
+        }
+
+        if(title === undefined || title === "" || title.length > 50 || title.length < 1) {
+            return false;
+        }
+
+        return !(text === undefined || text === "" || text.length > 500 || text.length < 1);
+    }
+}
+
 export class ValMessage {
     static isValid(senderId: string, message: string): boolean {
         if (!ValUser.isIFValid(senderId)) {
