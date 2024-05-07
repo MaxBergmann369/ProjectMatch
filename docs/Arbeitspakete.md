@@ -136,7 +136,7 @@
 - **Definition of Done:**
   - Benutzeranmeldung und -registrierung sind sicher und robust implementiert.
   - E-Mail-Verifizierung ist implementiert und funktioniert zuverlässig.
-  - Passwort-Sicherheitsrichtlinien sind implementiert.
+  - Passwort-Verschlüsselung ist implementiert.
 
 ### Fragebogen Logik
 - **Beschreibung:** Entwicklung der Backend-Logik für den Fragebogen.
@@ -145,6 +145,14 @@
   - Fragebogen-Struktur ist korrekt implementiert und validiert.
   - Alle Fragen und Antworten werden korrekt gespeichert und verarbeitet.
   - Generierung von Projektvorschlägen basierend auf den Fragebogen-Antworten funktioniert zuverlässig.
+
+### Projekt-Empfehlungs-Algorithmus
+- **Beschreibung:** Entwicklung eines Algorithmus zur Generierung von personalisierten Projektvorschlägen.
+- **Zeitaufwand:** 5 Stunden
+- **Definition of Done:**
+  - Der Algorithmus analysiert erfolgreich die Benutzerantworten und generiert passende Projektvorschläge.
+  - Der Algorithmus berücksichtigt verschiedene Faktoren wie Projektthemen und erforderliche Fähigkeiten.
+  - Die generierten Projektvorschläge sind relevant und entsprechen den Interessen und Fähigkeiten der Benutzer.
 
 ### Benutzerprofil-Verwaltung
 - **Beschreibung:** Entwicklung der Backend-Logik für die Benutzerprofil-Verwaltung.
@@ -199,3 +207,13 @@
 - **Definition of Done:**
   - API-Dokumentation ist vollständig und verständlich.
   - Alle Endpunkte, Parameter und Rückgabewerte sind dokumentiert.
+
+## Sonstige
+
+### Performance-Optimierung
+- **Beschreibung:** Durchführung von Optimierungen zur Verbesserung der Backend-Performance.
+- **Zeitaufwand:** 5 Stunden
+- **Definition of Done:**
+  - Die Backend-Performance ist nach der Optimierung spürbar verbessert.
+  - Caching- und Datenbank-Indexierungsstrategien sind implementiert und verbessern die Anwendungsleistung.
+  - Code-Optimierungen wurden durchgeführt, um überflüssige Last zu reduzieren und die Reaktionszeiten zu verkürzen.

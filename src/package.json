@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx ts-node api/app.ts",
+    "test": "jest",
+    "start": "npx ts-node app.ts",
     "build": "npx tsc && npx sass website/styles/"
   },
   "dependencies": {
@@ -16,7 +17,11 @@
     "nodemon": "^3.0.3",
     "sass": "^1.75.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "@types/jest": "^29.5.3",
+    "@types/typescript": "^2.0.0",
+    "jest": "^29.6.2",
+    "ts-jest": "^29.1.1"
   },
   "author": "",
   "license": "ISC"
