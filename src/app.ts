@@ -3,10 +3,11 @@ import http from "http";
 import express from 'express';
 import session from 'express-session';
 import Keycloak from 'keycloak-connect';
-import {userRouter} from "./api/user-router";
+import {createEndpoints} from "./api/user-router";
 
 const app = express();
 
+/*
 const memoryStore = new session.MemoryStore();
 app.use(session({
     secret: 'some long secret',
@@ -25,8 +26,11 @@ app.get('/logout', keycloak.protect(), (req: any, res) => {
     res.redirect('/');
 });
 
+*/
+
 app.use(express.json());
 
+const userRouter = createEndpoints();
 app.use('/api', userRouter);
 app.use(express.static('website'));
 

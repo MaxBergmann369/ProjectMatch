@@ -2,24 +2,24 @@ import express from "express";
 import {Database} from "./db";
 import {Utility} from "./utility";
 
-export const userRouter = express.Router();
+const userRouter = express.Router();
 
 export function createEndpoints() {
-    //addUser Utility
-    userRouter.post('/addUser', async (req, res) => {
+    userRouter.post('/user', async (req, res) => {
         const {ifId, username, firstname, lastname, birthdate, biografie, permissions, department} = req.body;
 
         const token = req.headers.authorization as string;
 
-        if(await Utility.addUser(ifId, username, firstname, lastname, birthdate, biografie, permissions, department)) {
+        const bd = new Date(birthdate);
+
+        if(await Utility.addUser(ifId, username, firstname, lastname, bd, biografie, permissions, department)) {
             res.status(200).send("User added");
         } else {
             res.status(400).send("User not added");
         }
     });
 
-    //getUser Utility
-    userRouter.get('/getUser', async (req, res) => {
+    userRouter.get('/user', async (req, res) => {
         const ifId = req.query.ifId as string;
 
         const user = await Utility.getUser(ifId);
@@ -31,19 +31,19 @@ export function createEndpoints() {
         }
     });
 
-    //updateUser Utility
-    userRouter.put('/updateUser', async (req, res) => {
+    userRouter.put('/user', async (req, res) => {
         const {ifId, username, firstname, lastname, birthdate, biografie, permissions, department} = req.body;
 
-        if(await Utility.updateUser(ifId, username, firstname, lastname, birthdate, biografie, permissions, department)) {
+        const bd = new Date(birthdate);
+
+        if(await Utility.updateUser(ifId, username, firstname, lastname, bd, biografie, permissions, department)) {
             res.status(200).send("User updated");
         } else {
             res.status(400).send("User not updated");
         }
     });
 
-    //deleteUser Utility
-    userRouter.delete('/deleteUser', async (req, res) => {
+    userRouter.delete('/user', async (req, res) => {
         const ifId = req.query.ifId as string;
 
         if(await Utility.deleteUser(ifId)) {
@@ -53,8 +53,7 @@ export function createEndpoints() {
         }
     });
 
-    //addUserAbility Utility
-    userRouter.post('/addUserAbility', async (req, res) => {
+    userRouter.post('/userAbility', async (req, res) => {
         const {userId, abilityId} = req.body;
 
         if(await Utility.addUserAbility(userId, abilityId)) {
@@ -64,8 +63,7 @@ export function createEndpoints() {
         }
     });
 
-    //getUserAbility Utility
-    userRouter.get('/getUserAbility', async (req, res) => {
+    userRouter.get('/userAbility', async (req, res) => {
         const userId = req.query.userId as string;
 
         const userAbility = await Utility.getUserAbilities(userId);
@@ -76,4 +74,25 @@ export function createEndpoints() {
             res.status(400).send("User ability not found");
         }
     });
+
+    userRouter.delete('/userAbility', async (req, res) => {
+        const userId = req.query.userId as string;
+        const abilityId = req.query.abilityId as string;
+
+        const abId: number = parseInt(abilityId);
+
+        if (isNaN(abId)) {
+            res.status(400).send("Invalid abilityId");
+        }
+
+        if (await Utility.deleteUserAbility(userId, abId)) {
+            res.status(200).send("User ability deleted");
+        } else {
+            res.status(400).send("User ability not deleted");
+        }
+    });
+
+    return userRouter;
 }
+
+module.exports = { createEndpoints };
