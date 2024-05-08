@@ -1210,7 +1210,7 @@ export class Database {
         });
     }
 
-    static async deleteUserAbility(userId: number, abilityId: number): Promise<boolean> {
+    static async deleteUserAbility(userId: string, abilityId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`DELETE FROM UserAbility WHERE userId = ? AND abilityId = ?`, [userId, abilityId], (err) => {
                 if (err) {

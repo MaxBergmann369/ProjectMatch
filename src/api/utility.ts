@@ -102,6 +102,15 @@ export class Utility {
         }
     }
 
+    static async deleteUserAbility(userId: string, abilityId: number): Promise<boolean> {
+        try {
+            return await Database.deleteUserAbility(userId, abilityId);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
     /* endregion */
 
     /* region Notification */

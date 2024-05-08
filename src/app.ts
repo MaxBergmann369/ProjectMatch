@@ -2,13 +2,13 @@
 import {Database} from './api/db';
 import http from "http";
 import express from "express";
-import {sqlRouter} from "./api/sql-router";
+import {userRouter} from "./api/user-router";
 
 const app = express();
 
 app.use(express.json());
 
-app.use('/api', sqlRouter);
+app.use('/api', userRouter);
 app.use(express.static('website'));
 
 const server = http.createServer(app);
