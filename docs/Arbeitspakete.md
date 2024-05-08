@@ -88,6 +88,23 @@
   - Benutzer können Benachrichtigungen verwalten.
   - Benachrichtigungen sind benutzerfreundlich.
 
+  #### Projekt-Detailseite
+- **Beschreibung:** Entwickeln Sie eine ansprechende Oberfläche zur Anzeige detaillierter Informationen zu einem bestimmten Projekt.
+- **Zeitaufwand:** 12 Stunden
+- **Definition of Done:**
+  - Die Detailseite zeigt alle relevanten Projektinformationen wie Titel, Beschreibung, Fähigkeiten, Links usw. übersichtlich an.
+  - Das Projekt-Thumbnail wird angezeigt.
+  - Benutzer können das Projekt bewerten und teilen, und diese Interaktionen werden in Echtzeit aktualisiert.
+
+  #### Projekt-Erstellungsformular
+- **Beschreibung:** Entwickeln Sie eine benutzerfreundliche Oberfläche über die Benutzer neue Projekte erstellen können.
+- **Zeitaufwand:** 10 Stunden
+- **Definition of Done:**
+  - Das Formular ermöglicht es Benutzern, Titel, Beschreibung, Fähigkeiten, Links und andere relevante Informationen für ein neues Projekt einzugeben.
+  - Validierung der Eingaben erfolgt sowohl clientseitig als auch serverseitig, um Fehler zu minimieren.
+  - Der Endpunkt sendet die eingegebenen Projektdaten in einem geeigneten Format (z. B. JSON) an den Backend-Server.
+  - Die Benutzeroberfläche reagiert angemessen auf die Rückmeldungen des Endpunkts und zeigt Benutzern klare Erfolgsmeldungen oder Fehlermeldungen an.
+
 ### Einstellungen
 - **Beschreibung:** Entwicklung einer Einstellungsseite.
 - **Zeitaufwand:** 5 Stunden
@@ -95,14 +112,6 @@
   - Alle Einstellungen können korrekt gespeichert und geladen werden.
   - Datenschutzeinstellungen sind benutzerfreundlich und transparent.
   - Einstellungen sind leicht zugänglich und intuitiv zu bedienen.
-
-### Report System
-- **Beschreibung:** Entwicklung einer Benutzeroberfläche für das Reporting-System.
-- **Zeitaufwand:** 4 Stunden
-- **Definition of Done:**
-  - Benutzer können erfolgreich Reports erstellen und absenden.
-  - Bilder können hochgeladen und korrekt verarbeitet werden.
-  - Reports werden korrekt gespeichert und an das Support- oder Admin-Team weitergeleitet.
 
 ### Mehrsprachige Unterstützung
 - **Beschreibung:** Implementierung einer Benutzeroberfläche für mehrsprachige Unterstützung.
@@ -176,14 +185,6 @@
 - **Definition of Done:**
   - Online-Status wird korrekt angezeigt und aktualisiert.
   - Benutzer können ihren aktuellen Status (z.B. online, offline, abwesend) aktualisieren.
-
-### Report-System
-- **Beschreibung:** Implementierung der Backend-Logik zur Verarbeitung von Reports.
-- **Zeitaufwand:** 3 Stunden
-- **Definition of Done:**
-  - Benutzer können erfolgreich Reports erstellen und absenden.
-  - Bilder können hochgeladen und korrekt verarbeitet werden.
-  - Reports werden korrekt gespeichert und an das Support- oder Admin-Team weitergeleitet.
 
 ## Dokumentation
 
