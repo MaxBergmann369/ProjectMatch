@@ -99,7 +99,46 @@ export function createEndpoints() {
 
     /* endregion */
 
-    /* region Notefication */
+    /* region Notification */
+
+    userRouter.post('/notification', async (req, res) => {
+        const {userId, title, text} = req.body;
+
+        if(await Utility.addNotification(userId, title, text)) {
+            res.status(200).send("Notification added");
+        } else {
+            res.status(400).send("Notification not added");
+        }
+    });
+
+    userRouter.get('/notification', async (req, res) => {
+        const userId = req.query.userId as string;
+
+        const notification = await Utility.getNotifications(userId);
+
+        if(notification !== null) {
+            res.status(200).send(notification);
+        } else {
+            res.status(400).send("Notification not found");
+        }
+    });
+
+    userRouter.delete('/notification', async (req, res) => {
+        const userId = req.query.userId as string;
+        const notificationId = req.query.notificationId as string;
+
+        const notId: number = parseInt(notificationId);
+
+        if (isNaN(notId)) {
+            res.status(400).send("Invalid notificationId");
+        }
+
+        if (await Utility.deleteNotification(userId, notId)) {
+            res.status(200).send("Notification deleted");
+        } else {
+            res.status(400).send("Notification not deleted");
+        }
+    });
 
     /* endregion */
 

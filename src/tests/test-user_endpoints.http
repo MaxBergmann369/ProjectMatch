@@ -47,7 +47,7 @@ Content-Type: application/json
 
 {
     "userId": "IF123456",
-    "abilityId": 5
+    "abilityId": 1
 }
 
 ###
@@ -59,4 +59,21 @@ GET http://localhost:3000/api/userAbility?userId=IF123456
 DELETE http://localhost:3000/api/userAbility?userId=IF123456&abilityId=1
 
 ###
+
+POST http://localhost:3000/api/notification
+Content-Type: application/json
+
+{
+      "userId": "IF123456",
+      "title": "test",
+      "text": "test"
+}
+
+###
+
+GET http://localhost:3000/api/notification?userId=IF123456
+
+###
+
+DELETE http://localhost:3000/api/notification?userId=IF123456&notificationId=6
 

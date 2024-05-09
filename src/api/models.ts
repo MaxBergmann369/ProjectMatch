@@ -46,7 +46,7 @@ export interface Notification {
     userId: string;
     title: string;
     text: string;
-    date: Date;
+    dateTime: string;
 }
 
 export interface UserAbility {

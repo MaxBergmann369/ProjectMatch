@@ -575,7 +575,7 @@ export class Database {
                         userId: row.userId,
                         title: row.title,
                         text: row.text,
-                        date: new Date(row.date)
+                        dateTime: row.date
                     }));
                     resolve(notifications);
                 }
@@ -606,6 +606,18 @@ export class Database {
         });
     }
 
+    static async userAbilityAlreadyExists(userId: string, abilityId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM UserAbility WHERE userId = ? AND abilityId = ?`, [userId, abilityId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row !== undefined);
+                }
+            });
+        });
+    }
+
     static getProjectAbilitiesByProjectId(projectId: number): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT abilityId FROM ProjectAbility WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
@@ -625,6 +637,18 @@ export class Database {
                             resolve(abilities);
                         }
                     });
+                }
+            });
+        });
+    }
+
+    static async projectAbilityAlreadyExists(projectId: number, abilityId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM ProjectAbility WHERE userId = ? AND abilityId = ?`, [projectId, abilityId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row !== undefined);
                 }
             });
         });

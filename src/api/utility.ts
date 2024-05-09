@@ -82,6 +82,10 @@ export class Utility {
                 return false;
             }
 
+            if(await Database.userAbilityAlreadyExists(userId, abilityId)) {
+                return false;
+            }
+
             return await Database.addUserAbility(userId, abilityId);
         }
         catch (e) {
@@ -124,8 +128,11 @@ export class Utility {
             if(!await ValUser.isUserValid(userId)) {
                 return false;
             }
+            const date = new Date(Date.now());
 
-            return await Database.addNotification(userId, title, text, new Date(Date.now()).toDateString());
+            const dateTime = `${date.toLocaleDateString()};${date.toLocaleTimeString()}`
+
+            return await Database.addNotification(userId, title, text, dateTime);
         }
         catch (e) {
             return false;
@@ -538,6 +545,10 @@ export class Utility {
     static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
         try {
             if(abilityId < 1 || projectId < 1 || await Database.getProject(projectId) === null || await Database.getAbilityById(abilityId) === null){
+                return false;
+            }
+
+            if(await Database.projectAbilityAlreadyExists(projectId, abilityId)) {
                 return false;
             }
 
