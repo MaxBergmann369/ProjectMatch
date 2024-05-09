@@ -1,8 +1,10 @@
 export interface User {
-    ifId: string;
+    userId: string;
     username: string;
     firstname: string;
     lastname: string;
+    email: string;
+    clazz: string;
     birthdate: Date;
     biografie: string;
     permissions: number;
@@ -24,6 +26,7 @@ export interface ProjectMember {
     id: number;
     projectId: number;
     userId: string;
+    IsAccepted: boolean;
 }
 
 export interface View {

@@ -20,10 +20,12 @@ export class Database {
     static createTables() {
         db.serialize(() => {
             db.run(`CREATE TABLE IF NOT EXISTS User (
-            ifId TEXT PRIMARY KEY,
+            userId TEXT PRIMARY KEY,
             username TEXT NOT NULL,
             firstname TEXT NOT NULL,
             lastname TEXT NOT NULL,
+            email TEXT NOT NULL,
+            clazz TEXT NOT NULL,
             birthdate TEXT NOT NULL,
             biografie TEXT,
             permissions INTEGER NOT NULL,
@@ -39,14 +41,15 @@ export class Database {
             dateOfCreation TEXT NOT NULL,
             links TEXT,
             maxMembers INTEGER NOT NULL,
-            FOREIGN KEY(ownerId) REFERENCES User(ifId)
+            FOREIGN KEY(ownerId) REFERENCES User(userId)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS ProjectMember (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userId TEXT NOT NULL,
             projectId INTEGER NOT NULL,
-            FOREIGN KEY(userId) REFERENCES User(ifId),
+            isAccepted BOOLEAN NOT NULL,
+            FOREIGN KEY(userId) REFERENCES User(userId),
             FOREIGN KEY(projectId) REFERENCES Project(id)
         )`);
 
@@ -55,7 +58,7 @@ export class Database {
             projectId INTEGER NOT NULL,
             userId TEXT NOT NULL,
             FOREIGN KEY(projectId) REFERENCES Project(id),
-            FOREIGN KEY(userId) REFERENCES User(ifId)
+            FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS View (
@@ -63,7 +66,7 @@ export class Database {
             projectId INTEGER NOT NULL,
             userId TEXT NOT NULL,
             FOREIGN KEY(projectId) REFERENCES Project(id),
-            FOREIGN KEY(userId) REFERENCES User(ifId)
+            FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS Notification (
@@ -72,14 +75,14 @@ export class Database {
             title TEXT NOT NULL,
             text TEXT NOT NULL,
             date TEXT NOT NULL,
-            FOREIGN KEY(userId) REFERENCES User(ifId)
+            FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS UserAbility (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userId TEXT NOT NULL,
             abilityId INTEGER NOT NULL,
-            FOREIGN KEY(userId) REFERENCES User(ifId),
+            FOREIGN KEY(userId) REFERENCES User(userId),
             FOREIGN KEY(abilityId) REFERENCES Ability(id)
         )`);
 
@@ -102,8 +105,8 @@ export class Database {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userId TEXT NOT NULL,
             otherUserId TEXT NOT NULL,
-            FOREIGN KEY(userId) REFERENCES User(ifId),
-            FOREIGN KEY(otherUserId) REFERENCES User(ifId)
+            FOREIGN KEY(userId) REFERENCES User(userId),
+            FOREIGN KEY(otherUserId) REFERENCES User(userId)
         )`);
 
             db.run(`CREATE TABLE IF NOT EXISTS Message (
@@ -113,7 +116,7 @@ export class Database {
             message TEXT NOT NULL,
             date TEXT NOT NULL,
             FOREIGN KEY(chatId) REFERENCES DirectChat(id),
-            FOREIGN KEY(userId) REFERENCES User(ifId)
+            FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
         });
     }
@@ -226,10 +229,12 @@ export class Database {
                     reject(err);
                 } else {
                     const users: User[] = (rows as any[]).map(row => ({
-                        ifId: row.ifId,
+                        userId: row.userId,
                         username: row.username,
                         firstname: row.firstname,
                         lastname: row.lastname,
+                        email: row.email,
+                        clazz: row.clazz,
                         birthdate: new Date(row.birthdate),
                         biografie: row.biografie,
                         permissions: row.permissions,
@@ -241,19 +246,21 @@ export class Database {
         });
     }
 
-    static async getUser(ifId: string): Promise<User | null> {
+    static async getUser(userId: string): Promise<User | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM User WHERE ifId = ?`, [ifId], (err, row: any) => {
+            db.get(`SELECT * FROM User WHERE userId = ?`, [userId], (err, row: any) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {
                     resolve(null);
                 } else {
                     const user: User = {
-                        ifId: row.ifId,
+                        userId: row.userId,
                         username: row.username,
                         firstname: row.firstname,
                         lastname: row.lastname,
+                        email: row.email,
+                        clazz: row.clazz,
                         birthdate: new Date(row.birthdate),
                         biografie: row.biografie,
                         permissions: row.permissions,
@@ -392,7 +399,8 @@ export class Database {
                     const projectMembers: ProjectMember[] = (rows as any[]).map(row => ({
                         id: row.id,
                         projectId: row.projectId,
-                        userId: row.userId
+                        userId: row.userId,
+                        IsAccepted: Boolean(row.IsAccepted)
                     }));
                     resolve(projectMembers);
                 }
@@ -688,9 +696,9 @@ export class Database {
 
     //#region InsertDataToDB
 
-    static async addUser(ifId: string, username: string, firstname: string, lastname: string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
+    static async addUser(userId: string, username: string, firstname: string, lastname: string, email: string, clazz: string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO User VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [ifId, username, firstname, lastname, birthdate, biografie, permissions, department], (err) => {
+            db.run(`INSERT INTO User (userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -713,8 +721,9 @@ export class Database {
     }
 
     static async addProjectMember(userId: string, projectId: number): Promise<boolean> {
+        //set isAccepted true
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO ProjectMember (userId, projectId) VALUES (?, ?)`, [userId, projectId], (err) => {
+            db.run(`INSERT INTO ProjectMember (userId, projectId, isAccepted) VALUES (?, ?, ?)`, [userId, projectId, false], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -824,9 +833,9 @@ export class Database {
 
     //#region UpdateDataInDB
 
-    static async updateUser(ifId: string, username: string, firstname: string, lastname: string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
+    static async updateUser(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, birthdate = ?, biografie = ?, permissions = ?, department = ? WHERE ifId = ?`, [username, firstname, lastname, birthdate, biografie, permissions, department, ifId], (err) => {
+            db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, email = ?, clazz = ?, birthdate = ?, biografie = ?, permissions = ?, department = ? WHERE userId = ?`, [username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department, userId], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -839,6 +848,18 @@ export class Database {
     static async updateProject(id: number, name: string, ownerId: string, thumbnail: string, description: string, links: string, maxMembers: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`UPDATE Project SET name = ?, ownerId = ?, thumbnail = ?, description = ?, links = ?, maxMembers = ? WHERE id = ?`, [name, ownerId, thumbnail, description, links, maxMembers, id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async acceptProjectMember(userId: string, projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`UPDATE ProjectMember SET isAccepted = ? WHERE userId = ? AND projectId = ?`, [true, userId, projectId], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -863,7 +884,7 @@ export class Database {
 
     //#region DeleteDataFromDB
 
-    static async deleteUser(ifId: string): Promise<boolean> {
+    static async deleteUser(userId: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run("BEGIN TRANSACTION", async (beginErr) => {
                 if (beginErr) {
@@ -872,15 +893,15 @@ export class Database {
                 }
 
                 try {
-                    const successAbilities = await this.deleteUserAbilitiesByUserId(ifId);
-                    const successProjects = await this.deleteProjectMembersByUserId(ifId);
-                    const successViews = await this.deleteViewsByUserId(ifId);
-                    const successLikes = await this.deleteLikesByUserId(ifId);
-                    const successNotifications = await this.deleteNotificationsByUserId(ifId);
-                    const successDirectChats = await this.deleteDirectChatsByUserId(ifId);
+                    const successAbilities = await this.deleteUserAbilitiesByUserId(userId);
+                    const successProjects = await this.deleteProjectMembersByUserId(userId);
+                    const successViews = await this.deleteViewsByUserId(userId);
+                    const successLikes = await this.deleteLikesByUserId(userId);
+                    const successNotifications = await this.deleteNotificationsByUserId(userId);
+                    const successDirectChats = await this.deleteDirectChatsByUserId(userId);
 
                     if (successAbilities && successProjects && successViews && successLikes && successNotifications && successDirectChats) {
-                        db.run(`DELETE FROM User WHERE ifId = ?`, [ifId], (deleteErr) => {
+                        db.run(`DELETE FROM User WHERE userId = ?`, [userId], (deleteErr) => {
                             if (deleteErr) {
                                 db.run("ROLLBACK", rollbackErr => {
                                     if (rollbackErr) {
