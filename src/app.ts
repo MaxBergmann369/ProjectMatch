@@ -1,9 +1,11 @@
-import {Database} from './api/db';
+import {Database} from './api/db/db';
 import http from "http";
 import express from 'express';
 import session from 'express-session';
 import Keycloak from 'keycloak-connect';
-import {createEndpoints} from "./api/user-router";
+import {createUserEndpoints} from "./api/router/user-router";
+import {createProjectEndpoints} from "./api/router/project-router";
+import {createChatEndpoints} from "./api/router/chat-router";
 
 const app = express();
 
@@ -30,8 +32,14 @@ app.get('/logout', keycloak.protect(), (req: any, res) => {
 
 app.use(express.json());
 
-const userRouter = createEndpoints();
+const userRouter = createUserEndpoints();
+const projectRouter = createProjectEndpoints();
+const chatRouter = createChatEndpoints();
+
 app.use('/api', userRouter);
+app.use('/api', projectRouter);
+app.use('/api', chatRouter);
+
 app.use(express.static('website'));
 
 const server = http.createServer(app);

@@ -373,6 +373,10 @@ export class Utility {
                 return false;
             }
 
+            if(!await this.isUserOwnerOfProject(userId, projectId)) {
+                return false;
+            }
+
             const members = await Database.getAmountOfProjectMembersByProjectId(projectId);
 
             if(members >= project.maxMembers) {

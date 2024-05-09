@@ -1,10 +1,10 @@
 import express from "express";
-import {Database} from "./db";
-import {Utility} from "./utility";
+import {Database} from "../db/db";
+import {Utility} from "../db/utility";
 
 const userRouter = express.Router();
 
-export function createEndpoints() {
+export function createUserEndpoints() {
     /* region User */
     userRouter.post('/user', async (req, res) => {
         const {userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department} = req.body;
@@ -145,4 +145,4 @@ export function createEndpoints() {
     return userRouter;
 }
 
-module.exports = { createEndpoints };
+module.exports = { createUserEndpoints };
