@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npx ts-node ./app.ts",
     "build": "npx webpack --mode=production  && npx sass website/styles/",
-    "dev": "npx webpack --mode=development && npx sass website/styles/"
+    "dev": "npx webpack --mode=development && npx sass website/styles/",
     "test": "jest"
   },
   "dependencies": {
