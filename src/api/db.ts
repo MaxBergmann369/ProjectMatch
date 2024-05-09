@@ -392,7 +392,7 @@ export class Database {
 
     static async getProjectMembersByProjectId(projectId: number): Promise<ProjectMember[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM ProjectMember WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM ProjectMember WHERE projectId = ? AND isAccepted = 1`, [projectId], (err, rows: unknown[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -400,7 +400,25 @@ export class Database {
                         id: row.id,
                         projectId: row.projectId,
                         userId: row.userId,
-                        IsAccepted: Boolean(row.IsAccepted)
+                        IsAccepted: row.isAccepted
+                    }));
+                    resolve(projectMembers);
+                }
+            });
+        });
+    }
+
+    static async getNotAcceptedProjectMembersByProjectId(projectId: number): Promise<ProjectMember[]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM ProjectMember WHERE projectId = ? AND isAccepted = 0`, [projectId], (err, rows: unknown[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const projectMembers: ProjectMember[] = (rows as any[]).map(row => ({
+                        id: row.id,
+                        projectId: row.projectId,
+                        userId: row.userId,
+                        IsAccepted: row.isAccepted
                     }));
                     resolve(projectMembers);
                 }

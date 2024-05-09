@@ -1,9 +1,9 @@
 import {Utility} from "./utility";
 
 export class ValUser {
-    static isValid(ifId: string, username: string, firstname: string, lastname: string,
+    static isValid(userId: string, username: string, firstname: string, email:string, clazz:string, lastname: string,
                    birthdate: Date, biografie: string, permissions: number, department: string): boolean {
-        if(!this.isIFValid(ifId)) {
+        if(!this.isUserIdValid(userId)) {
             return false;
         }
 
@@ -31,26 +31,39 @@ export class ValUser {
             return false;
         }
 
+        if(email === undefined || !this.isEmailValid(email)) {
+            return false;
+        }
+
+        if(clazz === undefined || clazz === "" || clazz.length > 10 || clazz.length < 1) {
+            return false;
+        }
+
         return !this.containsForbiddenWords(username, firstname, lastname);
     }
 
 
-    static isIFValid(ifId: string): boolean {
-        if(ifId === undefined || ifId.length !== 8 || !ifId.startsWith("IF")) {
+    static isUserIdValid(userId: string): boolean {
+        if(userId === undefined || userId.length !== 8 || !userId.startsWith("IF")) {
             return false;
         }
 
-        return !isNaN(Number(ifId.substring(2)));
+        return !isNaN(Number(userId.substring(2)));
     }
 
-    static async isUserValid(ifId: string) {
-        if(!this.isIFValid(ifId)) {
+    static async isUserValid(userId: string) {
+        if(!this.isUserIdValid(userId)) {
             return false;
         }
 
-        const user = await Utility.getUser(ifId);
+        const user = await Utility.getUser(userId);
 
         return user !== null;
+    }
+
+    private static isEmailValid(email: string): boolean {
+        const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return pattern.test(email);
     }
 
     private static containsForbiddenWords(username: string, firstname: string, lastname: string): boolean {
@@ -110,7 +123,7 @@ export class ValProject {
 
 export class ValNotification {
     static isValid(userId: string, title: string, text: string): boolean {
-        if(!ValUser.isIFValid(userId)){
+        if(!ValUser.isUserIdValid(userId)){
             return false;
         }
 
@@ -124,7 +137,7 @@ export class ValNotification {
 
 export class ValMessage {
     static isValid(senderId: string, message: string): boolean {
-        if (!ValUser.isIFValid(senderId)) {
+        if (!ValUser.isUserIdValid(senderId)) {
             return false;
         }
 
