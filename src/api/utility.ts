@@ -360,6 +360,18 @@ export class Utility {
                 return false;
             }
 
+            const project = await this.getProject(projectId);
+
+            if(project === null) {
+                return false;
+            }
+
+            const members = await Database.getAmountOfProjectMembersByProjectId(projectId);
+
+            if(members >= project.maxMembers) {
+                return false;
+            }
+
             return Database.acceptProjectMember(userId, projectId);
         }
         catch (e) {
@@ -539,6 +551,15 @@ export class Utility {
     static async getAbilitiesByProjectId(projectId: number): Promise<Ability[]> {
         try {
             return await Database.getProjectAbilitiesByProjectId(projectId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static async getAllAbilities(): Promise<Ability[]> {
+        try {
+            return await Database.getAbilities();
         }
         catch (e) {
             return null;

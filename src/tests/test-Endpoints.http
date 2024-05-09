@@ -6,6 +6,8 @@ Content-Type: application/json
     "username": "test",
     "firstname": "test",
     "lastname": "test",
+    "email": "test@test.at",
+    "clazz": "5BHITM",
     "birthdate": "2002-05-08",
     "biografie": "test",
     "permissions": 1,

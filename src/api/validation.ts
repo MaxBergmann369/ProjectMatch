@@ -1,4 +1,16 @@
 import {Utility} from "./utility";
+import {types} from "sass";
+import Map = types.Map;
+
+enum DepartmentTypes {
+    Unset = "Unknown",
+    AD = "Abendschule",
+    BG = "Biomedizin- und Gesundheitstechnik",
+    FE = "Fachschule Elektronik",
+    HE = "Höhere Elektronik",
+    IF = "Informatik",
+    IT = "Medientechnik"
+}
 
 export class ValUser {
     static isValid(userId: string, username: string, firstname: string, email:string, clazz:string, lastname: string,
@@ -27,7 +39,7 @@ export class ValUser {
             return false;
         }
 
-        if(department === undefined || department === "" || department.length > 20 || department.length < 1) {
+        if(department === undefined || department === "" || !this.validateDepartment(department)) {
             return false;
         }
 
@@ -44,11 +56,17 @@ export class ValUser {
 
 
     static isUserIdValid(userId: string): boolean {
-        if(userId === undefined || userId.length !== 8 || !userId.startsWith("IF")) {
+
+        if(userId === undefined || userId === null || userId.length !== 8) {
             return false;
         }
 
-        return !isNaN(Number(userId.substring(2)));
+        const id = userId.toLowerCase();
+        if(!Object.keys(DepartmentTypes).some(value => id.startsWith(value.toLowerCase()))) {
+            return false;
+        }
+
+        return !isNaN(Number(id.substring(2)));
     }
 
     static async isUserValid(userId: string) {
@@ -79,6 +97,10 @@ export class ValUser {
         }
 
         return !isNaN(birthdate.getTime());
+    }
+
+    private static validateDepartment(department: string): boolean {
+        return Object.keys(DepartmentTypes).some(value => department.toLowerCase() === value.toLowerCase());
     }
 }
 

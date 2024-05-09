@@ -6,13 +6,13 @@ const userRouter = express.Router();
 
 export function createEndpoints() {
     userRouter.post('/user', async (req, res) => {
-        const {ifId, username, firstname, lastname, birthdate, biografie, permissions, department} = req.body;
+        const {userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department} = req.body;
 
         const token = req.headers.authorization as string;
 
         const bd = new Date(birthdate);
 
-        if(await Utility.addUser(ifId, username, firstname, lastname, bd, biografie, permissions, department)) {
+        if(await Utility.addUser(userId, username, firstname, lastname, email, clazz, bd, biografie, permissions, department)) {
             res.status(200).send("User added");
         } else {
             res.status(400).send("User not added");
@@ -32,11 +32,11 @@ export function createEndpoints() {
     });
 
     userRouter.put('/user', async (req, res) => {
-        const {ifId, username, firstname, lastname, birthdate, biografie, permissions, department} = req.body;
+        const {userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department} = req.body;
 
         const bd = new Date(birthdate);
 
-        if(await Utility.updateUser(ifId, username, firstname, lastname, bd, biografie, permissions, department)) {
+        if(await Utility.updateUser(userId, username, firstname, lastname, email, clazz, bd, biografie, permissions, department)) {
             res.status(200).send("User updated");
         } else {
             res.status(400).send("User not updated");

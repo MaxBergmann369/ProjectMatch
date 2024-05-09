@@ -408,6 +408,18 @@ export class Database {
         });
     }
 
+    static async getAmountOfProjectMembersByProjectId(projectId: number): Promise<number> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT COUNT(*) FROM ProjectMember WHERE projectId = ? AND isAccepted = 1`, [projectId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row['COUNT(*)']);
+                }
+            });
+        });
+    }
+
     static async getNotAcceptedProjectMembersByProjectId(projectId: number): Promise<ProjectMember[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM ProjectMember WHERE projectId = ? AND isAccepted = 0`, [projectId], (err, rows: unknown[]) => {

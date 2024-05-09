@@ -9,14 +9,16 @@ describe('database-test-user', () => {
     const date: Date = new Date(new Date().getFullYear() - 11, 0, 1);
 
     const user: User = {
-        ifId: ifId,
-        username: "test123",
-        firstname: "Max",
-        lastname: "Mustermann",
-        birthdate: new Date(date.toDateString()),
-        biografie: "",
-        permissions: 0,
-        department: "Informatik"
+        userId: "IF123456",
+        username: "test",
+        firstname: "test",
+        lastname: "test",
+        email: "test@test.at",
+        clazz: "5BHITM",
+        birthdate: date,
+        biografie: "test",
+        permissions: 1,
+        department: "test"
     }
 
     /* region addUser */
