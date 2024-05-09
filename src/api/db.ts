@@ -2,17 +2,14 @@ import * as sqlite3 from 'sqlite3';
 import {
     User,
     Ability,
-    ProjectAbility,
     Project,
     View,
     Like,
-    UserAbility,
     Message,
     DirectChat,
     Notification,
     ProjectMember
 } from "./models";
-import {ValUser} from "./validation";
 
 const db = new sqlite3.Database('projectMatch.db');
 
@@ -122,101 +119,123 @@ export class Database {
     }
 
     static initData() {
-        db.serialize(() => {
-            //add Abilities
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Programming", NULL)`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Design", NULL)`);
+        db.serialize(async () => {
+            // Add Abilities
+            await this.insertAbilityIfNotExists("Programming");
+            await this.insertAbilityIfNotExists("Design");
 
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Java", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("C#", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Python", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("HTML", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("CSS", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("JavaScript", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("TypeScript", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("SQL", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("C++", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("C", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Ruby", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("PHP", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Kotlin", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Go", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Assembly", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Rust", (SELECT id FROM Ability WHERE name = "Programming"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("F#", (SELECT id FROM Ability WHERE name = "Programming"))`);
+            // Programming
+            await this.insertAbilityIfNotExists("Java", 1);
+            await this.insertAbilityIfNotExists("C#", 1);
+            await this.insertAbilityIfNotExists("Python", 1);
+            await this.insertAbilityIfNotExists("HTML", 1);
+            await this.insertAbilityIfNotExists("CSS", 1);
+            await this.insertAbilityIfNotExists("JavaScript", 1);
+            await this.insertAbilityIfNotExists("TypeScript", 1);
+            await this.insertAbilityIfNotExists("SQL", 1);
+            await this.insertAbilityIfNotExists("C++", 1);
+            await this.insertAbilityIfNotExists("C", 1);
+            await this.insertAbilityIfNotExists("Ruby", 1);
+            await this.insertAbilityIfNotExists("PHP", 1);
+            await this.insertAbilityIfNotExists("Kotlin", 1);
+            await this.insertAbilityIfNotExists("Go", 1);
+            await this.insertAbilityIfNotExists("Assembly", 1);
+            await this.insertAbilityIfNotExists("Rust", 1);
+            await this.insertAbilityIfNotExists("F#", 1);
 
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Photoshop", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Illustrator", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Gimp", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("After Effects", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Premiere Pro", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Video-Editing", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("3D-Design", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("2D-Design", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("UI/UX", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Web-Design", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Logo-Design", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Animation", (SELECT id FROM Ability WHERE name = "Design"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Character-Design", (SELECT id FROM Ability WHERE name = "Design"))`);
+            // Design
+            await this.insertAbilityIfNotExists("Photoshop", 2);
+            await this.insertAbilityIfNotExists("Illustrator", 2);
+            await this.insertAbilityIfNotExists("Gimp", 2);
+            await this.insertAbilityIfNotExists("After Effects", 2);
+            await this.insertAbilityIfNotExists("Premiere Pro", 2);
+            await this.insertAbilityIfNotExists("Video-Editing", 2);
+            await this.insertAbilityIfNotExists("3D-Design", 2);
+            await this.insertAbilityIfNotExists("2D-Design", 2);
+            await this.insertAbilityIfNotExists("UI/UX", 2);
+            await this.insertAbilityIfNotExists("Web-Design", 2);
+            await this.insertAbilityIfNotExists("Logo-Design", 2);
+            await this.insertAbilityIfNotExists("Animation", 2);
+            await this.insertAbilityIfNotExists("Character-Design", 2);
 
             // Java
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Spring", (SELECT id FROM Ability WHERE name = "Java"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Selenium", (SELECT id FROM Ability WHERE name = "Java"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("JavaFX", (SELECT id FROM Ability WHERE name = "Java"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("JavaEE", (SELECT id FROM Ability WHERE name = "Java"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("JavaSE", (SELECT id FROM Ability WHERE name = "Java"))`);
+            await this.insertAbilityIfNotExists("Spring", 9);
+            await this.insertAbilityIfNotExists("Selenium", 9);
+            await this.insertAbilityIfNotExists("JavaFX", 9);
+            await this.insertAbilityIfNotExists("JavaEE", 9);
+            await this.insertAbilityIfNotExists("JavaSE", 9);
 
             // C#
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("ASP.NET", (SELECT id FROM Ability WHERE name = "C#"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("ASP.NET Core", (SELECT id FROM Ability WHERE name = "C#"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Unity", (SELECT id FROM Ability WHERE name = "C#"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("WPF", (SELECT id FROM Ability WHERE name = "C#"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("UWP", (SELECT id FROM Ability WHERE name = "C#"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Xamarin", (SELECT id FROM Ability WHERE name = "C#"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Blazor", (SELECT id FROM Ability WHERE name = "C#"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Selenium", (SELECT id FROM Ability WHERE name = "C#"))`);
+            await this.insertAbilityIfNotExists("ASP.NET", 10);
+            await this.insertAbilityIfNotExists("ASP.NET Core", 10);
+            await this.insertAbilityIfNotExists("Unity", 10);
+            await this.insertAbilityIfNotExists("WPF", 10);
+            await this.insertAbilityIfNotExists("UWP", 10);
+            await this.insertAbilityIfNotExists("Xamarin", 10);
+            await this.insertAbilityIfNotExists("Blazor", 10);
+            await this.insertAbilityIfNotExists("Selenium", 10);
 
             // Python
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("PyQt", (SELECT id FROM Ability WHERE name = "Python"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Tkinter", (SELECT id FROM Ability WHERE name = "Python"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Pygame", (SELECT id FROM Ability WHERE name = "Python"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Tensorflow", (SELECT id FROM Ability WHERE name = "Python"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("PyTorch", (SELECT id FROM Ability WHERE name = "Python"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Pandas", (SELECT id FROM Ability WHERE name = "Python"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Numpy", (SELECT id FROM Ability WHERE name = "Python"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Selenium", (SELECT id FROM Ability WHERE name = "Python"))`);
+            await this.insertAbilityIfNotExists("PyQt", 11);
+            await this.insertAbilityIfNotExists("Tkinter", 11);
+            await this.insertAbilityIfNotExists("Pygame", 11);
+            await this.insertAbilityIfNotExists("Tensorflow", 11);
+            await this.insertAbilityIfNotExists("PyTorch", 11);
+            await this.insertAbilityIfNotExists("Pandas", 11);
+            await this.insertAbilityIfNotExists("Numpy", 11);
+            await this.insertAbilityIfNotExists("Selenium", 11);
 
             // JavaScript
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("React", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Angular", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Node.js", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Express", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("jQuery", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Cypress", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Jest", (SELECT id FROM Ability WHERE name = "JavaScript"))`);
+            await this.insertAbilityIfNotExists("React", 12);
+            await this.insertAbilityIfNotExists("Angular", 12);
+            await this.insertAbilityIfNotExists("Node.js", 12);
+            await this.insertAbilityIfNotExists("Express", 12);
+            await this.insertAbilityIfNotExists("jQuery", 12);
+            await this.insertAbilityIfNotExists("Cypress", 12);
+            await this.insertAbilityIfNotExists("Jest", 12);
 
-            // Typescript
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Angular", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("React", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Node.js", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Express", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("NestJS", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Jest", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Webpack", (SELECT id FROM Ability WHERE name = "TypeScript"))`);
+            // TypeScript
+            await this.insertAbilityIfNotExists("Angular", 13);
+            await this.insertAbilityIfNotExists("React", 13);
+            await this.insertAbilityIfNotExists("Node.js", 13);
+            await this.insertAbilityIfNotExists("Express", 13);
+            await this.insertAbilityIfNotExists("NestJS", 13);
+            await this.insertAbilityIfNotExists("Jest", 13);
+            await this.insertAbilityIfNotExists("Webpack", 13);
 
             // SQL
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("MySQL", (SELECT id FROM Ability WHERE name = "SQL"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("SQLite", (SELECT id FROM Ability WHERE name = "SQL"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("MongoDB", (SELECT id FROM Ability WHERE name = "SQL"))`);
+            await this.insertAbilityIfNotExists("MySQL", 14);
+            await this.insertAbilityIfNotExists("SQLite", 14);
+            await this.insertAbilityIfNotExists("MongoDB", 14);
 
             // C++
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Qt", (SELECT id FROM Ability WHERE name = "C++"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("OpenGL", (SELECT id FROM Ability WHERE name = "C++"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("DirectX", (SELECT id FROM Ability WHERE name = "C++"))`);
+            await this.insertAbilityIfNotExists("Qt", 15);
+            await this.insertAbilityIfNotExists("OpenGL", 15);
+            await this.insertAbilityIfNotExists("DirectX", 15);
 
             // Kotlin
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Android", (SELECT id FROM Ability WHERE name = "Kotlin"))`);
-            db.run(`INSERT INTO Ability (name, parentId) VALUES ("Spring", (SELECT id FROM Ability WHERE name = "Kotlin"))`);
+            await this.insertAbilityIfNotExists("Android", 16);
+            await this.insertAbilityIfNotExists("Spring", 16);
+        });
+    }
+
+    static async insertAbilityIfNotExists(name: string, parentId: number | null = null): Promise<void> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT id FROM Ability WHERE name = ?`, [name], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else if (row) {
+                    resolve();
+                } else {
+                    db.run(`INSERT INTO Ability (name, parentId) VALUES (?, ?)`, [name, parentId], (err) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    });
+                }
+            });
         });
     }
 
@@ -566,23 +585,22 @@ export class Database {
 
     static async getUserAbilitiesByUserId(userId: string): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT abilityId FROM UserAbility WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
+            db.all(`SELECT abilityId FROM UserAbility WHERE userId = ?`, [userId], async (err, rows: unknown[]) => {
                 if (err) {
                     reject(err);
                 } else {
                     const abilityIds: number[] = (rows as any[]).map(row => row.abilityId);
-                    db.all(`SELECT * FROM Ability WHERE id IN (?)`, [abilityIds], (err, rows: unknown[]) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            const abilities: Ability[] = (rows as any[]).map(row => ({
-                                id: row.id,
-                                name: row.name,
-                                parentId: row.parentId
-                            }));
-                            resolve(abilities);
+                    const ability = await this.getAbilityById(1);
+
+                    const abilities: Ability[] = [];
+                    for (const abilityId of abilityIds) {
+                        const ability = await this.getAbilityById(abilityId);
+                        if (ability) {
+                            abilities.push(ability);
                         }
-                    });
+                    }
+
+                    resolve(abilities);
                 }
             });
         });

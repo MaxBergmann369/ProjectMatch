@@ -16,7 +16,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/api/user?ifId=IF123456
+GET http://localhost:3000/api/user?userId=IF123456
 
 ###
 
@@ -24,10 +24,12 @@ PUT http://localhost:3000/api/user
 Content-Type: application/json
 
 {
-  "ifId": "IF123456",
+  "userId": "IF123456",
   "username": "test12",
   "firstname": "test",
   "lastname": "test",
+  "email": "test@test.at",
+  "clazz": "5BHITM",
   "birthdate": "2002-05-08",
   "biografie": "test",
   "permissions": 1,
@@ -36,7 +38,7 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:3000/api/user?ifId=IF123456
+DELETE http://localhost:3000/api/user?userId=IF123456
 
 ###
 
@@ -44,17 +46,17 @@ POST http://localhost:3000/api/userAbility
 Content-Type: application/json
 
 {
-    "ifId": "IF123456",
-    "abilityId": 1
+    "userId": "IF123456",
+    "abilityId": 5
 }
 
 ###
 
-GET http://localhost:3000/api/userAbility?ifId=IF123456
+GET http://localhost:3000/api/userAbility?userId=IF123456
 
 ###
 
-DELETE http://localhost:3000/api/userAbility?ifId=IF123456&abilityId=1
+DELETE http://localhost:3000/api/userAbility?userId=IF123456&abilityId=1
 
 ###
 

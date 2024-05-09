@@ -455,6 +455,10 @@ describe('database-test-user', () => {
         expect(dbUser).not.toBeNull();
 
         const success = await Utility.addUserAbility(ifId, 1);
+        const dbUserAbilities = await Utility.getUserAbilities(ifId);
+
+        expect(dbUserAbilities.length).toBe(1);
+
         await Utility.deleteUser(ifId);
         expect(success).toBeTruthy();
     });

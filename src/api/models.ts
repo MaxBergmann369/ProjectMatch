@@ -64,7 +64,7 @@ export interface ProjectAbility {
 export interface Ability {
     id: number;
     name: string;
-    parentId: number;
+    parentId: number | null;
 }
 
 export interface DirectChat {

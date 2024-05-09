@@ -5,6 +5,7 @@ import {Utility} from "./utility";
 const userRouter = express.Router();
 
 export function createEndpoints() {
+    /* region User */
     userRouter.post('/user', async (req, res) => {
         const {userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department} = req.body;
 
@@ -20,9 +21,9 @@ export function createEndpoints() {
     });
 
     userRouter.get('/user', async (req, res) => {
-        const ifId = req.query.ifId as string;
+        const userId = req.query.userId as string;
 
-        const user = await Utility.getUser(ifId);
+        const user = await Utility.getUser(userId);
 
         if(user !== null) {
             res.status(200).send(user);
@@ -44,14 +45,18 @@ export function createEndpoints() {
     });
 
     userRouter.delete('/user', async (req, res) => {
-        const ifId = req.query.ifId as string;
+        const userId = req.query.userId as string;
 
-        if(await Utility.deleteUser(ifId)) {
+        if(await Utility.deleteUser(userId)) {
             res.status(200).send("User deleted");
         } else {
             res.status(400).send("User not deleted");
         }
     });
+
+    /* endregion */
+
+    /* region UserAbility */
 
     userRouter.post('/userAbility', async (req, res) => {
         const {userId, abilityId} = req.body;
@@ -91,6 +96,12 @@ export function createEndpoints() {
             res.status(400).send("User ability not deleted");
         }
     });
+
+    /* endregion */
+
+    /* region Notefication */
+
+    /* endregion */
 
     return userRouter;
 }

@@ -1,6 +1,4 @@
 import {Utility} from "./utility";
-import {types} from "sass";
-import Map = types.Map;
 
 enum DepartmentTypes {
     Unset = "Unknown",
