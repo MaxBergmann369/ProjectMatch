@@ -18,18 +18,18 @@ describe('database-test-user', () => {
         birthdate: date,
         biografie: "test",
         permissions: 1,
-        department: "test"
+        department: "Informatik"
     }
 
     /* region addUser */
     // Test cases for ifId
     test('add-user-invalid-ifId', async() => {
-        const success = await Utility.addUser('12345678', user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        const success = await Utility.addUser('12345678', user.username, user.firstname, user.lastname, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
         expect(success).toBeFalsy();
 
         await deleteUser('12345678');
 
-        await Utility.addUser('IF12345', user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser('IF12345', user.username, user.firstname, user.lastname, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
         await deleteUser('IF12345');
     });
@@ -37,13 +37,13 @@ describe('database-test-user', () => {
     // Test cases for username
     test('add-user-invalid-username', async () => {
         // Invalid username: length < 4
-        const success1 = await Utility.addUser(ifId3, 'usr', user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        const success1 = await Utility.addUser(ifId3, 'usr', user.firstname, user.lastname, user.email, user.clazz,user.birthdate, user.biografie, user.permissions, user.department);
         expect(success1).toBeFalsy();
 
         await deleteUser(ifId3);
 
         // Invalid username: length > 20
-        const success2 = await Utility.addUser(ifId3, 'verylongusername1234567890', user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        const success2 = await Utility.addUser(ifId3, 'verylongusername1234567890', user.firstname, user.lastname, user.email, user.clazz,user.birthdate, user.biografie, user.permissions, user.department);
         expect(success2).toBeFalsy();
 
         await deleteUser(ifId3);
@@ -52,13 +52,13 @@ describe('database-test-user', () => {
     // Test cases for firstname
     test('add-user-invalid-firstname', async () => {
         // Invalid firstname: length < 1
-        const success1 = await Utility.addUser(ifId3, user.username, '', user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        const success1 = await Utility.addUser(ifId3, user.username, '', user.lastname, user.email, user.clazz,user.birthdate, user.biografie, user.permissions, user.department);
         expect(success1).toBeFalsy();
 
         await deleteUser(ifId3);
 
         // Invalid firstname: length > 20
-        const success2 = await Utility.addUser(ifId3, user.username, 'verylongfirstname1234567890', user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        const success2 = await Utility.addUser(ifId3, user.username, 'verylongfirstname1234567890', user.lastname, user.email, user.clazz,user.birthdate, user.biografie, user.permissions, user.department);
         expect(success2).toBeFalsy();
 
         await deleteUser(ifId3);
@@ -67,13 +67,13 @@ describe('database-test-user', () => {
     // Test cases for lastname
     test('add-user-invalid-lastname', async () => {
         // Invalid lastname: length < 1
-        const success1 = await Utility.addUser(ifId3, user.username, user.firstname, '', user.birthdate, user.biografie, user.permissions, user.department);
+        const success1 = await Utility.addUser(ifId3, user.username, user.firstname, '',user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
         expect(success1).toBeFalsy();
 
         await deleteUser(ifId3);
 
         // Invalid lastname: length > 20
-        const success2 = await Utility.addUser(ifId3, user.username, user.firstname, 'verylonglastname1234567890', user.birthdate, user.biografie, user.permissions, user.department);
+        const success2 = await Utility.addUser(ifId3, user.username, user.firstname, 'verylonglastname1234567890',user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
         expect(success2).toBeFalsy();
 
         await deleteUser(ifId3);
@@ -82,27 +82,27 @@ describe('database-test-user', () => {
     // Test cases for birthdate
     test('add-user-invalid-birthdate', async () => {
         // Invalid birthdate: undefined
-        let success = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, undefined, user.biografie, user.permissions, user.department);
+        let success = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, user.email, user.clazz, undefined, user.biografie, user.permissions, user.department);
         expect(success).toBeFalsy();
 
         await deleteUser(ifId3);
 
         // Invalid birthdate: null
-        success = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, null, user.biografie, user.permissions, user.department);
+        success = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, user.email, user.clazz, null, user.biografie, user.permissions, user.department);
         expect(success).toBeFalsy();
 
         await deleteUser(ifId3);
 
         // Invalid birthdate: more than 100 years ago
         const oldBirthdate = new Date(new Date().getFullYear() - 101, 0, 1); // More than 100 years ago
-        success = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, oldBirthdate, user.biografie, user.permissions, user.department);
+        success = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, user.email, user.clazz, oldBirthdate, user.biografie, user.permissions, user.department);
         expect(success).toBeFalsy();
 
         await deleteUser(ifId3);
 
         // Invalid birthdate: less than 10 years ago
         const recentBirthdate = new Date(new Date().getFullYear() - 9, 0, 1); // Less than 10 years ago
-        success = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, recentBirthdate, user.biografie, user.permissions, user.department);
+        success = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, user.email, user.clazz, recentBirthdate, user.biografie, user.permissions, user.department);
         expect(success).toBeFalsy();
 
         await deleteUser(ifId3);
@@ -111,7 +111,7 @@ describe('database-test-user', () => {
     // Test cases for permissions
     test('add-user-invalid-permissions', async () => {
         // Invalid permissions: negative
-        const success = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, -1, user.department);
+        const success = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname,user.email, user.clazz, user.birthdate, user.biografie, -1, user.department);
         expect(success).toBeFalsy();
 
         await deleteUser(ifId3);
@@ -120,13 +120,13 @@ describe('database-test-user', () => {
     // Test cases for department
     test('add-user-invalid-department', async () => {
         // Invalid department: length < 1
-        const success1 = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, '');
+        const success1 = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname,user.email, user.clazz, user.birthdate, user.biografie, user.permissions, '');
         expect(success1).toBeFalsy();
 
         await deleteUser(ifId3);
 
         // Invalid department: length > 20
-        const success2 = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, 'verylongdepartment1234567890');
+        const success2 = await Utility.addUser(ifId3, user.username, user.firstname, user.lastname,user.email, user.clazz, user.birthdate, user.biografie, user.permissions, 'verylongdepartment1234567890');
         expect(success2).toBeFalsy();
 
         await deleteUser(ifId3);
@@ -135,34 +135,34 @@ describe('database-test-user', () => {
     // Test case for forbidden words in username, firstname, and lastname
     test('add-user-forbidden-words', async () => {
         // Invalid username with forbidden word
-        const success1 = await Utility.addUser(ifId3, 'adminUser', user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        const success1 = await Utility.addUser(ifId3, 'adminUser', user.firstname, user.lastname,user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
         expect(success1).toBeFalsy();
 
         await deleteUser(ifId3);
 
         // Invalid firstname with forbidden word
-        const success2 = await Utility.addUser(ifId3, user.username, 'moderatorFirst', user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        const success2 = await Utility.addUser(ifId3, user.username, 'moderatorFirst', user.lastname,user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
         expect(success2).toBeFalsy();
 
         await deleteUser(ifId3);
 
         // Invalid lastname with forbidden word
-        const success3 = await Utility.addUser(ifId3, user.username, user.firstname, 'userLast', user.birthdate, user.biografie, user.permissions, user.department);
+        const success3 = await Utility.addUser(ifId3, user.username, user.firstname, 'userLast',user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
         expect(success3).toBeFalsy();
 
         await deleteUser(ifId3);
     });
 
     test('add-user-valid', async() => {
-        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
-        await Utility.addUser(ifId2, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(user.userId, user.username, user.firstname, user.lastname,user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(ifId2, user.username, user.firstname, user.lastname,user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
         let users: User[] | null = await Utility.getUsers();
-        const dbUser: User | null = await Utility.getUser(ifId);
+        const dbUser: User | null = await Utility.getUser(user.userId);
 
         expect(users.length).toBe(2);
 
-        await Utility.deleteUser(ifId);
+        await Utility.deleteUser(user.userId);
 
         users = await Utility.getUsers();
 
@@ -180,241 +180,257 @@ describe('database-test-user', () => {
     /* region updateUser */
 
     test('update-user-invalid-ifId', async() => {
-        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(user.userId, user.username, user.firstname, user.lastname,user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
-        let dbUser: User | null = await Utility.getUser(ifId);
+        let dbUser: User | null = await Utility.getUser(user.userId);
 
         expect(dbUser).not.toBeNull();
 
         const updatedUser: User = {
-            ifId: 'IF12345',
+            userId: 'IF12345',
             username: "test1234",
             firstname: "Maximilian",
             lastname: "Muster",
+            email: "test@test.at",
+            clazz: "5BHITM",
             birthdate: new Date(date.toDateString()),
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
         }
 
-        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+        const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz,updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
         expect(success).toBeFalsy();
 
-        dbUser = await Utility.getUser(ifId);
+        dbUser = await Utility.getUser(updatedUser.userId);
 
-        expect(user).toEqual(dbUser);
+        expect(dbUser).toBeNull();
 
-        await Utility.deleteUser(user.ifId);
-        await Utility.deleteUser(updatedUser.ifId);
+        await Utility.deleteUser(user.userId);
+        await Utility.deleteUser(updatedUser.userId);
     });
 
     test('update-user-invalid-username', async() => {
-        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(user.userId, user.username, user.firstname, user.lastname,user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
-        let dbUser: User | null = await Utility.getUser(ifId);
+        let dbUser: User | null = await Utility.getUser(user.userId);
 
         expect(dbUser).not.toBeNull();
 
         const updatedUser: User = {
-            ifId: ifId,
+            userId: user.userId,
             username: "usr",
             firstname: "Maximilian",
             lastname: "Muster",
+            email: "test@test.at",
+            clazz: "5BHITM",
             birthdate: new Date(date.toDateString()),
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
         }
 
-        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+        const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
         expect(success).toBeFalsy();
 
-        dbUser = await Utility.getUser(ifId);
+        dbUser = await Utility.getUser(user.userId);
 
         expect(user).toEqual(dbUser);
 
-        await Utility.deleteUser(user.ifId);
-        await Utility.deleteUser(updatedUser.ifId);
+        await Utility.deleteUser(user.userId);
+        await Utility.deleteUser(updatedUser.userId);
     });
 
     test('update-user-invalid-firstname', async() => {
-        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(user.userId, user.username, user.firstname, user.lastname,user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
-        let dbUser: User | null = await Utility.getUser(ifId);
+        let dbUser: User | null = await Utility.getUser(user.userId);
 
         expect(dbUser).not.toBeNull();
 
         const updatedUser: User = {
-            ifId: ifId,
+            userId: user.userId,
             username: "test1234",
             firstname: "",
             lastname: "Muster",
+            email: "test@test.at",
+            clazz: "5BHITM",
             birthdate: new Date(date.toDateString()),
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
         }
 
-        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+        const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz,updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
         expect(success).toBeFalsy();
 
-        dbUser = await Utility.getUser(ifId);
+        dbUser = await Utility.getUser(user.userId);
 
         expect(user).toEqual(dbUser);
 
-        await Utility.deleteUser(user.ifId);
-        await Utility.deleteUser(updatedUser.ifId);
+        await Utility.deleteUser(user.userId);
+        await Utility.deleteUser(updatedUser.userId);
     });
 
     test('update-user-invalid-lastname', async() => {
-        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(user.userId, user.username, user.firstname, user.lastname, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
-        let dbUser: User | null = await Utility.getUser(ifId);
+        let dbUser: User | null = await Utility.getUser(user.userId);
 
         expect(dbUser).not.toBeNull();
 
         const updatedUser: User = {
-            ifId: ifId,
+            userId: user.userId,
             username: "test1234",
             firstname: "Maximilian",
             lastname: "",
+            email: "test@test.at",
+            clazz: "5BHITM",
             birthdate: new Date(date.toDateString()),
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
         }
 
-        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+        const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
         expect(success).toBeFalsy();
 
-        dbUser = await Utility.getUser(ifId);
+        dbUser = await Utility.getUser(user.userId);
 
         expect(user).toEqual(dbUser);
 
-        await Utility.deleteUser(user.ifId);
-        await Utility.deleteUser(updatedUser.ifId);
+        await Utility.deleteUser(user.userId);
+        await Utility.deleteUser(updatedUser.userId);
     });
 
     test('update-user-invalid-birthdate', async() => {
-        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(user.userId, user.username, user.firstname, user.lastname,user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
-        let dbUser: User | null = await Utility.getUser(ifId);
+        let dbUser: User | null = await Utility.getUser(user.userId);
 
         expect(dbUser).not.toBeNull();
 
         const updatedUser: User = {
-            ifId: ifId,
+            userId: user.userId,
             username: "test1234",
             firstname: "Maximilian",
             lastname: "Muster",
+            email: "test@test.at",
+            clazz: "5BHITM",
             birthdate: null,
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
         }
 
-        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+        const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
         expect(success).toBeFalsy();
 
-        dbUser = await Utility.getUser(ifId);
+        dbUser = await Utility.getUser(user.userId);
 
         expect(user).toEqual(dbUser);
 
-        await Utility.deleteUser(user.ifId);
-        await Utility.deleteUser(updatedUser.ifId);
+        await Utility.deleteUser(user.userId);
+        await Utility.deleteUser(updatedUser.userId);
     });
 
     test('update-user-invalid-permissions', async() => {
-        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(user.userId, user.username, user.firstname, user.lastname, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
-        let dbUser: User | null = await Utility.getUser(ifId);
+        let dbUser: User | null = await Utility.getUser(user.userId);
 
         expect(dbUser).not.toBeNull();
 
         const updatedUser: User = {
-            ifId: ifId,
+            userId: user.userId,
             username: "test1234",
             firstname: "Maximilian",
             lastname: "Muster",
+            email: "test@test.at",
+            clazz: "5BHITM",
             birthdate: new Date(date.toDateString()),
             biografie: "Test",
             permissions: -1,
             department: "Informatik"
         }
 
-        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+        const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
         expect(success).toBeFalsy();
 
-        dbUser = await Utility.getUser(ifId);
+        dbUser = await Utility.getUser(user.userId);
 
         expect(user).toEqual(dbUser);
 
-        await Utility.deleteUser(user.ifId);
-        await Utility.deleteUser(updatedUser.ifId);
+        await Utility.deleteUser(user.userId);
+        await Utility.deleteUser(updatedUser.userId);
     });
 
     test('update-user-invalid-department', async() => {
-        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(user.userId, user.username, user.firstname, user.lastname, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
-        let dbUser: User | null = await Utility.getUser(ifId);
+        let dbUser: User | null = await Utility.getUser(user.userId);
 
         expect(dbUser).not.toBeNull();
 
         const updatedUser: User = {
-            ifId: ifId,
+            userId: user.userId,
             username: "test1234",
             firstname: "Maximilian",
             lastname: "Muster",
+            email: "test@test.at",
+            clazz: "5BHITM",
             birthdate: new Date(date.toDateString()),
             biografie: "Test",
             permissions: 1,
             department: ""
         }
 
-        const success = await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+        const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz,updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
         expect(success).toBeFalsy();
 
-        dbUser = await Utility.getUser(ifId);
+        dbUser = await Utility.getUser(user.userId);
 
         expect(user).toEqual(dbUser);
 
-        await Utility.deleteUser(user.ifId);
-        await Utility.deleteUser(updatedUser.ifId);
+        await Utility.deleteUser(user.userId);
+        await Utility.deleteUser(updatedUser.userId);
     });
 
     test('update-user-valid', async() => {
-        await Utility.addUser(user.ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(user.userId, user.username, user.firstname, user.lastname, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
-        let dbUser: User | null = await Utility.getUser(ifId);
+        let dbUser: User | null = await Utility.getUser(user.userId);
 
         expect(dbUser).not.toBeNull();
 
         const updatedUser: User = {
-            ifId: ifId,
+            userId: user.userId,
             username: "test1234",
             firstname: "Maximilian",
             lastname: "Muster",
+            email: "test@test.at",
+            clazz: "5BHITM",
             birthdate: new Date(date.toDateString()),
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
         }
 
-        await Utility.updateUser(updatedUser.ifId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
+        await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
-        dbUser = await Utility.getUser(ifId);
+        dbUser = await Utility.getUser(user.userId);
 
         expect(updatedUser).toEqual(dbUser);
 
-        await Utility.deleteUser(user.ifId);
-        await Utility.deleteUser(updatedUser.ifId);
+        await Utility.deleteUser(user.userId);
+        await Utility.deleteUser(updatedUser.userId);
     });
 
     /* endregion */
@@ -432,7 +448,7 @@ describe('database-test-user', () => {
     });
 
     test('add-user-ability-valid', async() => {
-        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
         let dbUser: User | null = await Utility.getUser(ifId);
 
@@ -453,7 +469,7 @@ describe('database-test-user', () => {
     });
 
     test('add-notification-invalid-title', async() => {
-        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
         const success = await Utility.addNotification(ifId, '', 'Test');
         await deleteNotification(ifId);
@@ -462,7 +478,7 @@ describe('database-test-user', () => {
     });
 
     test('add-notification-invalid-text', async() => {
-        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
         const success = await Utility.addNotification(ifId, 'Test', '');
         await deleteNotification(ifId);
@@ -471,7 +487,7 @@ describe('database-test-user', () => {
     });
 
     test('add-notification-valid', async() => {
-        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.birthdate, user.biografie, user.permissions, user.department);
+        await Utility.addUser(ifId, user.username, user.firstname, user.lastname, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department);
 
         let dbUser: User | null = await Utility.getUser(ifId);
 
@@ -485,6 +501,7 @@ describe('database-test-user', () => {
 
     /* endregion */
 });
+
 
 describe('database-test-project', () => {
     const ifId: string = 'IF210053';
@@ -516,7 +533,7 @@ describe('database-test-project', () => {
     test('add-project-name-already-exists', async() => {
         await deleteProjectByName(project.name, project.ownerId);
 
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
@@ -586,7 +603,7 @@ describe('database-test-project', () => {
     test('add-project-valid', async() => {
         await deleteProjectByName(project.name, project.ownerId);
 
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         await deleteProjectByName(project.name, project.ownerId);
@@ -604,7 +621,7 @@ describe('database-test-project', () => {
     });
 
     test('update-project-invalid-ownerId', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
@@ -617,7 +634,7 @@ describe('database-test-project', () => {
     });
 
     test('update-project-invalid-name', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
@@ -631,7 +648,7 @@ describe('database-test-project', () => {
     });
 
     test('update-project-invalid-thumbnail', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
@@ -643,7 +660,7 @@ describe('database-test-project', () => {
     });
 
     test('update-project-invalid-description', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
@@ -655,7 +672,7 @@ describe('database-test-project', () => {
     });
 
     test('update-project-invalid-links', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
@@ -667,7 +684,7 @@ describe('database-test-project', () => {
     });
 
     test('update-project-invalid-maxMembers', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
@@ -683,7 +700,7 @@ describe('database-test-project', () => {
     });
 
     test('update-project-valid', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         expect(success1).toBeTruthy();
@@ -710,7 +727,7 @@ describe('database-test-project', () => {
     });
 
     test('add-project-ability-valid', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
         await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
 
         const projectId = await Utility.getProjectId(project.name, project.ownerId);
@@ -738,7 +755,7 @@ describe('database-test-project', () => {
     });
 
     test('add-project-member-valid', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
         await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
 
         const projectId = await Utility.getProjectId(project.name, project.ownerId);
@@ -767,7 +784,7 @@ describe('database-test-project', () => {
     });
 
     test('add-like-valid', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF',new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
         await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
 
         const projectId = await Utility.getProjectId(project.name, project.ownerId);
@@ -803,7 +820,7 @@ describe('database-test-project', () => {
     });
 
     test('add-view-valid', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF',new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
         await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
 
         const projectId: number = await Utility.getProjectId(project.name, project.ownerId);
@@ -828,7 +845,7 @@ describe('database-test-project', () => {
     /* region otherTests */
     //test getProjectsWhereUserIsOwner
     test('get-projects-where-user-is-owner', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         await Utility.addProject('test2', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
@@ -854,8 +871,8 @@ describe('database-test-project', () => {
 
     //test getProjectsWhereUserIsMember
     test('get-projects-where-user-is-member', async() => {
-        await Utility.addUser(ifId, 'test1223', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test1223', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         await Utility.addProject(project.name, project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
         await Utility.addProject('test2', project.ownerId, project.thumbnail, project.description, project.links, project.maxMembers);
@@ -911,8 +928,8 @@ describe('database-test-chat', () => {
     test('add-chat-already-exists', async() => {
         await Utility.deleteDirectChat(ifId, ifId2);
 
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success = await Utility.addDirectChat(ifId, ifId2);
         expect(success).toBeTruthy();
@@ -926,8 +943,8 @@ describe('database-test-chat', () => {
     });
 
     test('add-chat-valid', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', 'test@test.at', '3BHIF',new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', 'test@test.at', '3BHIF',new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success = await Utility.addDirectChat(ifId, ifId2);
         await Utility.deleteDirectChat(ifId, ifId2);
@@ -941,9 +958,9 @@ describe('database-test-chat', () => {
         await Utility.deleteDirectChat(ifId, ifId3);
         await Utility.deleteDirectChat(ifId2, ifId3);
 
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId3, 'test12345', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId3, 'test12345', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
@@ -971,8 +988,8 @@ describe('database-test-chat', () => {
 
     /* region addMessage */
     test('add-message-invalid-ifId', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
@@ -989,8 +1006,8 @@ describe('database-test-chat', () => {
     });
 
     test('add-message-invalid-text', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
@@ -1007,8 +1024,8 @@ describe('database-test-chat', () => {
     });
 
     test('add-message-invalid-ifId2', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
@@ -1025,8 +1042,8 @@ describe('database-test-chat', () => {
     });
 
     test('add-message-valid', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
@@ -1046,8 +1063,8 @@ describe('database-test-chat', () => {
 
     /* region updateMessage */
     test('update-message-invalid-id', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
@@ -1062,8 +1079,8 @@ describe('database-test-chat', () => {
     });
 
     test('update-message-invalid-chatId', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
@@ -1078,8 +1095,8 @@ describe('database-test-chat', () => {
     });
 
     test('update-message-invalid-ifId', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
@@ -1094,8 +1111,8 @@ describe('database-test-chat', () => {
     });
 
     test('update-message-invalid-text', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
@@ -1110,8 +1127,8 @@ describe('database-test-chat', () => {
     });
 
     test('update-message-valid', async() => {
-        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
-        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId, 'test123', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
+        await Utility.addUser(ifId2, 'test1234', 'Max', 'Mustermann','test@test.at', '3BHIF', new Date(new Date().getFullYear() - 11, 0, 1), '', 0, 'Informatik');
 
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();

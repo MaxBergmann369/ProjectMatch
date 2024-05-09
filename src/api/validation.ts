@@ -13,7 +13,7 @@ enum DepartmentTypes {
 }
 
 export class ValUser {
-    static isValid(userId: string, username: string, firstname: string, email:string, clazz:string, lastname: string,
+    static isValid(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string,
                    birthdate: Date, biografie: string, permissions: number, department: string): boolean {
         if(!this.isUserIdValid(userId)) {
             return false;
@@ -100,7 +100,7 @@ export class ValUser {
     }
 
     private static validateDepartment(department: string): boolean {
-        return Object.keys(DepartmentTypes).some(value => department.toLowerCase() === value.toLowerCase());
+        return Object.values(DepartmentTypes).some(value => department.toLowerCase() === value.toLowerCase());
     }
 }
 

@@ -2,7 +2,7 @@ POST http://localhost:3000/api/user
 Content-Type: application/json
 
 {
-    "ifId": "IF123456",
+    "userId": "IF123456",
     "username": "test",
     "firstname": "test",
     "lastname": "test",
@@ -11,7 +11,7 @@ Content-Type: application/json
     "birthdate": "2002-05-08",
     "biografie": "test",
     "permissions": 1,
-    "department": "test"
+    "department": "Informatik"
 }
 
 ###
@@ -31,7 +31,7 @@ Content-Type: application/json
   "birthdate": "2002-05-08",
   "biografie": "test",
   "permissions": 1,
-  "department": "test"
+  "department": "Informatik"
 }
 
 ###
