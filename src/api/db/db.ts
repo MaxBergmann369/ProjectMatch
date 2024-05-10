@@ -9,7 +9,7 @@ import {
     DirectChat,
     Notification,
     ProjectMember
-} from "./models";
+} from "../../models";
 
 const db = new sqlite3.Database('projectMatch.db');
 
