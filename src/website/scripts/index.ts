@@ -1,4 +1,5 @@
 import {initKeycloak, keycloak} from "./keycloak";
+
 initKeycloak().then((authenticated) => {
     if (authenticated){
         location.href = "home.html";

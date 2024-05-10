@@ -1,5 +1,5 @@
 import {Utility} from "../api/utility";
-import {Project, User} from "../api/models";
+import {Project, User} from "../models";
 
 describe('database-test-user', () => {
 

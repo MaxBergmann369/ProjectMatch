@@ -11,7 +11,7 @@ import {
     DirectChat,
     Notification,
     ProjectMember
-} from "./models";
+} from "../models";
 import {ValUser} from "./validation";
 
 const db = new sqlite3.Database('projectMatch.db');

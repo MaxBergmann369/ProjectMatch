@@ -77,3 +77,20 @@ export interface Message {
     message: string;
     date: Date;
 }
+
+export enum Role {
+    Unknown = 0,
+    Student = 1,
+    Teacher = 2,
+    TestUser = 3
+}
+
+export enum Department {
+    Unset = "Unknown",
+    AD = "Abendschule",
+    BG = "Biomedizin- und Gesundheitstechnik",
+    FE = "Fachschule Elektronik",
+    HE = "Höhere Elektronik",
+    IF = "Informatik",
+    IT = "Medientechnik"
+}
