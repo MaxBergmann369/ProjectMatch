@@ -75,10 +75,8 @@ GET http://localhost:3000/api/notification?userId=IF123456
 
 ###
 
-DELETE http://localhost:3000/api/notification?userId=IF123456&notificationId=6
+DELETE http://localhost:3000/api/notification?userId=IF123456&notificationId=2
 
 ###
 
 GET http://localhost:3000/api/abilities
-
-

@@ -1,0 +1,21 @@
+POST http://localhost:3000/api/project
+Content-Type: application/json
+
+{
+  "id": null,
+  "name": "test",
+  "ownerId": "IF123456",
+  "thumbnail": "image.png",
+  "description": "some description",
+  "dateOfCreation": null,
+  "links": "https://www.google.com;https://www.youtube.com",
+  "maxMembers": 5
+}
+
+###
+
+GET http://localhost:3000/api/project?projectId=1
+
+###
+
+DELETE http://localhost:3000/api/project?userId=IF123456&projectId=1
