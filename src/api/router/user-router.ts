@@ -142,6 +142,20 @@ export function createUserEndpoints() {
 
     /* endregion */
 
+    /* region Others */
+
+    userRouter.get('/abilities', async (req, res) => {
+        const abilities = await Utility.getAllAbilities();
+
+        if(abilities !== null) {
+            res.status(200).send(abilities);
+        } else {
+            res.status(400).send("Abilities not found");
+        }
+    });
+
+    /* endregion */
+
     return userRouter;
 }
 
