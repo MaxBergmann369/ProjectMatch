@@ -20,8 +20,8 @@ export function createUserEndpoints() {
         }
     });
 
-    userRouter.get('/user', async (req, res) => {
-        const userId = req.query.userId as string;
+    userRouter.get('/user/:userId', async (req, res) => {
+        const userId = req.params.userId;
 
         const user = await Utility.getUser(userId);
 
@@ -44,8 +44,8 @@ export function createUserEndpoints() {
         }
     });
 
-    userRouter.delete('/user', async (req, res) => {
-        const userId = req.query.userId as string;
+    userRouter.delete('/user/:userId', async (req, res) => {
+        const userId = req.params.userId;
 
         if(await Utility.deleteUser(userId)) {
             res.status(200).send("User deleted");
@@ -58,8 +58,14 @@ export function createUserEndpoints() {
 
     /* region UserAbility */
 
-    userRouter.post('/userAbility', async (req, res) => {
-        const {userId, abilityId} = req.body;
+    userRouter.post('/user/:userId/ability', async (req, res) => {
+        const userId = req.params.userId;
+        const abilityId = parseInt(req.body.abilityId);
+
+        if(isNaN(abilityId)) {
+            res.status(400).send("Invalid Ability Id");
+            return;
+        }
 
         if(await Utility.addUserAbility(userId, abilityId)) {
             res.status(200).send("User ability added");
@@ -68,9 +74,8 @@ export function createUserEndpoints() {
         }
     });
 
-    userRouter.get('/userAbility', async (req, res) => {
-        const userId = req.query.userId as string;
-
+    userRouter.get('/user/:userId/ability', async (req, res) => {
+        const userId = req.params.userId;
         const userAbility = await Utility.getUserAbilities(userId);
 
         if(userAbility !== null) {
@@ -80,7 +85,7 @@ export function createUserEndpoints() {
         }
     });
 
-    userRouter.delete('/userAbility', async (req, res) => {
+    userRouter.delete('/user/:userId/ability/:abilityId', async (req, res) => {
         const userId = req.query.userId as string;
         const abilityId = req.query.abilityId as string;
 
@@ -101,8 +106,9 @@ export function createUserEndpoints() {
 
     /* region Notification */
 
-    userRouter.post('/notification', async (req, res) => {
-        const {userId, title, text} = req.body;
+    userRouter.post('/user/:userId/notification', async (req, res) => {
+        const {title, text} = req.body;
+        const userId = req.params.userId;
 
         if(await Utility.addNotification(userId, title, text)) {
             res.status(200).send("Notification added");
@@ -111,8 +117,8 @@ export function createUserEndpoints() {
         }
     });
 
-    userRouter.get('/notification', async (req, res) => {
-        const userId = req.query.userId as string;
+    userRouter.get('/user/:userId/notification', async (req, res) => {
+        const userId = req.params.userId;
 
         const notification = await Utility.getNotifications(userId);
 
@@ -123,11 +129,10 @@ export function createUserEndpoints() {
         }
     });
 
-    userRouter.delete('/notification', async (req, res) => {
-        const userId = req.query.userId as string;
-        const notificationId = req.query.notificationId as string;
+    userRouter.delete('/user/:userId/notification/:notId', async (req, res) => {
+        const userId = req.params.userId;
+        const notId = parseInt(req.params.notId);
 
-        const notId: number = parseInt(notificationId);
 
         if (isNaN(notId)) {
             res.status(400).send("Invalid notificationId");
@@ -144,7 +149,7 @@ export function createUserEndpoints() {
 
     /* region Others */
 
-    userRouter.get('/abilities', async (req, res) => {
+    userRouter.get('/user/abilities', async (req, res) => {
         const abilities = await Utility.getAllAbilities();
 
         if(abilities !== null) {

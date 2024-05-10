@@ -3,111 +3,61 @@
 
 ###
 
-POST {{url}}/user
+POST {{url}}/chats
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
     "userId": "IF123456",
-    "username": "test",
-    "firstname": "test",
-    "lastname": "test",
-    "email": "test@test.at",
-    "clazz": "5BHITM",
-    "birthdate": "2002-05-08",
-    "biografie": "test",
-    "permissions": 1,
-    "department": "Informatik"
+    "otherUserId": "IF123457"
 }
+
 ###
-POST {{url}}/user
+
+GET {{url}}/chats/IF123456/IF123457
+Authorization: Bearer {{token}}
+
+###
+
+GET {{url}}/chats/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+DELETE {{url}}/chats/IF123456/IF123457
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/messages
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "userId": "IF123457",
-    "username": "test2",
-    "firstname": "test2",
-    "lastname": "tes2t",
-    "email": "test2@test.at",
-    "clazz": "5BHITM",
-    "birthdate": "2002-05-08",
-    "biografie": "test",
-    "permissions": 1,
-    "department": "Informatik"
+    "chatId": 1,
+    "userId": "IF123456",
+    "message": "Hello, world!"
 }
 
 ###
 
-GET {{url}}/user/IF123456
+GET {{url}}/messages/1
 Authorization: Bearer {{token}}
 
 ###
 
-PUT {{url}}/user
+PUT {{url}}/messages
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "userId": "IF123456",
-  "username": "test12",
-  "firstname": "test",
-  "lastname": "test",
-  "email": "test@test.at",
-  "clazz": "5BHITM",
-  "birthdate": "2002-05-08",
-  "biografie": "test",
-  "permissions": 1,
-  "department": "Informatik"
+    "messageId": 1,
+    "chatId": 1,
+    "userId": "IF123456",
+    "message": "Updated message content"
 }
 
 ###
 
-DELETE {{url}}/user/IF123456
-Authorization: Bearer {{token}}
-
-###
-
-POST {{url}}/user/IF123456/ability
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "abilityId": 1
-}
-
-###
-
-GET {{url}}/user/IF123456/ability
-Authorization: Bearer {{token}}
-
-###
-
-DELETE {{url}}/user/IF123456/ability/1
-Authorization: Bearer {{token}}
-
-###
-
-POST {{url}}/user/IF123456/notification
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-      "title": "test",
-      "text": "test"
-}
-
-###
-
-GET {{url}}/user/IF123456/notification
-Authorization: Bearer {{token}}
-
-###
-
-DELETE {{url}}/user/IF123456/notification/2
-Authorization: Bearer {{token}}
-
-###
-
-GET {{url}}/user/abilities
+DELETE {{url}}/messages/IF123456/1
 Authorization: Bearer {{token}}

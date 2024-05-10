@@ -7,7 +7,7 @@ export function createChatEndpoints() {
 
     /* region Chat */
 
-    chatRouter.post('/chat', async (req, res) => {
+    chatRouter.post('/chats', async (req, res) => {
         const {userId, otherUserId} = req.body;
 
         if(await Utility.addDirectChat(userId, otherUserId)) {
@@ -17,8 +17,9 @@ export function createChatEndpoints() {
         }
     });
 
-    chatRouter.get('/chat', async (req, res) => {
-        const {userId, otherUserId} = req.body;
+    chatRouter.get('/chats/:userId/:otherUserId', async (req, res) => {
+        const userId = req.params.userId;
+        const otherUserId = req.params.otherUserId;
 
         const chat = await Utility.getDirectChat(userId, otherUserId);
 
@@ -29,8 +30,8 @@ export function createChatEndpoints() {
         }
     });
 
-    chatRouter.get('/chats', async (req, res) => {
-        const userId = req.query.userId as string;
+    chatRouter.get('/chats/:userId', async (req, res) => {
+        const userId = req.params.userId;
 
         const chats = await Utility.getDirectChats(userId);
 
@@ -41,9 +42,9 @@ export function createChatEndpoints() {
         }
     });
 
-    chatRouter.delete('/chat', async (req, res) => {
-        const {userId, otherUserId} = req.body;
-
+    chatRouter.delete('/chats/:userId/:otherUserId', async (req, res) => {
+        const userId = req.params.userId;
+        const otherUserId = req.params.otherUserId;
         if(await Utility.deleteDirectChat(userId, otherUserId)) {
             res.status(200).send("Chat deleted");
         } else {
@@ -55,7 +56,7 @@ export function createChatEndpoints() {
 
     /* region Message */
 
-    chatRouter.post('/message', async (req, res) => {
+    chatRouter.post('/messages', async (req, res) => {
         const {chatId, userId, message} = req.body;
 
         if(await Utility.addMessage(chatId, userId, message)) {
@@ -65,8 +66,8 @@ export function createChatEndpoints() {
         }
     });
 
-    chatRouter.get('/messages', async (req, res) => {
-        const chatId = req.query.chatId as string;
+    chatRouter.get('/messages/:chatId', async (req, res) => {
+        const chatId = req.params.chatId;
 
         const id = parseInt(chatId);
 
@@ -84,7 +85,7 @@ export function createChatEndpoints() {
         }
     });
 
-    chatRouter.put('/message', async (req, res) => {
+    chatRouter.put('/messages', async (req, res) => {
         const {messageId, chatId, userId, message} = req.body;
 
         const id = parseInt(messageId);
@@ -101,10 +102,10 @@ export function createChatEndpoints() {
         }
     });
 
-    chatRouter.delete('/message', async (req, res) => {
-        const userId = req.query.userId as string;
-        const messageId = req.query.messageId as string;
-
+    chatRouter.delete('/messages/:userId/:messageId', async (req, res) => {
+        const userId = req.params.userId;
+        const messageId = req.params.messageId;
+        
         const id = parseInt(messageId);
 
         if(isNaN(id)) {

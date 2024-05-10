@@ -7,7 +7,7 @@ export function createProjectEndpoints() {
 
     /* region Project */
 
-    projectRouter.post('/project', async (req, res) => {
+    projectRouter.post('/projects', async (req, res) => {
         const {name, ownerId, thumbnail, description, links, maxMembers} = req.body;
 
         if(await Utility.addProject(name, ownerId, thumbnail, description, links, maxMembers)) {
@@ -17,10 +17,8 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/project', async (req, res) => {
-        const projectId = req.query.projectId as string;
-
-        const id = parseInt(projectId);
+    projectRouter.get('/projects/:projId', async (req, res) => {
+        const id = parseInt(req.params.projId);
 
         if(isNaN(id)) {
             res.status(400).send("Invalid project id");
@@ -47,8 +45,8 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/myProjects', async (req, res) => {
-        const userId = req.query.userId as string;
+    projectRouter.get('/projects/:userId', async (req, res) => {
+        const userId = req.params.userId;
 
         const projects = await Utility.getProjectsWhereUserIsOwner(userId);
 
@@ -59,7 +57,7 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.put('/project', async (req, res) => {
+    projectRouter.put('/projects', async (req, res) => {
         const {id, name, ownerId, thumbnail, description, links, maxMembers} = req.body;
 
         if(await Utility.updateProject(id, name, ownerId, thumbnail, description, links, maxMembers)) {
@@ -69,9 +67,9 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.delete('/project', async (req, res) => {
-        const userId = req.query.userId as string;
-        const projectId = req.query.projectId as string;
+    projectRouter.delete('/projects/:userId/:projId', async (req, res) => {
+        const userId = req.params.userId;
+        const projectId = req.params.projId;
 
         const id = parseInt(projectId);
 
@@ -91,8 +89,13 @@ export function createProjectEndpoints() {
 
     /* region ProjectMember */
 
-    projectRouter.post('/projectMember', async (req, res) => {
-        const {projectId, userId} = req.body;
+    projectRouter.post('/projects/:projId/members', async (req, res) => {
+        const {userId} = req.body;
+        const projectId = parseInt(req.params.projId);
+        if (isNaN(projectId)) {
+            res.status(400).send("Invalid project id");
+            return;
+        }
 
         if(await Utility.addProjectMember(projectId, userId)) {
             res.status(200).send("Project member added");
@@ -101,8 +104,8 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/projectMembers', async (req, res) => {
-        const projectId = req.query.projectId as string;
+    projectRouter.get('/projects/:projId', async (req, res) => {
+        const projectId = req.params.projId;
 
         const id = parseInt(projectId);
 
@@ -120,9 +123,8 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/userIsMember', async (req, res) => {
-        const userId = req.query.userId as string;
-
+    projectRouter.get('/projects/members/:userId', async (req, res) => {
+        const userId = req.params.userId;
         const projects = await Utility.getProjectsWhereUserIsMember(userId);
 
         if(projects !== null) {
@@ -132,8 +134,13 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.put('/projectMember', async (req, res) => {
-        const {projectId, userId} = req.body;
+    projectRouter.put('/projects/:projId/members', async (req, res) => {
+        const { userId} = req.body;
+        const projectId = parseInt(req.params.projId);
+        if (isNaN(projectId)) {
+            res.status(400).send("Invalid project id");
+            return;
+        }
 
         if(await Utility.projectMemberAccepted(projectId, userId)) {
             res.status(200).send("Project member updated");
@@ -142,9 +149,9 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.delete('/projectMember', async (req, res) => {
-        const projectId = req.query.projectId as string;
-        const userId = req.query.userId as string;
+    projectRouter.delete('/projects/:projId/members/:userId', async (req, res) => {
+        const projectId = req.params.projId;
+        const userId = req.params.userId;
 
         const id = parseInt(projectId);
 
@@ -164,7 +171,7 @@ export function createProjectEndpoints() {
 
     /* region View */
 
-    projectRouter.post('/view', async (req, res) => {
+    projectRouter.post('/views', async (req, res) => {
         const {projectId, userId} = req.body;
 
         if(await Utility.addView(projectId, userId)) {
@@ -174,8 +181,8 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/views', async (req, res) => {
-        const projectId = req.query.projectId as string;
+    projectRouter.get('/views/:projId', async (req, res) => {
+        const projectId = req.params.projId;
 
         const id = parseInt(projectId);
 
@@ -197,7 +204,7 @@ export function createProjectEndpoints() {
 
     /* region Like */
 
-    projectRouter.post('/like', async (req, res) => {
+    projectRouter.post('/likes', async (req, res) => {
         const {projectId, userId} = req.body;
 
         if(await Utility.addLike(projectId, userId)) {
@@ -207,8 +214,8 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/likes', async (req, res) => {
-        const projectId = req.query.projectId as string;
+    projectRouter.get('/likes/:projId', async (req, res) => {
+        const projectId = req.params.projId;
 
         const id = parseInt(projectId);
 
@@ -226,9 +233,9 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.delete('/like', async (req, res) => {
-        const projectId = req.query.projectId as string;
-        const userId = req.query.userId as string;
+    projectRouter.delete('/likes/:projId/:userId', async (req, res) => {
+        const projectId = req.params.projId;
+        const userId = req.params.userId;
 
         const id = parseInt(projectId);
 
@@ -248,8 +255,13 @@ export function createProjectEndpoints() {
 
     /* region projectAbility */
 
-    projectRouter.post('/projectAbility', async (req, res) => {
-        const {projectId, abilityId} = req.body
+    projectRouter.post('/projects/:projId/abilities', async (req, res) => {
+        const { abilityId} = req.body
+        const projectId = parseInt(req.params.projId);
+        if (isNaN(projectId)) {
+            res.status(400).send("Invalid project id");
+            return;
+        }
 
         if(await Utility.addProjectAbility(projectId, abilityId)) {
             res.status(200).send("Project ability added");
@@ -258,8 +270,8 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/projectAbilities', async (req, res) => {
-        const projectId = req.query.projectId as string;
+    projectRouter.get('/projects/:projId/abilities', async (req, res) => {
+        const projectId = req.params.projId;
 
         const id = parseInt(projectId);
 
@@ -277,9 +289,9 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.delete('/projectAbility', async (req, res) => {
-        const projectId = req.query.projectId as string;
-        const abilityId = req.query.abilityId as string;
+    projectRouter.delete('/projects/:projId/abilities/:abilityId', async (req, res) => {
+        const projectId = req.params.projId;
+        const abilityId = req.params.abilityId;
 
         const id = parseInt(projectId);
         const abId = parseInt(abilityId);

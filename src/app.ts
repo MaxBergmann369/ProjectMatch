@@ -9,10 +9,9 @@ import {createChatEndpoints} from "./api/router/chat-router";
 
 const app = express();
 
-/*
 const memoryStore = new session.MemoryStore();
 app.use(session({
-    secret: 'some long secret',
+    secret: 'u4ZhRf6B@@FUmLsFmpeGSdQKmfZ@YVBYqc@zQh9Re2y3^VzLV5rST$9EbPW2&%X!9dLz5piKHBmjcMPU4hqZzm3ud6Y7h*aMzNA^^@BDn2!BC7a', //TODO: change secret and save in .env
     resave: false,
     saveUninitialized: true,
     store: memoryStore
@@ -28,7 +27,7 @@ app.get('/logout', keycloak.protect(), (req: any, res) => {
     res.redirect('/');
 });
 
-*/
+
 
 app.use(express.json());
 
@@ -36,9 +35,10 @@ const userRouter = createUserEndpoints();
 const projectRouter = createProjectEndpoints();
 const chatRouter = createChatEndpoints();
 
-app.use('/api', userRouter);
-app.use('/api', projectRouter);
-app.use('/api', chatRouter);
+app.use('/api',keycloak.protect(), userRouter);
+app.use('/api',keycloak.protect(), projectRouter);
+app.use('/api',keycloak.protect(), chatRouter);
+
 
 app.use(express.static('website'));
 
