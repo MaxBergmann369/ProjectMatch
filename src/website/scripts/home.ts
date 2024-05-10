@@ -1,4 +1,6 @@
-import {keycloak, initKeycloak, ldapToRole, ldapToClass, Role} from "./keycloak";
+import {keycloak, initKeycloak} from "./keycloak";
+import {Role} from "../../models";
+import {TokenUser} from "./tokenUser";
 
 const authenticatedPromise = initKeycloak();
 
@@ -6,16 +8,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await authenticatedPromise;
     if (authenticated) {
         console.log("User is authenticated");
-        const ldap = keycloak.tokenParsed.LDAP_ENTRY_DN;
-        document.getElementById("username").innerText = `
-        Username: ${keycloak.tokenParsed.preferred_username}
-        First name: ${keycloak.tokenParsed.given_name}
-        Last name: ${keycloak.tokenParsed.family_name}
-        Email: ${keycloak.tokenParsed.email}
-        Role: ${Role[ldapToRole(ldap)]}
-        Class: ${ldapToClass(ldap)}
-        LDAP: ${ldap}
+        const user = new TokenUser(keycloak.tokenParsed);
+        const data = `
+            Username: ${user.ifId}
+            Firstname: ${user.firstname}
+            Lastname: ${user.lastname}
+            Email: ${user.email}
+            Role: ${Role[user.role]}
+            Class: ${user.class}
+            Department: ${user.department}
         `;
+        document.getElementById("username").innerText = data;
         // TODO: check if user doesnt exist in database yet:
         if (authenticated.toString() === keycloak.token) {
             // TODO: redirect to register page; unreachable: do above
