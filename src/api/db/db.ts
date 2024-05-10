@@ -125,103 +125,114 @@ export class Database {
             await this.insertAbilityIfNotExists("Design");
 
             // Programming
-            await this.insertAbilityIfNotExists("Java", 1);
-            await this.insertAbilityIfNotExists("C#", 1);
-            await this.insertAbilityIfNotExists("Python", 1);
-            await this.insertAbilityIfNotExists("HTML", 1);
-            await this.insertAbilityIfNotExists("CSS", 1);
-            await this.insertAbilityIfNotExists("JavaScript", 1);
-            await this.insertAbilityIfNotExists("TypeScript", 1);
-            await this.insertAbilityIfNotExists("SQL", 1);
-            await this.insertAbilityIfNotExists("C++", 1);
-            await this.insertAbilityIfNotExists("C", 1);
-            await this.insertAbilityIfNotExists("Ruby", 1);
-            await this.insertAbilityIfNotExists("PHP", 1);
-            await this.insertAbilityIfNotExists("Kotlin", 1);
-            await this.insertAbilityIfNotExists("Go", 1);
-            await this.insertAbilityIfNotExists("Assembly", 1);
-            await this.insertAbilityIfNotExists("Rust", 1);
-            await this.insertAbilityIfNotExists("F#", 1);
+            const progId = await this.getParentIdByName("Programming");
+            await this.insertAbilityIfNotExists("Java", progId);
+            await this.insertAbilityIfNotExists("C#", progId);
+            await this.insertAbilityIfNotExists("Python", progId);
+            await this.insertAbilityIfNotExists("HTML", progId);
+            await this.insertAbilityIfNotExists("CSS", progId);
+            await this.insertAbilityIfNotExists("JavaScript", progId);
+            await this.insertAbilityIfNotExists("TypeScript", progId);
+            await this.insertAbilityIfNotExists("SQL", progId);
+            await this.insertAbilityIfNotExists("C++", progId);
+            await this.insertAbilityIfNotExists("C", progId);
+            await this.insertAbilityIfNotExists("Ruby", progId);
+            await this.insertAbilityIfNotExists("PHP", progId);
+            await this.insertAbilityIfNotExists("Kotlin", progId);
+            await this.insertAbilityIfNotExists("Go", progId);
+            await this.insertAbilityIfNotExists("Assembly", progId);
+            await this.insertAbilityIfNotExists("Rust", progId);
+            await this.insertAbilityIfNotExists("F#", progId);
 
             // Design
-            await this.insertAbilityIfNotExists("Photoshop", 2);
-            await this.insertAbilityIfNotExists("Illustrator", 2);
-            await this.insertAbilityIfNotExists("Gimp", 2);
-            await this.insertAbilityIfNotExists("After Effects", 2);
-            await this.insertAbilityIfNotExists("Premiere Pro", 2);
-            await this.insertAbilityIfNotExists("Video-Editing", 2);
-            await this.insertAbilityIfNotExists("3D-Design", 2);
-            await this.insertAbilityIfNotExists("2D-Design", 2);
-            await this.insertAbilityIfNotExists("UI/UX", 2);
-            await this.insertAbilityIfNotExists("Web-Design", 2);
-            await this.insertAbilityIfNotExists("Logo-Design", 2);
-            await this.insertAbilityIfNotExists("Animation", 2);
-            await this.insertAbilityIfNotExists("Character-Design", 2);
+            const designId = await this.getParentIdByName("Design");
+            await this.insertAbilityIfNotExists("Photoshop", designId);
+            await this.insertAbilityIfNotExists("Illustrator", designId);
+            await this.insertAbilityIfNotExists("Gimp", designId);
+            await this.insertAbilityIfNotExists("After Effects", designId);
+            await this.insertAbilityIfNotExists("Premiere Pro", designId);
+            await this.insertAbilityIfNotExists("Video-Editing", designId);
+            await this.insertAbilityIfNotExists("3D-Design", designId);
+            await this.insertAbilityIfNotExists("2D-Design", designId);
+            await this.insertAbilityIfNotExists("UI/UX", designId);
+            await this.insertAbilityIfNotExists("Web-Design", designId);
+            await this.insertAbilityIfNotExists("Logo-Design", designId);
+            await this.insertAbilityIfNotExists("Animation", designId);
+            await this.insertAbilityIfNotExists("Character-Design", designId);
 
             // Java
-            await this.insertAbilityIfNotExists("Spring", 9);
-            await this.insertAbilityIfNotExists("Selenium", 9);
-            await this.insertAbilityIfNotExists("JavaFX", 9);
-            await this.insertAbilityIfNotExists("JavaEE", 9);
-            await this.insertAbilityIfNotExists("JavaSE", 9);
+            const javaId = await this.getParentIdByName("Java");
+            await this.insertAbilityIfNotExists("Spring", javaId);
+            await this.insertAbilityIfNotExists("Selenium", javaId);
+            await this.insertAbilityIfNotExists("JavaFX", javaId);
+            await this.insertAbilityIfNotExists("JavaEE", javaId);
+            await this.insertAbilityIfNotExists("JavaSE", javaId);
 
             // C#
-            await this.insertAbilityIfNotExists("ASP.NET", 10);
-            await this.insertAbilityIfNotExists("ASP.NET Core", 10);
-            await this.insertAbilityIfNotExists("Unity", 10);
-            await this.insertAbilityIfNotExists("WPF", 10);
-            await this.insertAbilityIfNotExists("UWP", 10);
-            await this.insertAbilityIfNotExists("Xamarin", 10);
-            await this.insertAbilityIfNotExists("Blazor", 10);
-            await this.insertAbilityIfNotExists("Selenium", 10);
+            const csId = await this.getParentIdByName("C#");
+            await this.insertAbilityIfNotExists("ASP.NET", csId);
+            await this.insertAbilityIfNotExists("ASP.NET Core", csId);
+            await this.insertAbilityIfNotExists("Unity", csId);
+            await this.insertAbilityIfNotExists("WPF", csId);
+            await this.insertAbilityIfNotExists("UWP", csId);
+            await this.insertAbilityIfNotExists("Xamarin", csId);
+            await this.insertAbilityIfNotExists("Blazor", csId);
+            await this.insertAbilityIfNotExists("Selenium", csId);
 
             // Python
-            await this.insertAbilityIfNotExists("PyQt", 11);
-            await this.insertAbilityIfNotExists("Tkinter", 11);
-            await this.insertAbilityIfNotExists("Pygame", 11);
-            await this.insertAbilityIfNotExists("Tensorflow", 11);
-            await this.insertAbilityIfNotExists("PyTorch", 11);
-            await this.insertAbilityIfNotExists("Pandas", 11);
-            await this.insertAbilityIfNotExists("Numpy", 11);
-            await this.insertAbilityIfNotExists("Selenium", 11);
+            const pyId = await this.getParentIdByName("Python");
+            await this.insertAbilityIfNotExists("PyQt", pyId);
+            await this.insertAbilityIfNotExists("Tkinter", pyId);
+            await this.insertAbilityIfNotExists("Pygame", pyId);
+            await this.insertAbilityIfNotExists("Tensorflow", pyId);
+            await this.insertAbilityIfNotExists("PyTorch", pyId);
+            await this.insertAbilityIfNotExists("Pandas", pyId);
+            await this.insertAbilityIfNotExists("Numpy", pyId);
+            await this.insertAbilityIfNotExists("Selenium", pyId);
 
             // JavaScript
-            await this.insertAbilityIfNotExists("React", 12);
-            await this.insertAbilityIfNotExists("Angular", 12);
-            await this.insertAbilityIfNotExists("Node.js", 12);
-            await this.insertAbilityIfNotExists("Express", 12);
-            await this.insertAbilityIfNotExists("jQuery", 12);
-            await this.insertAbilityIfNotExists("Cypress", 12);
-            await this.insertAbilityIfNotExists("Jest", 12);
+            const jsId = await this.getParentIdByName("JavaScript");
+            await this.insertAbilityIfNotExists("React", jsId);
+            await this.insertAbilityIfNotExists("Angular", jsId);
+            await this.insertAbilityIfNotExists("Node.js", jsId);
+            await this.insertAbilityIfNotExists("Express", jsId);
+            await this.insertAbilityIfNotExists("jQuery", jsId);
+            await this.insertAbilityIfNotExists("Cypress", jsId);
+            await this.insertAbilityIfNotExists("Jest", jsId);
 
             // TypeScript
-            await this.insertAbilityIfNotExists("Angular", 13);
-            await this.insertAbilityIfNotExists("React", 13);
-            await this.insertAbilityIfNotExists("Node.js", 13);
-            await this.insertAbilityIfNotExists("Express", 13);
-            await this.insertAbilityIfNotExists("NestJS", 13);
-            await this.insertAbilityIfNotExists("Jest", 13);
-            await this.insertAbilityIfNotExists("Webpack", 13);
+            const tsId = await this.getParentIdByName("TypeScript");
+            await this.insertAbilityIfNotExists("Angular", tsId);
+            await this.insertAbilityIfNotExists("React", tsId);
+            await this.insertAbilityIfNotExists("Node.js", tsId);
+            await this.insertAbilityIfNotExists("Express", tsId);
+            await this.insertAbilityIfNotExists("NestJS", tsId);
+            await this.insertAbilityIfNotExists("Jest", tsId);
+            await this.insertAbilityIfNotExists("Webpack", tsId);
 
             // SQL
-            await this.insertAbilityIfNotExists("MySQL", 14);
-            await this.insertAbilityIfNotExists("SQLite", 14);
-            await this.insertAbilityIfNotExists("MongoDB", 14);
+            const sqlId = await this.getParentIdByName("SQL");
+            await this.insertAbilityIfNotExists("MySQL", sqlId);
+            await this.insertAbilityIfNotExists("SQLite", sqlId);
+            await this.insertAbilityIfNotExists("MongoDB", sqlId);
 
             // C++
-            await this.insertAbilityIfNotExists("Qt", 15);
-            await this.insertAbilityIfNotExists("OpenGL", 15);
-            await this.insertAbilityIfNotExists("DirectX", 15);
+            const cppId = await this.getParentIdByName("C++");
+            await this.insertAbilityIfNotExists("Qt", cppId);
+            await this.insertAbilityIfNotExists("OpenGL", cppId);
+            await this.insertAbilityIfNotExists("DirectX", cppId);
 
             // Kotlin
-            await this.insertAbilityIfNotExists("Android", 16);
-            await this.insertAbilityIfNotExists("Spring", 16);
+            const kotlinId = await this.getParentIdByName("Kotlin");
+            await this.insertAbilityIfNotExists("Android", kotlinId);
+            await this.insertAbilityIfNotExists("Spring", kotlinId);
         });
     }
 
     static async insertAbilityIfNotExists(name: string, parentId: number | null = null): Promise<void> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT id FROM Ability WHERE name = ?`, [name], (err, row) => {
+            const sql:string = parentId ? `SELECT id FROM Ability WHERE name = ? AND parentId=?` : `SELECT id FROM Ability WHERE name = ? AND parentId IS ?`;
+            db.get(sql, [name, parentId], (err, row) => {
                 if (err) {
                     reject(err);
                 } else if (row) {
@@ -234,6 +245,20 @@ export class Database {
                             resolve();
                         }
                     });
+                }
+            });
+        });
+    }
+
+    static async getParentIdByName(name: string): Promise<number | null> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT id FROM Ability WHERE name = ?`, [name], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else if (row) {
+                    resolve(row.id);
+                } else {
+                    resolve(null);
                 }
             });
         });
