@@ -8,27 +8,27 @@ export class Utility {
     /* region User */
 
     /* region Base */
-    static async addUser(ifId: string, username: string, firstname: string, lastname: string,
+    static async addUser(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string,
                    birthdate: Date, biografie: string, permissions: number, department: string): Promise<boolean> {
         try {
-            if (!ValUser.isValid(ifId, username, firstname, lastname, birthdate, biografie, permissions, department)) {
+            if (!ValUser.isValid(userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department)) {
                 return false;
             }
 
-            return await Database.addUser(ifId, username, firstname, lastname, birthdate.toDateString(), biografie, permissions, department);
+            return await Database.addUser(userId, username, firstname, lastname, email, clazz, birthdate.toDateString(), biografie, permissions, department);
         }
         catch (e) {
             return false;
         }
     }
 
-    static async getUser(ifId: string): Promise<User | null> {
+    static async getUser(userId: string): Promise<User | null> {
         try {
-            if(!ValUser.isIFValid(ifId)) {
+            if(!ValUser.isUserIdValid(userId)) {
                 return null;
             }
 
-            const user = await Database.getUser(ifId);
+            const user = await Database.getUser(userId);
             if (!user) {
                 return null;
             }
@@ -38,26 +38,26 @@ export class Utility {
         }
     }
 
-    static async updateUser(ifId: string, username: string, firstname: string, lastname: string, birthdate: Date, biografie: string, permissions: number, department: string): Promise<boolean> {
+    static async updateUser(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string, birthdate: Date, biografie: string, permissions: number, department: string): Promise<boolean> {
         try {
-            if(!ValUser.isValid(ifId, username, firstname, lastname, birthdate, biografie, permissions, department)) {
+            if(!ValUser.isValid(userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department)) {
                 return false;
             }
 
-            return await Database.updateUser(ifId, username, firstname, lastname, birthdate.toDateString(), biografie, permissions, department);
+            return await Database.updateUser(userId, username, firstname, lastname, email, clazz, birthdate.toDateString(), biografie, permissions, department);
         }
         catch (e) {
             return false;
         }
     }
 
-    static async deleteUser(ifId: string): Promise<boolean> {
+    static async deleteUser(userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(ifId)) {
+            if(!ValUser.isUserIdValid(userId)) {
                 return false;
             }
 
-            return await Database.deleteUser(ifId);
+            return await Database.deleteUser(userId);
         }
         catch (e) {
             return false;
@@ -82,6 +82,10 @@ export class Utility {
                 return false;
             }
 
+            if(await Database.userAbilityAlreadyExists(userId, abilityId)) {
+                return false;
+            }
+
             return await Database.addUserAbility(userId, abilityId);
         }
         catch (e) {
@@ -102,6 +106,15 @@ export class Utility {
         }
     }
 
+    static async deleteUserAbility(userId: string, abilityId: number): Promise<boolean> {
+        try {
+            return await Database.deleteUserAbility(userId, abilityId);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
     /* endregion */
 
     /* region Notification */
@@ -115,8 +128,11 @@ export class Utility {
             if(!await ValUser.isUserValid(userId)) {
                 return false;
             }
+            const date = new Date(Date.now());
 
-            return await Database.addNotification(userId, title, text, new Date(Date.now()).toDateString());
+            const dateTime = `${date.toLocaleDateString()};${date.toLocaleTimeString()}`
+
+            return await Database.addNotification(userId, title, text, dateTime);
         }
         catch (e) {
             return false;
@@ -125,7 +141,7 @@ export class Utility {
 
     static async getNotifications(userId: string): Promise<Notification[] | null> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!ValUser.isUserIdValid(userId)) {
                 return null;
             }
 
@@ -151,7 +167,7 @@ export class Utility {
 
     static async isNotificationOwner(userId: string, notificationId: number): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || notificationId < 1) {
+            if(!ValUser.isUserIdValid(userId) || notificationId < 1) {
                 return false;
             }
 
@@ -231,7 +247,7 @@ export class Utility {
 
     static async alreadyProjectWithSameName(ownerId: string, projectName: string, id: number): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(ownerId) || projectName.length < 1 || projectName.length > 30) {
+            if(!ValUser.isUserIdValid(ownerId) || projectName.length < 1 || projectName.length > 30) {
                 return false;
             }
 
@@ -265,7 +281,7 @@ export class Utility {
 
     static async deleteProjectByName(projectName: string, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || projectName.length < 1 || projectName.length > 30) {
+            if(!ValUser.isUserIdValid(userId) || projectName.length < 1 || projectName.length > 30) {
                 return false;
             }
 
@@ -284,7 +300,7 @@ export class Utility {
 
     static async isUserOwnerOfProject(userId: string, projectId: number): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || projectId < 1) {
+            if(!ValUser.isUserIdValid(userId) || projectId < 1) {
                 return false;
             }
 
@@ -310,7 +326,7 @@ export class Utility {
 
     static async getProjectId(projectName: string, ownerId: string): Promise<number | null> {
         try {
-            if(!ValUser.isIFValid(ownerId) || projectName.length < 1 || projectName.length > 30) {
+            if(!ValUser.isUserIdValid(ownerId) || projectName.length < 1 || projectName.length > 30) {
                 return null;
             }
 
@@ -345,9 +361,55 @@ export class Utility {
         }
     }
 
+    static async projectMemberAccepted(projectId: number, userId: string): Promise<boolean> {
+        try {
+            if(!ValUser.isUserIdValid(userId) || projectId < 1) {
+                return false;
+            }
+
+            const project = await this.getProject(projectId);
+
+            if(project === null) {
+                return false;
+            }
+
+            if(!await this.isUserOwnerOfProject(userId, projectId)) {
+                return false;
+            }
+
+            const members = await Database.getAmountOfProjectMembersByProjectId(projectId);
+
+            if(members >= project.maxMembers) {
+                return false;
+            }
+
+            return Database.acceptProjectMember(userId, projectId);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
     static async getProjectMembers(projectId: number): Promise<ProjectMember[] | null> {
         try {
+            if(projectId < 1) {
+                return null;
+            }
+
             return await Database.getProjectMembersByProjectId(projectId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static async getPendingRequests(projectId: number): Promise<ProjectMember[] | null> {
+        try {
+            if(projectId < 1) {
+                return null;
+            }
+
+            return await Database.getNotAcceptedProjectMembersByProjectId(projectId);
         }
         catch (e) {
             return null;
@@ -356,7 +418,7 @@ export class Utility {
 
     static async getProjectsWhereUserIsMember(userId: string): Promise<Project[] | null> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!ValUser.isUserIdValid(userId)) {
                 return null;
             }
 
@@ -369,7 +431,7 @@ export class Utility {
 
     static async deleteProjectMember(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!ValUser.isUserIdValid(userId)) {
                 return false;
             }
 
@@ -415,7 +477,7 @@ export class Utility {
 
     static async getLikedProjectsByUserId(userId: string): Promise<Project[]> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!ValUser.isUserIdValid(userId)) {
                 return null;
             }
 
@@ -428,7 +490,7 @@ export class Utility {
 
     static async deleteLike(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!ValUser.isUserIdValid(userId)) {
                 return false;
             }
 
@@ -490,6 +552,10 @@ export class Utility {
                 return false;
             }
 
+            if(await Database.projectAbilityAlreadyExists(projectId, abilityId)) {
+                return false;
+            }
+
             return await Database.addProjectAbility(projectId, abilityId);
         }
         catch (e) {
@@ -500,6 +566,15 @@ export class Utility {
     static async getAbilitiesByProjectId(projectId: number): Promise<Ability[]> {
         try {
             return await Database.getProjectAbilitiesByProjectId(projectId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static async getAllAbilities(): Promise<Ability[]> {
+        try {
+            return await Database.getAbilities();
         }
         catch (e) {
             return null;
@@ -543,7 +618,7 @@ export class Utility {
 
     static async getDirectChats(userId: string): Promise<DirectChat[]> {
         try {
-            if(!ValUser.isIFValid(userId)) {
+            if(!ValUser.isUserIdValid(userId)) {
                 return null;
             }
 
@@ -556,7 +631,7 @@ export class Utility {
 
     static async getDirectChat(userId: string, otherUserId: string): Promise<DirectChat | null> {
         try {
-            if(!ValUser.isIFValid(userId) || !ValUser.isIFValid(otherUserId)) {
+            if(!ValUser.isUserIdValid(userId) || !ValUser.isUserIdValid(otherUserId)) {
                 return null;
             }
 
@@ -569,7 +644,7 @@ export class Utility {
 
     static async deleteDirectChat(userId: string, otherUserId: string): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || !ValUser.isIFValid(otherUserId)) {
+            if(!ValUser.isUserIdValid(userId) || !ValUser.isUserIdValid(otherUserId)) {
                 return false;
             }
 
@@ -633,7 +708,7 @@ export class Utility {
 
     static async deleteMessage(userId: string, messageId: number): Promise<boolean> {
         try {
-            if(!ValUser.isIFValid(userId) || messageId < 1) {
+            if(!ValUser.isUserIdValid(userId) || messageId < 1) {
                 return false;
             }
 

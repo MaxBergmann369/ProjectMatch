@@ -1,8 +1,10 @@
 export interface User {
-    ifId: string;
+    userId: string;
     username: string;
     firstname: string;
     lastname: string;
+    email: string;
+    clazz: string;
     birthdate: Date;
     biografie: string;
     permissions: number;
@@ -24,6 +26,7 @@ export interface ProjectMember {
     id: number;
     projectId: number;
     userId: string;
+    IsAccepted: boolean;
 }
 
 export interface View {
@@ -43,7 +46,7 @@ export interface Notification {
     userId: string;
     title: string;
     text: string;
-    date: Date;
+    dateTime: string;
 }
 
 export interface UserAbility {
@@ -61,7 +64,7 @@ export interface ProjectAbility {
 export interface Ability {
     id: number;
     name: string;
-    parentId: number;
+    parentId: number | null;
 }
 
 export interface DirectChat {

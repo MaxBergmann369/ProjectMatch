@@ -1,0 +1,145 @@
+@token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ1OW1SYV85Q0NJWGtUNDdaUXQyNEplZGd1MWtsMTFNZ0ozb01NZ3k5V2UwIn0.eyJleHAiOjE3MTUzNDE3MTYsImlhdCI6MTcxNTM0MDgxNiwiYXV0aF90aW1lIjoxNzE1MzQwODE0LCJqdGkiOiI3MDFkZGE5Yi1hMTRkLTQ5ODYtODljZi1jMTEwMDQ1YmE4MWUiLCJpc3MiOiJodHRwczovL2F1dGguaHRsLWxlb25kaW5nLmFjLmF0L3JlYWxtcy9odGwtbGVvbmRpbmciLCJzdWIiOiJkODQ4NDU2MS1mNzJiLTQ1OWEtYjJkNS1kOWYzNmJjMTkzMDMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJodGxsZW9uZGluZy1zZXJ2aWNlIiwibm9uY2UiOiJiYmUzOGQzNC1hZGQ1LTQ2NDMtODdhNi1lMjJlYzBhZmNlNmIiLCJzZXNzaW9uX3N0YXRlIjoiMzI4MjI0ZWEtNjc5YS00NjMyLWE3MDQtMTYxNDVmYzJjYjlkIiwiYWNyIjoiMCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgTERBUF9FTlRSWV9ETiBodGwtbGVvbmRpbmctZ3JvdXAtbWFwcGVyIGVtYWlsIGh0bC1sZW9uZGluZy1hY2NvdW50LW5hbWUiLCJzaWQiOiIzMjgyMjRlYS02NzlhLTQ2MzItYTcwNC0xNjE0NWZjMmNiOWQiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIkxEQVBfRU5UUllfRE4iOiJDTj1pZjIxMDAxMCxPVT0zQkhJRixPVT1JRixPVT1TdHVkZW50cyxPVT1IVEwsREM9RURVLERDPUhUTC1MRU9ORElORyxEQz1BQyxEQz1BVCIsIm5hbWUiOiJBZGFtIEjDtmxsZXJsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiaWYyMTAwMTAiLCJnaXZlbl9uYW1lIjoiQWRhbSIsImZhbWlseV9uYW1lIjoiSMO2bGxlcmwiLCJlbWFpbCI6ImEuaG9lbGxlcmxAc3R1ZGVudHMuaHRsLWxlb25kaW5nLmFjLmF0In0.nrXKBjm60iXxEfyWWPD5u9cT9l0aY_CYzHpl0ofwH5j0oAVndAABzJzQ4TFDCrkpPyLFRGlgMD7335l6ovfv0704cCwYC0tI7lku9ED8Foo5AMQGtsPPLALVlq3LR2O0Mwotl2iElK_EHDT7Ij4yHfaE2Dp6YZwgLiPnCxnvF-lfaiJiMdlIBdpwRkwodyJWPcKNq1SV903wR-i-vvF8KXffseMM5i-r7P7nrx6RbYJJqvpvl5YFldlfo8hc-2AMw8uDr9xzgVcRYHO57edsNzo28Vsog6-sJ61rZK5QtpaIggwxBh7FSdCukr0lss_98RQ2-Qk_MnsIETxDeJqq7w"
+@url = "http://localhost:3000/api"
+
+###
+
+POST {{url}}/projects
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "test",
+  "ownerId": "IF123456",
+  "thumbnail": "image.png",
+  "description": "some description",
+  "links": "https://www.google.com;https://www.youtube.com",
+  "maxMembers": 5
+}
+
+###
+
+GET {{url}}/projects/1
+Authorization: Bearer {{token}}
+
+###
+
+GET {{url}}/projects
+Authorization: Bearer {{token}}
+
+###
+
+GET {{url}}/projects/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+PUT {{url}}/projects
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "name": "test updated",
+  "ownerId": "IF123456",
+  "thumbnail": "image.png",
+  "description": "some updated description",
+  "links": "https://www.google.com;https://www.youtube.com",
+  "maxMembers": 5
+}
+
+###
+
+DELETE {{url}}/projects/IF123456/1
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/projects/1/members
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userId": "IF123456"
+}
+
+###
+
+GET {{url}}/projects/1
+Authorization: Bearer {{token}}
+
+###
+
+GET {{url}}/projects/members/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+PUT {{url}}/projects/1/members
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userId": "IF123456"
+}
+
+###
+
+DELETE {{url}}/projects/1/members/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/views
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "projectId": 1,
+  "userId": "IF123456"
+}
+
+###
+
+GET {{url}}/views/1
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/likes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "projectId": 1,
+  "userId": "IF123456"
+}
+
+###
+
+GET {{url}}/likes/1
+Authorization: Bearer {{token}}
+
+###
+
+DELETE {{url}}/likes/1/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/projects/1/abilities
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "abilityId": 1
+}
+
+###
+
+GET {{url}}/projects/1/abilities
+Authorization: Bearer {{token}}
+
+###
+
+DELETE {{url}}/projects/1/abilities/1
+Authorization: Bearer {{token}}

@@ -1,9 +1,19 @@
 import {Utility} from "./utility";
 
+enum DepartmentTypes {
+    Unset = "Unknown",
+    AD = "Abendschule",
+    BG = "Biomedizin- und Gesundheitstechnik",
+    FE = "Fachschule Elektronik",
+    HE = "Höhere Elektronik",
+    IF = "Informatik",
+    IT = "Medientechnik"
+}
+
 export class ValUser {
-    static isValid(ifId: string, username: string, firstname: string, lastname: string,
+    static isValid(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string,
                    birthdate: Date, biografie: string, permissions: number, department: string): boolean {
-        if(!this.isIFValid(ifId)) {
+        if(!this.isUserIdValid(userId)) {
             return false;
         }
 
@@ -27,7 +37,15 @@ export class ValUser {
             return false;
         }
 
-        if(department === undefined || department === "" || department.length > 20 || department.length < 1) {
+        if(department === undefined || department === "" || !this.validateDepartment(department)) {
+            return false;
+        }
+
+        if(email === undefined || !this.isEmailValid(email)) {
+            return false;
+        }
+
+        if(clazz === undefined || clazz === "" || clazz.length > 10 || clazz.length < 1) {
             return false;
         }
 
@@ -35,22 +53,33 @@ export class ValUser {
     }
 
 
-    static isIFValid(ifId: string): boolean {
-        if(ifId === undefined || ifId.length !== 8 || !ifId.startsWith("IF")) {
+    static isUserIdValid(userId: string): boolean {
+
+        if(userId === undefined || userId === null || userId.length !== 8) {
             return false;
         }
 
-        return !isNaN(Number(ifId.substring(2)));
+        const id = userId.toLowerCase();
+        if(!Object.keys(DepartmentTypes).some(value => id.startsWith(value.toLowerCase()))) {
+            return false;
+        }
+
+        return !isNaN(Number(id.substring(2)));
     }
 
-    static async isUserValid(ifId: string) {
-        if(!this.isIFValid(ifId)) {
+    static async isUserValid(userId: string) {
+        if(!this.isUserIdValid(userId)) {
             return false;
         }
 
-        const user = await Utility.getUser(ifId);
+        const user = await Utility.getUser(userId);
 
         return user !== null;
+    }
+
+    private static isEmailValid(email: string): boolean {
+        const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return pattern.test(email);
     }
 
     private static containsForbiddenWords(username: string, firstname: string, lastname: string): boolean {
@@ -66,6 +95,10 @@ export class ValUser {
         }
 
         return !isNaN(birthdate.getTime());
+    }
+
+    private static validateDepartment(department: string): boolean {
+        return Object.values(DepartmentTypes).some(value => department.toLowerCase() === value.toLowerCase());
     }
 }
 
@@ -110,7 +143,7 @@ export class ValProject {
 
 export class ValNotification {
     static isValid(userId: string, title: string, text: string): boolean {
-        if(!ValUser.isIFValid(userId)){
+        if(!ValUser.isUserIdValid(userId)){
             return false;
         }
 
@@ -124,7 +157,7 @@ export class ValNotification {
 
 export class ValMessage {
     static isValid(senderId: string, message: string): boolean {
-        if (!ValUser.isIFValid(senderId)) {
+        if (!ValUser.isUserIdValid(senderId)) {
             return false;
         }
 
