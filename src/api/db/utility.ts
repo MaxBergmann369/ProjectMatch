@@ -1,7 +1,7 @@
 
 import {Database} from "./db";
 import {ValMessage, ValNotification, ValProject, ValUser} from "./validation";
-import {Ability, DirectChat, Like, Message, Notification, Project, ProjectMember, User, View} from "../models";
+import {Ability, DirectChat, Like, Message, Notification, Project, ProjectMember, User, View} from "../../models";
 
 export class Utility {
 
