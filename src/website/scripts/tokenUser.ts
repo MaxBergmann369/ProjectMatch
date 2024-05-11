@@ -2,7 +2,7 @@ import {KeycloakTokenParsed} from "keycloak-js";
 import {Department, Role} from "../../models";
 
 export class TokenUser {
-    ifId: string;
+    userId: string;
     firstname: string;
     lastname: string;
     class: string;
@@ -10,8 +10,8 @@ export class TokenUser {
     email: string;
     department: Department;
 
-    constructor(token:KeycloakTokenParsed) {
-        this.ifId = token.preferred_username;
+    constructor(token: any) {
+        this.userId = token.preferred_username;
         this.firstname = token.given_name;
         this.lastname = token.family_name;
         this.email = token.email;

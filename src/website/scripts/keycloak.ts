@@ -14,8 +14,8 @@ export async function initKeycloak() {
             flow: "implicit",
             pkceMethod: 'S256',
             // enableLogging: true,
-            silentCheckSsoRedirectUri:
-                window.location.origin + '/silent-check-sso.html',
+            //silentCheckSsoRedirectUri:
+            //    window.location.origin + '/silent-check-sso.html',
         });
     }
     catch (error) {

@@ -1,9 +1,11 @@
 import {User, Project, View, Like, Message, DirectChat, Notification, ProjectMember, UserAbility, Ability, ProjectAbility} from "../../models";
+import {keycloak} from "./keycloak";
 
 export class HttpClient {
 
     baseUrl = "http://localhost:3000/api";
-    bearer = `Bearer ${localStorage.token}`;
+    //get keycloak token
+    bearer = `Bearer ${keycloak.token}`
 
     /* region User */
 
@@ -11,11 +13,11 @@ export class HttpClient {
         return await fetch(`${this.baseUrl}/user`, {
             method: 'POST',
             headers: {
-                'Authorization': this.bearer
+                Authorization: this.bearer
             },
             body: JSON.stringify({
                 username: "test",
-                birthdate: "2002-05-08",
+                birthdate: "28.04.2001"
             })
         })
             .then(response => response.json());

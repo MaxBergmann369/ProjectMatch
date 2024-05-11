@@ -1,7 +1,8 @@
 import express from "express";
 import {Utility} from "../db/utility";
+import jwt from "jsonwebtoken";
 import {TokenUser} from "../../website/scripts/tokenUser";
-import {keycloak} from "../../website/scripts/keycloak";
+import {User} from "../../models";
 
 const userRouter = express.Router();
 
@@ -10,18 +11,45 @@ export function createUserEndpoints() {
     userRouter.post('/user', async (req, res) => {
         const {username, birthdate} = req.body;
 
-        keycloak.token = req.headers.authorization as string;
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            res.status(400).send("Invalid or missing token");
+            return;
+        }
+        const token = authHeader.split(" ")[1];
 
-        const user = new TokenUser(keycloak.tokenParsed);
+        const decodedToken  = jwt.decode(token);
+        if (!decodedToken) {
+            res.status(400).send("Invalid token");
+            return;
+        }
 
-        const userId = user.ifId;
-        const firstname = user.firstname;
-        const lastname = user.lastname;
-        const email = user.email;
-        const clazz = user.class;
-        const department = user.department;
+        const tokenUser = new TokenUser(decodedToken);
+
+        const userId = tokenUser.userId;
+        const firstname = tokenUser.firstname;
+        const lastname = tokenUser.lastname;
+        const email = tokenUser.lastname;
+        const clazz = tokenUser.class;
+        const department = tokenUser.department;
 
         const bd = new Date(birthdate);
+
+        const user: User = {
+            userId: userId,
+            username: username,
+            firstname: firstname,
+            lastname: lastname,
+            email: email,
+            clazz: clazz,
+            birthdate: bd,
+            biografie: "",
+            permissions: 0,
+            department: department
+        }
+
+        res.send(birthdate);
+        return;
 
         if(await Utility.addUser(userId, username, firstname, lastname, email, clazz, bd, "", 0, department)) {
             res.status(200).send("User added");

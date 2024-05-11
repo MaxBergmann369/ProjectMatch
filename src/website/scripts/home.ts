@@ -1,6 +1,7 @@
 import {keycloak, initKeycloak} from "./keycloak";
 import {Role} from "../../models";
 import {TokenUser} from "./tokenUser";
+import {HttpClient} from "./server-client";
 
 const authenticatedPromise = initKeycloak();
 
@@ -10,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("User is authenticated");
         const user = new TokenUser(keycloak.tokenParsed);
         const data = `
-            Username: ${user.ifId}
+            Username: ${user.userId}
             Firstname: ${user.firstname}
             Lastname: ${user.lastname}
             Email: ${user.email}
@@ -19,6 +20,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             Department: ${user.department}
         `;
         document.getElementById("username").innerText = data;
+
+        let client = new HttpClient();
+        client.addUser().then((data) => {
+            console.log(data);
+        });
+
         // TODO: check if user doesnt exist in database yet:
         if (authenticated.toString() === keycloak.token) {
             // TODO: redirect to register page; unreachable: do above
