@@ -9,6 +9,8 @@ export function createUserEndpoints() {
     userRouter.post('/user', async (req, res) => {
         const {userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department} = req.body;
 
+        const token = req.headers.authorization as string;
+
         const bd = new Date(birthdate);
 
         if(await Utility.addUser(userId, username, firstname, lastname, email, clazz, bd, biografie, permissions, department)) {
