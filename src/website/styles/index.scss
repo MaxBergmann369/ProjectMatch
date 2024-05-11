@@ -37,6 +37,8 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-image: url("../resources/alternate.jpg");
+  background-position: center;
+  background-position-y: 22%;
   color: white;
   background-color: black;
     font-family: 'Carlito', sans-serif;
@@ -49,6 +51,7 @@ body {
   justify-content: space-between;
   width: 100%;
   height: 10%;
+  opacity: 1;
   h1{
     padding-left: 1rem;
   }
