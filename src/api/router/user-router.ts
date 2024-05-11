@@ -1,19 +1,29 @@
 import express from "express";
-import {Database} from "../db/db";
 import {Utility} from "../db/utility";
+import {TokenUser} from "../../website/scripts/tokenUser";
+import {keycloak} from "../../website/scripts/keycloak";
 
 const userRouter = express.Router();
 
 export function createUserEndpoints() {
     /* region User */
     userRouter.post('/user', async (req, res) => {
-        const {userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department} = req.body;
+        const {username, birthdate} = req.body;
 
-        const token = req.headers.authorization as string;
+        keycloak.token = req.headers.authorization as string;
+
+        const user = new TokenUser(keycloak.tokenParsed);
+
+        const userId = user.ifId;
+        const firstname = user.firstname;
+        const lastname = user.lastname;
+        const email = user.email;
+        const clazz = user.class;
+        const department = user.department;
 
         const bd = new Date(birthdate);
 
-        if(await Utility.addUser(userId, username, firstname, lastname, email, clazz, bd, biografie, permissions, department)) {
+        if(await Utility.addUser(userId, username, firstname, lastname, email, clazz, bd, "", 0, department)) {
             res.status(200).send("User added");
         } else {
             res.status(400).send("User not added");
