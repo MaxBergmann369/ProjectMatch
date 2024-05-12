@@ -22,9 +22,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("username").innerText = data;
 
         let client = new HttpClient();
-        client.addUser().then((data) => {
-            console.log(data);
-        });
+        await client.addUser("Tester", "1.1.2001");
+        const user1: any = await client.getUser("IF210062");
+        console.log(user1);
 
         // TODO: check if user doesnt exist in database yet:
         if (authenticated.toString() === keycloak.token) {
