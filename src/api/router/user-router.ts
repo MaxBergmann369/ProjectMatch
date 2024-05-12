@@ -2,7 +2,6 @@ import express from "express";
 import {Utility} from "../db/utility";
 import jwt from "jsonwebtoken";
 import {TokenUser} from "../../website/scripts/tokenUser";
-import {User} from "../../models";
 
 const userRouter = express.Router();
 
@@ -14,7 +13,7 @@ export function createUserEndpoints() {
 
             const authHeader = req.headers.authorization;
             if (!authHeader || !authHeader.startsWith("Bearer ")) {
-                res.status(400).send("Invalid or missing token");
+                res.sendStatus(400);
                 return;
             }
 
@@ -22,7 +21,7 @@ export function createUserEndpoints() {
 
             const decodedToken  = jwt.decode(token);
             if (!decodedToken) {
-                res.status(400).send("Invalid token");
+                res.sendStatus(400);
                 return;
             }
 
@@ -38,12 +37,12 @@ export function createUserEndpoints() {
             const bd = new Date(birthdate);
 
             if(await Utility.addUser(userId, username, firstname, lastname, email, clazz, bd, "", 1, department)) {
-                res.status(200).send("User added");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("User not added");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("User not added");
+            res.sendStatus(400);
         }
     });
 
@@ -54,12 +53,12 @@ export function createUserEndpoints() {
             const user = await Utility.getUser(userId);
 
             if (user !== null) {
-                res.status(200).send(user);
+                res.sendStatus(200);
             } else {
-                res.status(400).send("User not found");
+                res.sendStatus(400)
             }
         } catch (e) {
-            res.status(400).send("User not found");
+            res.sendStatus(400)
         }
     });
 
@@ -81,12 +80,12 @@ export function createUserEndpoints() {
             const bd = new Date(birthdate);
 
             if (await Utility.updateUser(userId, username, firstname, lastname, email, clazz, bd, biografie, permissions, department)) {
-                res.status(200).send("User updated");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("User not updated");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("User not updated");
+            res.sendStatus(400);
         }
     });
 
@@ -95,12 +94,12 @@ export function createUserEndpoints() {
             const userId = req.params.userId;
 
             if (await Utility.deleteUser(userId)) {
-                res.status(200).send("User deleted");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("User not deleted");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("User not deleted");
+            res.status(400);
         }
     });
 
@@ -114,17 +113,17 @@ export function createUserEndpoints() {
             const abilityId = parseInt(req.body.abilityId);
 
             if (isNaN(abilityId)) {
-                res.status(400).send("Invalid Ability Id");
+                res.sendStatus(400);
                 return;
             }
 
             if (await Utility.addUserAbility(userId, abilityId)) {
-                res.status(200).send("User ability added");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("User ability not added");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("User ability not added");
+            res.status(400);
         }
     });
 
@@ -138,10 +137,10 @@ export function createUserEndpoints() {
             if (userAbility !== null) {
                 res.status(200).send(userAbility);
             } else {
-                res.status(400).send("User ability not found");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("User ability not found");
+            res.sendStatus(400);
         }
     });
 
@@ -153,16 +152,16 @@ export function createUserEndpoints() {
             const abId: number = parseInt(abilityId);
 
             if (isNaN(abId)) {
-                res.status(400).send("Invalid abilityId");
+                res.sendStatus(400);
             }
 
             if (await Utility.deleteUserAbility(userId, abId)) {
-                res.status(200).send("User ability deleted");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("User ability not deleted");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("User ability not deleted");
+            res.sendStatus(400);
         }
     });
 
@@ -176,13 +175,13 @@ export function createUserEndpoints() {
             const userId = req.params.userId;
 
             if(await Utility.addNotification(userId, title, text)) {
-                res.status(200).send("Notification added");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Notification not added");
+                res.sendStatus(400);
             }
         }
         catch (e) {
-            res.status(400).send("Notification not added");
+            res.sendStatus(400);
         }
     });
 
@@ -195,10 +194,10 @@ export function createUserEndpoints() {
             if(notification !== null) {
                 res.status(200).send(notification);
             } else {
-                res.status(400).send("Notification not found");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Notification not found");
+            res.sendStatus(400);
         }
     });
 
@@ -209,16 +208,16 @@ export function createUserEndpoints() {
 
 
             if (isNaN(notId)) {
-                res.status(400).send("Invalid notificationId");
+                res.sendStatus(400);
             }
 
             if (await Utility.deleteNotification(userId, notId)) {
-                res.status(200).send("Notification deleted");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Notification not deleted");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Notification not deleted");
+            res.status(400);
         }
     });
 
@@ -233,10 +232,10 @@ export function createUserEndpoints() {
             if(abilities !== null) {
                 res.status(200).send(abilities);
             } else {
-                res.status(400).send("Abilities not found");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Abilities not found");
+            res.sendStatus(400);
         }
     });
 

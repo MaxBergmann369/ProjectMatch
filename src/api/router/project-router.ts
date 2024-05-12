@@ -11,12 +11,12 @@ export function createProjectEndpoints() {
             const {name, ownerId, thumbnail, description, links, maxMembers} = req.body;
 
             if (await Utility.addProject(name, ownerId, thumbnail, description, links, maxMembers)) {
-                res.status(200).send("Project added");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Project not added");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Project not added");
+            res.sendStatus(400);
         }
     });
 
@@ -25,7 +25,7 @@ export function createProjectEndpoints() {
             const id = parseInt(req.params.projId);
 
             if (isNaN(id)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
@@ -34,10 +34,10 @@ export function createProjectEndpoints() {
             if (project !== null) {
                 res.status(200).send(project);
             } else {
-                res.status(400).send("Project not found");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Project not found");
+            res.sendStatus(400)
         }
     });
 
@@ -49,10 +49,10 @@ export function createProjectEndpoints() {
                 //TODO: algorithm
                 res.status(200).send(projects);
             } else {
-                res.status(400).send("Projects not found");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Projects not found");
+            res.sendStatus(400);
         }
     });
 
@@ -65,10 +65,10 @@ export function createProjectEndpoints() {
             if (projects !== null) {
                 res.status(200).send(projects);
             } else {
-                res.status(400).send("Projects not found");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Projects not found");
+            res.sendStatus(400);
         }
     });
 
@@ -77,12 +77,12 @@ export function createProjectEndpoints() {
             const {id, name, ownerId, thumbnail, description, links, maxMembers} = req.body;
 
             if (await Utility.updateProject(id, name, ownerId, thumbnail, description, links, maxMembers)) {
-                res.status(200).send("Project updated");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Project not updated");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Project not updated");
+            res.sendStatus(400);
         }
     });
 
@@ -94,17 +94,17 @@ export function createProjectEndpoints() {
             const id = parseInt(projectId);
 
             if (isNaN(id)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
             if (await Utility.deleteProject(userId, id)) {
-                res.status(200).send("Project deleted");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Project not deleted");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Project not deleted");
+            res.sendStatus(400);
         }
     });
 
@@ -117,17 +117,17 @@ export function createProjectEndpoints() {
             const {userId} = req.body;
             const projectId = parseInt(req.params.projId);
             if (isNaN(projectId)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
             if(await Utility.addProjectMember(projectId, userId)) {
-                res.status(200).send("Project member added");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Project member not added");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Project member not added");
+            res.sendStatus(400);
         }
     });
 
@@ -138,7 +138,7 @@ export function createProjectEndpoints() {
             const id = parseInt(projectId);
 
             if (isNaN(id)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
@@ -147,11 +147,11 @@ export function createProjectEndpoints() {
             if (projectMembers !== null) {
                 res.status(200).send(projectMembers);
             } else {
-                res.status(400).send("Project members not found");
+                res.sendStatus(400);
             }
         }
         catch (e) {
-            res.status(400).send("Project members not found");
+            res.sendStatus(400);
         }
     });
 
@@ -163,10 +163,10 @@ export function createProjectEndpoints() {
             if (projects !== null) {
                 res.status(200).send(projects);
             } else {
-                res.status(400).send("Projects not found");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Projects not found");
+            res.sendStatus(400);
         }
     });
 
@@ -175,17 +175,17 @@ export function createProjectEndpoints() {
             const {userId} = req.body;
             const projectId = parseInt(req.params.projId);
             if (isNaN(projectId)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
             if (await Utility.projectMemberAccepted(projectId, userId)) {
-                res.status(200).send("Project member updated");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Project member not updated");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Project member not updated");
+            res.sendStatus(400);
         }
     });
 
@@ -197,17 +197,17 @@ export function createProjectEndpoints() {
             const id = parseInt(projectId);
 
             if (isNaN(id)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
             if (await Utility.deleteProjectMember(id, userId)) {
-                res.status(200).send("Project member deleted");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Project member not deleted");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Project member not deleted");
+            res.sendStatus(400);
         }
     });
 
@@ -220,12 +220,12 @@ export function createProjectEndpoints() {
             const {projectId, userId} = req.body;
 
             if (await Utility.addView(projectId, userId)) {
-                res.status(200).send("View added");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("View not added");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("View not added");
+            res.sendStatus(400);
         }
     });
 
@@ -236,7 +236,7 @@ export function createProjectEndpoints() {
             const id = parseInt(projectId);
 
             if (isNaN(id)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
@@ -245,10 +245,10 @@ export function createProjectEndpoints() {
             if (views !== null) {
                 res.status(200).send(views);
             } else {
-                res.status(400).send("Views not found");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Views not found");
+            res.sendStatus(400);
         }
     });
 
@@ -261,12 +261,12 @@ export function createProjectEndpoints() {
             const {projectId, userId} = req.body;
 
             if(await Utility.addLike(projectId, userId)) {
-                res.status(200).send("Like added");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Like not added");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Like not added");
+            res.sendStatus(400);
         }
     });
 
@@ -277,7 +277,7 @@ export function createProjectEndpoints() {
             const id = parseInt(projectId);
 
             if (isNaN(id)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
@@ -286,10 +286,10 @@ export function createProjectEndpoints() {
             if (likes !== null) {
                 res.status(200).send(likes);
             } else {
-                res.status(400).send("Likes not found");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Likes not found");
+            res.sendStatus(400);
         }
     });
 
@@ -301,17 +301,17 @@ export function createProjectEndpoints() {
             const id = parseInt(projectId);
 
             if(isNaN(id)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
             if(await Utility.deleteLike(id, userId)) {
-                res.status(200).send("Like deleted");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Like not deleted");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Like not deleted");
+            res.sendStatus(400);
         }
     });
 
@@ -324,17 +324,17 @@ export function createProjectEndpoints() {
             const {abilityId} = req.body
             const projectId = parseInt(req.params.projId);
             if (isNaN(projectId)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
             if (await Utility.addProjectAbility(projectId, abilityId)) {
-                res.status(200).send("Project ability added");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Project ability not added");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Project ability not added");
+            res.sendStatus(400);
         }
     });
 
@@ -345,7 +345,7 @@ export function createProjectEndpoints() {
             const id = parseInt(projectId);
 
             if(isNaN(id)) {
-                res.status(400).send("Invalid project id");
+                res.sendStatus(400);
                 return;
             }
 
@@ -354,10 +354,10 @@ export function createProjectEndpoints() {
             if(projectAbilities !== null) {
                 res.status(200).send(projectAbilities);
             } else {
-                res.status(400).send("Project abilities not found");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Project abilities not found");
+            res.sendStatus(400);
         }
     });
 
@@ -369,23 +369,18 @@ export function createProjectEndpoints() {
             const id = parseInt(projectId);
             const abId = parseInt(abilityId);
 
-            if (isNaN(id)) {
-                res.status(400).send("Invalid project id");
-                return;
-            }
-
-            if (isNaN(abId)) {
-                res.status(400).send("Invalid ability id");
+            if (isNaN(id) || isNaN(abId)) {
+                res.sendStatus(400);
                 return;
             }
 
             if (await Utility.deleteAbilityFromProject(id, abId)) {
-                res.status(200).send("Project ability deleted");
+                res.sendStatus(200);
             } else {
-                res.status(400).send("Project ability not deleted");
+                res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400).send("Project ability not deleted");
+            res.sendStatus(400);
         }
     });
 
