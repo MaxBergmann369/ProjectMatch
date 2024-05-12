@@ -1,4 +1,6 @@
 import {Utility} from "./utility";
+import jwt from "jsonwebtoken";
+import {TokenUser} from "../../website/scripts/tokenUser";
 
 enum DepartmentTypes {
     Unset = "Unknown",
@@ -179,5 +181,22 @@ export class ValMessage {
         const forbiddenWords: string[] = ["admin", "moderator", "user", "root", "guest", "login", "register", "password", "username", "firstname", "lastname", "email", "birthdate", "permissions"];
 
         return forbiddenWords.some(word => message.toLowerCase().includes(word));
+    }
+}
+
+export class EndPoints {
+    static getToken(authHeader: any): TokenUser | null {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        const decodedToken  = jwt.decode(token);
+        if (!decodedToken) {
+            return null;
+        }
+
+        return new TokenUser(decodedToken);
     }
 }

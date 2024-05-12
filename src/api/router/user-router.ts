@@ -2,6 +2,7 @@ import express from "express";
 import {Utility} from "../db/utility";
 import jwt from "jsonwebtoken";
 import {TokenUser} from "../../website/scripts/tokenUser";
+import {EndPoints} from "../db/validation";
 
 const userRouter = express.Router();
 
@@ -11,21 +12,17 @@ export function createUserEndpoints() {
         try {
             const {username, birthdate} = req.body;
 
+            /* region Authorization */
             const authHeader = req.headers.authorization;
-            if (!authHeader || !authHeader.startsWith("Bearer ")) {
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null) {
                 res.sendStatus(400);
                 return;
             }
 
-            const token = authHeader.split(" ")[1];
-
-            const decodedToken  = jwt.decode(token);
-            if (!decodedToken) {
-                res.sendStatus(400);
-                return;
-            }
-
-            const tokenUser = new TokenUser(decodedToken);
+            /* endregion */
 
             const userId = tokenUser.userId;
             const firstname = tokenUser.firstname;
@@ -49,6 +46,18 @@ export function createUserEndpoints() {
     userRouter.get('/user/:userId', async (req, res) => {
         try {
             const userId = req.params.userId;
+
+            /* region Authorization */
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null) {
+                res.sendStatus(400);
+                return;
+            }
+
+            /* endregion */
 
             const user = await Utility.getUser(userId);
 
