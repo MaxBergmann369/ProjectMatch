@@ -13,14 +13,15 @@ export class HttpClient {
         return await fetch(`${this.baseUrl}/user`, {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 Authorization: this.bearer
             },
             body: JSON.stringify({
                 username: "test",
-                birthdate: "28.04.2001"
+                birthdate: "2000-01-01"
             })
         })
-            .then(response => response.json());
+            .then(response => response.text());
     }
 
     /* endregion */

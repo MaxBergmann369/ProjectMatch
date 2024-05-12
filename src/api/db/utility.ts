@@ -15,9 +15,10 @@ export class Utility {
                 return false;
             }
 
-            return await Database.addUser(userId, username, firstname, lastname, email, clazz, birthdate.toDateString(), biografie, permissions, department);
+            return await Database.addUser(userId.trim(), username.trim(), firstname.trim(), lastname.trim(), email.trim(), clazz.trim(), birthdate.toDateString(), biografie.trim(), permissions, department.trim());
         }
         catch (e) {
+            throw new Error(e);
             return false;
         }
     }
@@ -128,9 +129,10 @@ export class Utility {
             if(!await ValUser.isUserValid(userId)) {
                 return false;
             }
+
             const date = new Date(Date.now());
 
-            const dateTime = `${date.toLocaleDateString()};${date.toLocaleTimeString()}`
+            const dateTime = `${date.toLocaleDateString()};${date.toLocaleTimeString()}`;
 
             return await Database.addNotification(userId, title, text, dateTime);
         }
@@ -677,7 +679,11 @@ export class Utility {
                 return false;
             }
 
-            return await Database.addMessage(chatId, userId, message, new Date(Date.now()).toDateString());
+            const date = new Date(Date.now());
+
+            const dateTime = `${date.toLocaleDateString()};${date.toLocaleTimeString()}`;
+
+            return await Database.addMessage(chatId, userId, message, dateTime);
         }
         catch (e) {
             return false;

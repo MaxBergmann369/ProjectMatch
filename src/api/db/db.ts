@@ -781,7 +781,7 @@ export class Database {
                         chatId: row.chatId,
                         userId: row.userId,
                         message: row.message,
-                        date: new Date(row.date)
+                        dateTime: row.date
                     }));
                     resolve(messages);
                 }

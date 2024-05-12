@@ -9,13 +9,14 @@ const userRouter = express.Router();
 export function createUserEndpoints() {
     /* region User */
     userRouter.post('/user', async (req, res) => {
-        const {username, birthdate} = req.body;
+       const {username, birthdate} = req.body;
 
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             res.status(400).send("Invalid or missing token");
             return;
         }
+
         const token = authHeader.split(" ")[1];
 
         const decodedToken  = jwt.decode(token);
@@ -29,29 +30,13 @@ export function createUserEndpoints() {
         const userId = tokenUser.userId;
         const firstname = tokenUser.firstname;
         const lastname = tokenUser.lastname;
-        const email = tokenUser.lastname;
+        const email = tokenUser.email;
         const clazz = tokenUser.class;
         const department = tokenUser.department;
 
         const bd = new Date(birthdate);
 
-        const user: User = {
-            userId: userId,
-            username: username,
-            firstname: firstname,
-            lastname: lastname,
-            email: email,
-            clazz: clazz,
-            birthdate: bd,
-            biografie: "",
-            permissions: 0,
-            department: department
-        }
-
-        res.send(birthdate);
-        return;
-
-        if(await Utility.addUser(userId, username, firstname, lastname, email, clazz, bd, "", 0, department)) {
+        if(await Utility.addUser(userId, username, firstname, lastname, email, clazz, bd, "", 1, department)) {
             res.status(200).send("User added");
         } else {
             res.status(400).send("User not added");

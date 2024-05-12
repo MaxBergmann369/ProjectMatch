@@ -78,7 +78,7 @@ export interface Message {
     chatId: number;
     userId: string;
     message: string;
-    date: Date;
+    dateTime: string;
 }
 
 export enum Role {
