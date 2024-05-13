@@ -158,22 +158,23 @@ export function createChatEndpoints() {
         }
     });
 
-    chatRouter.put('/messages', async (req, res) => {
+    chatRouter.put('/messages/:chatId/:messageId', async (req, res) => {
         try {
-            const {messageId, chatId, userId, message} = req.body;
+            const messageId = parseInt(req.params.messageId);
+            const chatId = parseInt(req.params.chatId);
 
-            const id = parseInt(messageId);
+            const {userId, message} = req.body;
 
             const authHeader = req.headers.authorization;
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(id)) {
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(messageId) || isNaN(chatId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if (await Utility.updateMessage(id, chatId, userId, message)) {
+            if (await Utility.updateMessage(messageId, chatId, userId, message)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);

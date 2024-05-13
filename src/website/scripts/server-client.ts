@@ -337,5 +337,101 @@ export class HttpClient {
 
     /* region Chat */
 
+    async addDirectChat(userId: string, otherUserId: string) {
+        return await fetch(`${this.baseUrl}/chats`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: this.bearer
+            },
+            body: JSON.stringify({
+                userId: userId,
+                otherUserId: otherUserId
+            })
+        })
+            .then(response => response.text());
+    }
+
+    async getDirectChat(userId: string, otherUserId: string) {
+        return await fetch(`${this.baseUrl}/chats/${userId}/${otherUserId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.json());
+    }
+
+    async getDirectChats(userId: string) {
+        return await fetch(`${this.baseUrl}/chats/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.json());
+    }
+
+    async deleteDirectChat(userId: string, otherUserId: string) {
+        return await fetch(`${this.baseUrl}/chats/${userId}/${otherUserId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.text());
+    }
+
+    async addMessage(userId: string, otherUserId: string, message: string) {
+        return await fetch(`${this.baseUrl}/messages`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: this.bearer
+            },
+            body: JSON.stringify({
+                userId: userId,
+                otherUserId: otherUserId,
+                message: message
+            })
+        })
+            .then(response => response.text());
+    }
+
+    async getMessages(chatId: number) {
+        return await fetch(`${this.baseUrl}/messages/${chatId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.json());
+    }
+
+    async editMessage(messageId: number, chatId: number, userId: string, message: string) {
+        return await fetch(`${this.baseUrl}/messages/${chatId}/${messageId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: this.bearer
+            },
+            body: JSON.stringify({
+                userId: userId,
+                message: message
+            })
+        })
+            .then(response => response.text());
+    }
+
+    async deleteMessage(messageId: number, chatId: number, userId: string) {
+        return await fetch(`${this.baseUrl}/messages/${chatId}/${messageId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.text());
+    }
+
     /* endregion */
 }
