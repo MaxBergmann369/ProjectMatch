@@ -86,6 +86,15 @@ export function createUserEndpoints() {
                 department
             } = req.body;
 
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
             const bd = new Date(birthdate);
 
             if (await Utility.updateUser(userId, username, firstname, lastname, email, clazz, bd, biografie, permissions, department)) {
@@ -101,6 +110,15 @@ export function createUserEndpoints() {
     userRouter.delete('/user/:userId', async (req, res) => {
         try {
             const userId = req.params.userId;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
 
             if (await Utility.deleteUser(userId)) {
                 res.sendStatus(200);
@@ -121,7 +139,11 @@ export function createUserEndpoints() {
             const userId = req.params.userId;
             const abilityId = parseInt(req.body.abilityId);
 
-            if (isNaN(abilityId)) {
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(abilityId)) {
                 res.sendStatus(400);
                 return;
             }
@@ -138,9 +160,17 @@ export function createUserEndpoints() {
 
     userRouter.get('/user/:userId/ability', async (req, res) => {
         try {
-
-
             const userId = req.params.userId;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
             const userAbility = await Utility.getUserAbilities(userId);
 
             if (userAbility !== null) {
@@ -157,6 +187,15 @@ export function createUserEndpoints() {
         try {
             const userId = req.query.userId as string;
             const abilityId = req.query.abilityId as string;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
 
             const abId: number = parseInt(abilityId);
 
@@ -183,6 +222,15 @@ export function createUserEndpoints() {
             const {title, text} = req.body;
             const userId = req.params.userId;
 
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
             if(await Utility.addNotification(userId, title, text)) {
                 res.sendStatus(200);
             } else {
@@ -197,6 +245,15 @@ export function createUserEndpoints() {
     userRouter.get('/user/:userId/notification', async (req, res) => {
         try {
             const userId = req.params.userId;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
 
             const notification = await Utility.getNotifications(userId);
 
@@ -215,9 +272,13 @@ export function createUserEndpoints() {
             const userId = req.params.userId;
             const notId = parseInt(req.params.notId);
 
+            const authHeader = req.headers.authorization;
 
-            if (isNaN(notId)) {
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(notId)) {
                 res.sendStatus(400);
+                return;
             }
 
             if (await Utility.deleteNotification(userId, notId)) {
@@ -237,6 +298,15 @@ export function createUserEndpoints() {
     userRouter.get('/user/abilities', async (req, res) => {
         try {
             const abilities = await Utility.getAllAbilities();
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null) {
+                res.sendStatus(400);
+                return;
+            }
 
             if(abilities !== null) {
                 res.status(200).send(abilities);

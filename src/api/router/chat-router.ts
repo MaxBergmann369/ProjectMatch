@@ -1,5 +1,6 @@
 import express from "express";
 import {Utility} from "../db/utility";
+import {EndPoints} from "../db/validation";
 
 const chatRouter = express.Router();
 
@@ -10,6 +11,15 @@ export function createChatEndpoints() {
     chatRouter.post('/chats', async (req, res) => {
         try {
             const {userId, otherUserId} = req.body;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
 
             if(await Utility.addDirectChat(userId, otherUserId)) {
                 res.sendStatus(200);
@@ -25,6 +35,15 @@ export function createChatEndpoints() {
         try {
             const userId = req.params.userId;
             const otherUserId = req.params.otherUserId;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
 
             const chat = await Utility.getDirectChat(userId, otherUserId);
 
@@ -42,6 +61,15 @@ export function createChatEndpoints() {
         try {
             const userId = req.params.userId;
 
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
             const chats = await Utility.getDirectChats(userId);
 
             if (chats !== null) {
@@ -58,6 +86,15 @@ export function createChatEndpoints() {
         try {
             const userId = req.params.userId;
             const otherUserId = req.params.otherUserId;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
 
             if (await Utility.deleteDirectChat(userId, otherUserId)) {
                 res.sendStatus(200);
@@ -77,6 +114,15 @@ export function createChatEndpoints() {
         try {
             const {chatId, userId, message} = req.body;
 
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
             if (await Utility.addMessage(chatId, userId, message)) {
                 res.sendStatus(200);
             } else {
@@ -89,16 +135,18 @@ export function createChatEndpoints() {
 
     chatRouter.get('/messages/:chatId', async (req, res) => {
         try {
-            const chatId = req.params.chatId;
+            const chatId = parseInt(req.params.chatId);
 
-            const id = parseInt(chatId);
+            const authHeader = req.headers.authorization;
 
-            if (isNaN(id)) {
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || isNaN(chatId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            const messages = await Utility.getMessages(id);
+            const messages = await Utility.getMessages(chatId);
 
             if (messages !== null) {
                 res.status(200).send(messages);
@@ -116,12 +164,16 @@ export function createChatEndpoints() {
 
             const id = parseInt(messageId);
 
-            if (isNaN(id)) {
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(id)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if (await Utility.updateMessage(messageId, chatId, userId, message)) {
+            if (await Utility.updateMessage(id, chatId, userId, message)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -134,16 +186,18 @@ export function createChatEndpoints() {
     chatRouter.delete('/messages/:userId/:messageId', async (req, res) => {
         try {
             const userId = req.params.userId;
-            const messageId = req.params.messageId;
+            const messageId = parseInt(req.params.messageId);
 
-            const id = parseInt(messageId);
+            const authHeader = req.headers.authorization;
 
-            if(isNaN(id)) {
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(messageId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if(await Utility.deleteMessage(userId, id)) {
+            if(await Utility.deleteMessage(userId, messageId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);

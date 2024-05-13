@@ -1,5 +1,6 @@
 import express from "express";
 import {Utility} from "../db/utility";
+import {EndPoints} from "../db/validation";
 
 const projectRouter = express.Router();
 
@@ -175,7 +176,11 @@ export function createProjectEndpoints() {
             const projectId = parseInt(req.params.projId);
             const userId = req.params.userId;
 
-            if (isNaN(projectId)) {
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
@@ -192,17 +197,19 @@ export function createProjectEndpoints() {
 
     projectRouter.delete('/projects/:projId/members/:userId', async (req, res) => {
         try {
-            const projectId = req.params.projId;
+            const projectId = parseInt(req.params.projId);
             const userId = req.params.userId;
 
-            const id = parseInt(projectId);
+            const authHeader = req.headers.authorization;
 
-            if (isNaN(id)) {
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if (await Utility.deleteProjectMember(id, userId)) {
+            if (await Utility.deleteProjectMember(projectId, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -220,7 +227,18 @@ export function createProjectEndpoints() {
         try {
             const {projectId, userId} = req.body;
 
-            if (await Utility.addView(projectId, userId)) {
+            const id = parseInt(projectId);
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(id)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if (await Utility.addView(id, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -232,16 +250,18 @@ export function createProjectEndpoints() {
 
     projectRouter.get('/views/:projId', async (req, res) => {
         try {
-            const projectId = req.params.projId;
+            const projectId = parseInt(req.params.projId);
 
-            const id = parseInt(projectId);
+            const authHeader = req.headers.authorization;
 
-            if (isNaN(id)) {
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            const views = await Utility.getViews(id);
+            const views = await Utility.getViews(projectId);
 
             if (views !== null) {
                 res.status(200).send(views);
@@ -261,7 +281,18 @@ export function createProjectEndpoints() {
         try {
             const {projectId, userId} = req.body;
 
-            if(await Utility.addLike(projectId, userId)) {
+            const id = parseInt(projectId);
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(id)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if(await Utility.addLike(id, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -273,16 +304,18 @@ export function createProjectEndpoints() {
 
     projectRouter.get('/likes/:projId', async (req, res) => {
         try {
-            const projectId = req.params.projId;
+            const projectId = parseInt(req.params.projId);
 
-            const id = parseInt(projectId);
+            const authHeader = req.headers.authorization;
 
-            if (isNaN(id)) {
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            const likes = await Utility.getLikes(id);
+            const likes = await Utility.getLikes(projectId);
 
             if (likes !== null) {
                 res.status(200).send(likes);
@@ -296,17 +329,19 @@ export function createProjectEndpoints() {
 
     projectRouter.delete('/likes/:projId/:userId', async (req, res) => {
         try {
-            const projectId = req.params.projId;
+            const projectId = parseInt(req.params.projId);
             const userId = req.params.userId;
 
-            const id = parseInt(projectId);
+            const authHeader = req.headers.authorization;
 
-            if(isNaN(id)) {
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if(await Utility.deleteLike(id, userId)) {
+            if(await Utility.deleteLike(projectId, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -324,7 +359,12 @@ export function createProjectEndpoints() {
         try {
             const {abilityId} = req.body
             const projectId = parseInt(req.params.projId);
-            if (isNaN(projectId)) {
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
@@ -341,16 +381,18 @@ export function createProjectEndpoints() {
 
     projectRouter.get('/projects/:projId/abilities', async (req, res) => {
         try {
-            const projectId = req.params.projId;
+            const projectId = parseInt(req.params.projId);
 
-            const id = parseInt(projectId);
+            const authHeader = req.headers.authorization;
 
-            if(isNaN(id)) {
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            const projectAbilities = await Utility.getAbilitiesByProjectId(id);
+            const projectAbilities = await Utility.getAbilitiesByProjectId(projectId);
 
             if(projectAbilities !== null) {
                 res.status(200).send(projectAbilities);
@@ -364,18 +406,19 @@ export function createProjectEndpoints() {
 
     projectRouter.delete('/projects/:projId/abilities/:abilityId', async (req, res) => {
         try {
-            const projectId = req.params.projId;
-            const abilityId = req.params.abilityId;
+            const projectId = parseInt(req.params.projId);
+            const abilityId = parseInt(req.params.abilityId);
 
-            const id = parseInt(projectId);
-            const abId = parseInt(abilityId);
+            const authHeader = req.headers.authorization;
 
-            if (isNaN(id) || isNaN(abId)) {
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || isNaN(projectId) || isNaN(abilityId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if (await Utility.deleteAbilityFromProject(id, abId)) {
+            if (await Utility.deleteAbilityFromProject(projectId, abilityId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
