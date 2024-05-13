@@ -11,25 +11,28 @@ export class Utility {
     static async addUser(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string,
                    birthdate: Date, biografie: string, permissions: number, department: string): Promise<boolean> {
         try {
-            if (!ValUser.isValid(userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department)) {
+            const id = userId.toLowerCase();
+
+            if (!ValUser.isValid(id, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department)) {
                 return false;
             }
 
-            return await Database.addUser(userId.trim(), username.trim(), firstname.trim(), lastname.trim(), email.trim(), clazz.trim(), birthdate.toDateString(), biografie.trim(), permissions, department.trim());
+            return await Database.addUser(id, username, firstname, lastname, email, clazz, birthdate.toDateString(), biografie, permissions, department);
         }
         catch (e) {
-            throw new Error(e);
             return false;
         }
     }
 
     static async getUser(userId: string): Promise<User | null> {
         try {
-            if(!ValUser.isUserIdValid(userId)) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id)) {
                 return null;
             }
 
-            const user = await Database.getUser(userId);
+            const user = await Database.getUser(id);
             if (!user) {
                 return null;
             }
@@ -41,11 +44,13 @@ export class Utility {
 
     static async updateUser(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string, birthdate: Date, biografie: string, permissions: number, department: string): Promise<boolean> {
         try {
-            if(!ValUser.isValid(userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department)) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isValid(id, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department)) {
                 return false;
             }
 
-            return await Database.updateUser(userId, username, firstname, lastname, email, clazz, birthdate.toDateString(), biografie, permissions, department);
+            return await Database.updateUser(id, username, firstname, lastname, email, clazz, birthdate.toDateString(), biografie, permissions, department);
         }
         catch (e) {
             return false;
@@ -54,11 +59,13 @@ export class Utility {
 
     static async deleteUser(userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isUserIdValid(userId)) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id)) {
                 return false;
             }
 
-            return await Database.deleteUser(userId);
+            return await Database.deleteUser(id);
         }
         catch (e) {
             return false;
@@ -79,15 +86,17 @@ export class Utility {
     /* region UserAbility */
     static async addUserAbility(userId: string, abilityId: number): Promise<boolean> {
         try {
-            if(!await ValUser.isUserValid(userId) || abilityId < 1) {
+            const id = userId.toLowerCase();
+
+            if(!await ValUser.isUserValid(id) || abilityId < 1) {
                 return false;
             }
 
-            if(await Database.userAbilityAlreadyExists(userId, abilityId)) {
+            if(await Database.userAbilityAlreadyExists(id, abilityId)) {
                 return false;
             }
 
-            return await Database.addUserAbility(userId, abilityId);
+            return await Database.addUserAbility(id, abilityId);
         }
         catch (e) {
             return false;
@@ -96,11 +105,13 @@ export class Utility {
 
     static async getUserAbilities(userId: string): Promise<Ability[] | null> {
         try {
-            if(!await ValUser.isUserValid(userId)) {
+            const id = userId.toLowerCase();
+
+            if(!await ValUser.isUserValid(id)) {
                 return null;
             }
 
-            return await Database.getUserAbilitiesByUserId(userId);
+            return await Database.getUserAbilitiesByUserId(id);
         }
         catch (e) {
             return null;
@@ -109,7 +120,9 @@ export class Utility {
 
     static async deleteUserAbility(userId: string, abilityId: number): Promise<boolean> {
         try {
-            return await Database.deleteUserAbility(userId, abilityId);
+            const id = userId.toLowerCase();
+
+            return await Database.deleteUserAbility(id, abilityId);
         }
         catch (e) {
             return false;
@@ -122,11 +135,13 @@ export class Utility {
 
     static async addNotification(userId: string, title: string, text: string): Promise<boolean> {
         try {
-            if(!ValNotification.isValid(userId, title, text)) {
+            const id = userId.toLowerCase();
+
+            if(!ValNotification.isValid(id, title, text)) {
                 return false;
             }
 
-            if(!await ValUser.isUserValid(userId)) {
+            if(!await ValUser.isUserValid(id)) {
                 return false;
             }
 
@@ -134,7 +149,7 @@ export class Utility {
 
             const dateTime = `${date.toLocaleDateString()};${date.toLocaleTimeString()}`;
 
-            return await Database.addNotification(userId, title, text, dateTime);
+            return await Database.addNotification(id, title, text, dateTime);
         }
         catch (e) {
             return false;
@@ -143,11 +158,13 @@ export class Utility {
 
     static async getNotifications(userId: string): Promise<Notification[] | null> {
         try {
-            if(!ValUser.isUserIdValid(userId)) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id)) {
                 return null;
             }
 
-            return await Database.getNotificationsByUserId(userId);
+            return await Database.getNotificationsByUserId(id);
         }
         catch (e) {
             return null;
@@ -156,7 +173,9 @@ export class Utility {
 
     static async deleteNotification(userId: string, notificationId: number): Promise<boolean> {
         try {
-            if(!await this.isNotificationOwner(userId, notificationId)) {
+            const id = userId.toLowerCase();
+
+            if(!await this.isNotificationOwner(id, notificationId)) {
                 return false;
             }
 
@@ -169,11 +188,13 @@ export class Utility {
 
     static async isNotificationOwner(userId: string, notificationId: number): Promise<boolean> {
         try {
-            if(!ValUser.isUserIdValid(userId) || notificationId < 1) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id) || notificationId < 1) {
                 return false;
             }
 
-            return await Database.isNotificationOwner(userId, notificationId);
+            return await Database.isNotificationOwner(id, notificationId);
         }
         catch (e) {
             return false;
@@ -187,21 +208,23 @@ export class Utility {
     /* region Base */
     static async addProject(name: string, ownerId: string, thumbnail: string, description: string, links: string, maxMembers: number): Promise<boolean> {
         try {
+            const owId = ownerId.toLowerCase();
+
             const date = new Date(Date.now());
 
-            if(!ValProject.isValid(name, ownerId, thumbnail, description, date, links, maxMembers) || await this.getAmountOfProjects(ownerId) >= 5){
+            if(!ValProject.isValid(name, owId, thumbnail, description, date, links, maxMembers) || await this.getAmountOfProjects(ownerId) >= 5){
                 return false;
             }
 
-            if(!await ValUser.isUserValid(ownerId)) {
+            if(!await ValUser.isUserValid(owId)) {
                 return false;
             }
 
-            if(await this.alreadyProjectWithSameName(ownerId, name, 0)) {
+            if(await this.alreadyProjectWithSameName(owId, name, 0)) {
                 return false;
             }
 
-            return await Database.addProject(name, ownerId, thumbnail, description, date.toDateString(), links, maxMembers);
+            return await Database.addProject(name, owId, thumbnail, description, date.toDateString(), links, maxMembers);
         }
         catch (e) {
             return false;
@@ -219,7 +242,9 @@ export class Utility {
 
     static async getAmountOfProjects(ownerId:string): Promise<number> {
         try {
-            return await Database.getAmountOfProjectsByOwnerId(ownerId);
+            const owId = ownerId.toLowerCase();
+
+            return await Database.getAmountOfProjectsByOwnerId(owId);
         }
         catch (e) {
             return -1;
@@ -228,19 +253,21 @@ export class Utility {
 
     static async updateProject(id: number, name: string, ownerId: string, thumbnail: string, description: string, links: string, maxMembers: number): Promise<boolean> {
         try {
-            if(!ValProject.isValid(name, ownerId, thumbnail, description, new Date(Date.now()), links, maxMembers) || id < 1) {
+            const owId = ownerId.toLowerCase();
+
+            if(!ValProject.isValid(name, owId, thumbnail, description, new Date(Date.now()), links, maxMembers) || id < 1) {
                 return false;
             }
 
-            if(!await ValUser.isUserValid(ownerId)) {
+            if(!await ValUser.isUserValid(owId)) {
                 return false;
             }
 
-            if(await this.alreadyProjectWithSameName(ownerId, name, id)) {
+            if(await this.alreadyProjectWithSameName(owId, name, id)) {
                 return false;
             }
 
-            return await Database.updateProject(id, name, ownerId, thumbnail, description, links, maxMembers);
+            return await Database.updateProject(id, name, owId, thumbnail, description, links, maxMembers);
         }
         catch (e) {
             return false;
@@ -249,11 +276,13 @@ export class Utility {
 
     static async alreadyProjectWithSameName(ownerId: string, projectName: string, id: number): Promise<boolean> {
         try {
-            if(!ValUser.isUserIdValid(ownerId) || projectName.length < 1 || projectName.length > 30) {
+            const owId = ownerId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(owId) || projectName.length < 1 || projectName.length > 30) {
                 return false;
             }
 
-            const projects = await Database.getProjectsByOwnerId(ownerId);
+            const projects = await Database.getProjectsByOwnerId(owId);
 
             for(const project of projects) {
                 if(project.name === projectName && project.id !== id) {
@@ -270,7 +299,9 @@ export class Utility {
 
     static async deleteProject(userId: string, projectId: number): Promise<boolean> {
         try {
-            if(!await this.isUserOwnerOfProject(userId, projectId)) {
+            const owId = userId.toLowerCase();
+
+            if(!await this.isUserOwnerOfProject(owId, projectId)) {
                 return false;
             }
 
@@ -283,17 +314,19 @@ export class Utility {
 
     static async deleteProjectByName(projectName: string, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isUserIdValid(userId) || projectName.length < 1 || projectName.length > 30) {
+            const owId = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(owId) || projectName.length < 1 || projectName.length > 30) {
                 return false;
             }
 
-            const projectId = await this.getProjectId(projectName, userId);
+            const projectId = await this.getProjectId(projectName, owId);
 
             if (projectId === null) {
                 return false;
             }
 
-            return await this.deleteProject(userId, projectId);
+            return await this.deleteProject(owId, projectId);
         }
         catch (e) {
             return false;
@@ -302,11 +335,13 @@ export class Utility {
 
     static async isUserOwnerOfProject(userId: string, projectId: number): Promise<boolean> {
         try {
-            if(!ValUser.isUserIdValid(userId) || projectId < 1) {
+            const owId = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(owId) || projectId < 1) {
                 return false;
             }
 
-            return await Database.isUserOwnerOfProject(userId, projectId);
+            return await Database.isUserOwnerOfProject(owId, projectId);
         }
         catch (e) {
             return false;
@@ -315,11 +350,13 @@ export class Utility {
 
     static async getProjectsWhereUserIsOwner(userId: string): Promise<Project[] | null> {
         try {
-            if(!await ValUser.isUserValid(userId)) {
+            const owId = userId.toLowerCase();
+
+            if(!await ValUser.isUserValid(owId)) {
                 return null;
             }
 
-            return await Database.getProjectsByOwnerId(userId);
+            return await Database.getProjectsByOwnerId(owId);
         }
         catch (e) {
             return null;
@@ -328,11 +365,13 @@ export class Utility {
 
     static async getProjectId(projectName: string, ownerId: string): Promise<number | null> {
         try {
-            if(!ValUser.isUserIdValid(ownerId) || projectName.length < 1 || projectName.length > 30) {
+            const owId = ownerId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(owId) || projectName.length < 1 || projectName.length > 30) {
                 return null;
             }
 
-            return await Database.getProjectIdBy(ownerId, projectName);
+            return await Database.getProjectIdBy(owId, projectName);
         }
         catch (e) {
             return null;
@@ -352,11 +391,13 @@ export class Utility {
     /* region ProjectMember */
     static async addProjectMember(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!await ValUser.isUserValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
+            const id = userId.toLowerCase();
+
+            if(!await ValUser.isUserValid(id) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
-            return await Database.addProjectMember(userId, projectId);
+            return await Database.addProjectMember(id, projectId);
         }
         catch (e) {
             return false;
@@ -365,7 +406,9 @@ export class Utility {
 
     static async projectMemberAccepted(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isUserIdValid(userId) || projectId < 1) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id) || projectId < 1) {
                 return false;
             }
 
@@ -375,7 +418,7 @@ export class Utility {
                 return false;
             }
 
-            if(!await this.isUserOwnerOfProject(userId, projectId)) {
+            if(!await this.isUserOwnerOfProject(id, projectId)) {
                 return false;
             }
 
@@ -385,7 +428,7 @@ export class Utility {
                 return false;
             }
 
-            return Database.acceptProjectMember(userId, projectId);
+            return Database.acceptProjectMember(id, projectId);
         }
         catch (e) {
             return false;
@@ -420,11 +463,13 @@ export class Utility {
 
     static async getProjectsWhereUserIsMember(userId: string): Promise<Project[] | null> {
         try {
-            if(!ValUser.isUserIdValid(userId)) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id)) {
                 return null;
             }
 
-            return await Database.getProjectsWhereUserIsMember(userId);
+            return await Database.getProjectsWhereUserIsMember(id);
         }
         catch (e) {
             return null;
@@ -433,11 +478,13 @@ export class Utility {
 
     static async deleteProjectMember(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isUserIdValid(userId)) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id)) {
                 return false;
             }
 
-            return await Database.deleteProjectMember(userId, projectId);
+            return await Database.deleteProjectMember(id, projectId);
         }
         catch (e) {
             return false;
@@ -448,12 +495,14 @@ export class Utility {
     /* region Like */
     static async addLike(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!await ValUser.isUserValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
+            const id = userId.toLowerCase();
+
+            if(!await ValUser.isUserValid(id) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
             //Problems with getLikesByUserId
-            const likes = await Database.getLikesByUserId(userId);
+            const likes = await Database.getLikesByUserId(id);
 
             for(const like of likes) {
                 if(like.projectId === projectId) {
@@ -461,7 +510,7 @@ export class Utility {
                 }
             }
 
-            return await Database.addLike(userId, projectId);
+            return await Database.addLike(id, projectId);
         }
         catch (e) {
             return false;
@@ -479,11 +528,13 @@ export class Utility {
 
     static async getLikedProjectsByUserId(userId: string): Promise<Project[]> {
         try {
-            if(!ValUser.isUserIdValid(userId)) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id)) {
                 return null;
             }
 
-            return await Database.getLikedProjectsByUserId(userId);
+            return await Database.getLikedProjectsByUserId(id);
         }
         catch (e) {
             return null;
@@ -492,11 +543,13 @@ export class Utility {
 
     static async deleteLike(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!ValUser.isUserIdValid(userId)) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id)) {
                 return false;
             }
 
-            return await Database.deleteLike(userId, projectId);
+            return await Database.deleteLike(id, projectId);
         }
         catch (e) {
             return false;
@@ -508,11 +561,13 @@ export class Utility {
     /* region View */
     static async addView(projectId: number, userId: string): Promise<boolean> {
         try {
-            if(!await ValUser.isUserValid(userId) || projectId < 1 || await Database.getProject(projectId) === null) {
+            const id = userId.toLowerCase();
+
+            if(!await ValUser.isUserValid(id) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
-            return await Database.addView(userId, projectId);
+            return await Database.addView(id, projectId);
         }
         catch (e) {
             return false;
@@ -601,17 +656,20 @@ export class Utility {
 
     static async addDirectChat(userId: string, otherUserId: string): Promise<boolean> {
         try {
-            if(!await ValUser.isUserValid(userId) || !await ValUser.isUserValid(otherUserId)) {
+            const id = userId.toLowerCase();
+            const otherId = otherUserId.toLowerCase();
+
+            if(!await ValUser.isUserValid(id) || !await ValUser.isUserValid(otherId)) {
                 return false;
             }
 
-            const chat = await Database.getDirectChatByUserIds(userId, otherUserId);
+            const chat = await Database.getDirectChatByUserIds(id, otherId);
 
             if(chat !== null) {
                 return false;
             }
 
-            return await Database.addDirectChat(userId, otherUserId);
+            return await Database.addDirectChat(id, otherId);
         }
         catch (e) {
             return false;
@@ -620,11 +678,13 @@ export class Utility {
 
     static async getDirectChats(userId: string): Promise<DirectChat[]> {
         try {
-            if(!ValUser.isUserIdValid(userId)) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id)) {
                 return null;
             }
 
-            return await Database.getDirectChatsByUserId(userId);
+            return await Database.getDirectChatsByUserId(id);
         }
         catch (e) {
             return null;
@@ -633,11 +693,14 @@ export class Utility {
 
     static async getDirectChat(userId: string, otherUserId: string): Promise<DirectChat | null> {
         try {
-            if(!ValUser.isUserIdValid(userId) || !ValUser.isUserIdValid(otherUserId)) {
+            const id = userId.toLowerCase();
+            const otherId = otherUserId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id) || !ValUser.isUserIdValid(otherId)) {
                 return null;
             }
 
-            return await Database.getDirectChatByUserIds(userId, otherUserId);
+            return await Database.getDirectChatByUserIds(id, otherId);
         }
         catch (e) {
             return null;
@@ -646,13 +709,16 @@ export class Utility {
 
     static async deleteDirectChat(userId: string, otherUserId: string): Promise<boolean> {
         try {
-            if(!ValUser.isUserIdValid(userId) || !ValUser.isUserIdValid(otherUserId)) {
+            const id = userId.toLowerCase();
+            const otherId = otherUserId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id) || !ValUser.isUserIdValid(otherId)) {
                 return false;
             }
 
-            const chat = await Database.getDirectChatByUserIds(userId, otherUserId);
+            const chat = await Database.getDirectChatByUserIds(id, otherId);
 
-            if(chat === null || chat.userId !== userId || chat.otherUserId !== otherUserId) {
+            if(chat === null || chat.userId !== id || chat.otherUserId !== otherId) {
                 return false;
             }
 
@@ -669,13 +735,15 @@ export class Utility {
 
     static async addMessage(chatId: number, userId: string, message: string): Promise<boolean> {
         try {
-            if(!ValMessage.isValid(userId, message) || chatId < 1){
+            const id = userId.toLowerCase();
+
+            if(!ValMessage.isValid(id, message) || chatId < 1){
                 return false;
             }
 
             const chat = await Database.getDirectChatById(chatId);
 
-            if(chat === null || (chat.userId !== userId && chat.otherUserId !== userId)) {
+            if(chat === null || (chat.userId !== id && chat.otherUserId !== id)) {
                 return false;
             }
 
@@ -683,7 +751,7 @@ export class Utility {
 
             const dateTime = `${date.toLocaleDateString()};${date.toLocaleTimeString()}`;
 
-            return await Database.addMessage(chatId, userId, message, dateTime);
+            return await Database.addMessage(chatId, id, message, dateTime);
         }
         catch (e) {
             return false;
@@ -701,11 +769,13 @@ export class Utility {
 
     static async updateMessage(messageId: number, chatId: number, userId: string, message: string): Promise<boolean> {
         try {
-            if(!ValMessage.isValid(userId, message) || messageId < 1 || chatId < 1){
+            const id = userId.toLowerCase();
+
+            if(!ValMessage.isValid(id, message) || messageId < 1 || chatId < 1){
                 return false;
             }
 
-            return await Database.updateMessage(messageId, chatId, userId, message);
+            return await Database.updateMessage(messageId, chatId, id, message);
         }
         catch (e) {
             return false;
@@ -714,7 +784,9 @@ export class Utility {
 
     static async deleteMessage(userId: string, messageId: number): Promise<boolean> {
         try {
-            if(!ValUser.isUserIdValid(userId) || messageId < 1) {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id) || messageId < 1) {
                 return false;
             }
 

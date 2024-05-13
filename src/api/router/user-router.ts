@@ -62,7 +62,7 @@ export function createUserEndpoints() {
             const user = await Utility.getUser(userId);
 
             if (user !== null) {
-                res.sendStatus(200);
+                res.status(200).send(user);
             } else {
                 res.sendStatus(400)
             }
