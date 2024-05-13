@@ -555,6 +555,18 @@ export class Database {
         });
     }
 
+    static async alreadyViewedProject(userId: string, projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM View WHERE userId = ? AND projectId = ?`, [userId, projectId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row !== undefined);
+                }
+            });
+        });
+    }
+
     static async getLikesByUserId(userId: string): Promise<Like[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM Like WHERE userId = ?`, [userId], (err, rows: unknown[]) => {

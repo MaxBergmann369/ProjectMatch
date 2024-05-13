@@ -567,6 +567,10 @@ export class Utility {
                 return false;
             }
 
+            if(await Database.alreadyViewedProject(id, projectId)) {
+                return false;
+            }
+
             return await Database.addView(id, projectId);
         }
         catch (e) {
@@ -574,18 +578,18 @@ export class Utility {
         }
     }
 
-    static async getViews(projectId: number): Promise<View[]> {
+    static async getViews(projectId: number): Promise<number> {
         try {
-            return await Database.getViewsByProjectId(projectId);
+            return await Database.getViewCount(projectId);
         }
         catch (e) {
             return null;
         }
     }
 
-    static async getProjectViews(projectId: number): Promise<number> {
+    static async getProjectViews(projectId: number): Promise<View[]> {
         try {
-            return await Database.getViewCount(projectId);
+            return await Database.getViewsByProjectId(projectId);
         }
         catch (e) {
             return null;

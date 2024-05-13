@@ -170,10 +170,11 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.put('/projects/:projId/members', async (req, res) => {
+    projectRouter.put('/projects/:projId/members/:userId', async (req, res) => {
         try {
-            const {userId} = req.body;
             const projectId = parseInt(req.params.projId);
+            const userId = req.params.userId;
+
             if (isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
