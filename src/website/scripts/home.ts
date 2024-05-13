@@ -1,5 +1,5 @@
 import {keycloak, initKeycloak} from "./keycloak";
-import {Role} from "../../models";
+import {Role, User} from "../../models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 
@@ -22,8 +22,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("username").innerText = data;
 
         let client = new HttpClient();
-        await client.addUser("Tester", "1.1.2001");
-        const user1: any = await client.getUser("IF210062");
+        const user1: User | null = await client.getUser("if21");
+        console.log(user1)
+        if(user1 === null) {
+            await client.addUser("Tester", "1.1.2001");
+        }
         console.log(user1);
 
         // TODO: check if user doesnt exist in database yet:

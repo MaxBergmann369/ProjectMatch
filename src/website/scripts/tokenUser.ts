@@ -10,7 +10,7 @@ export class TokenUser {
     email: string;
     department: Department;
 
-    constructor(token: any) {
+    constructor(token: KeycloakTokenParsed) {
         this.userId = token.preferred_username;
         this.firstname = token.given_name;
         this.lastname = token.family_name;

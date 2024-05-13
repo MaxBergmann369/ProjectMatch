@@ -1,6 +1,7 @@
 import {Utility} from "./utility";
 import jwt from "jsonwebtoken";
 import {TokenUser} from "../../website/scripts/tokenUser";
+import {KeycloakTokenParsed} from "keycloak-js";
 
 enum DepartmentTypes {
     Unset = "Unknown",
@@ -192,7 +193,7 @@ export class EndPoints {
 
         const token = authHeader.split(" ")[1];
 
-        const decodedToken  = jwt.decode(token);
+        const decodedToken: KeycloakTokenParsed = jwt.decode(token);
         if (!decodedToken) {
             return null;
         }

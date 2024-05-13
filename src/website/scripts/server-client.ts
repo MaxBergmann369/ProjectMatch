@@ -23,14 +23,20 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getUser(userId: string) {
+    async getUser(userId: string): Promise<User | null> {
         return await fetch(`${this.baseUrl}/user/${userId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
             }
         })
-            .then(response => response.json());
+            .then(response => {
+                if(!response.ok) {
+                    return null;
+                }
+
+                response.json()
+            });
     }
 
     async updateUser(username: string, birthdate: string) {

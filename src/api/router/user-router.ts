@@ -64,10 +64,10 @@ export function createUserEndpoints() {
             if (user !== null) {
                 res.status(200).send(user);
             } else {
-                res.sendStatus(400)
+                res.sendStatus(404);
             }
         } catch (e) {
-            res.sendStatus(400)
+            res.sendStatus(400);
         }
     });
 
