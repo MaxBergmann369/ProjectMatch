@@ -59,7 +59,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async addUserAbility(userId: string, abilityId: number) {
+    async addUserAbility(userId: string, abilityId: number[]) {
         return await fetch(`${this.baseUrl}/user/${userId}/ability`, {
             method: 'POST',
             headers: {

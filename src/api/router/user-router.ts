@@ -1,7 +1,5 @@
 import express from "express";
 import {Utility} from "../db/utility";
-import jwt from "jsonwebtoken";
-import {TokenUser} from "../../website/scripts/tokenUser";
 import {EndPoints} from "../db/validation";
 
 const userRouter = express.Router();
@@ -137,21 +135,24 @@ export function createUserEndpoints() {
     userRouter.post('/user/:userId/ability', async (req, res) => {
         try {
             const userId = req.params.userId;
-            const abilityId = parseInt(req.body.abilityId);
+            const abilityIds = req.body.abilityId;
 
             const authHeader = req.headers.authorization;
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(abilityId)) {
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
                 res.sendStatus(400);
                 return;
             }
 
-            if (await Utility.addUserAbility(userId, abilityId)) {
-                res.sendStatus(200);
-            } else {
-                res.sendStatus(400);
+            for(const abilityId of abilityIds) {
+                const abId: number = parseInt(abilityId);
+                if (!isNaN(abId) && await Utility.addUserAbility(userId, abId)) {
+                    res.sendStatus(200);
+                } else {
+                    res.sendStatus(400);
+                }
             }
         } catch (e) {
             res.status(400);
