@@ -1,4 +1,4 @@
-import {keycloak, initKeycloak} from "./keycloak";
+import {initKeycloak, keycloak} from "./keycloak";
 import {Role, User} from "../../models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
@@ -11,8 +11,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         const client = new HttpClient();
         console.log("User is authenticated");
         const user = new TokenUser(keycloak.tokenParsed);
-        const data = `
-            Username: ${user.userId}
+
+
+        const user1: User | null = await client.getUser(user.userId);
+
+        if(user1 === null) {
+            location.href = "register.html";
+        }
+        document.getElementById("username").innerText = `
+            UserId: ${user.userId}
+            Username: ${user1.username}
+            Born on: ${user1.birthdate}
             Firstname: ${user.firstname}
             Lastname: ${user.lastname}
             Email: ${user.email}
@@ -20,13 +29,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             Class: ${user.class}
             Department: ${user.department}
         `;
-        document.getElementById("username").innerText = data;
-
-        const user1: User | null = await client.getUser(user.userId);
-
-        if(user1 === null) {
-            window.location.href = "register.html";
-        }
     }
     else {
         console.log("User is not authenticated");

@@ -1,23 +1,39 @@
 import {HttpClient} from "./server-client";
-import { initKeycloak} from "./keycloak";
+import {initKeycloak, keycloak} from "./keycloak";
+import {Ability, User} from "../../models";
 
-import {Ability} from "../../models";
-
-const authenticatedPromise = initKeycloak();
-
+const auth = initKeycloak();
 document.addEventListener("DOMContentLoaded", async () => {
-    const authenticated = await authenticatedPromise;
-    if (authenticated) {
-        console.log("User is authenticated");
+    const authenticated = await auth;
 
-        await renderAbilities();
-    }
-    else {
-        console.log("User is not authenticated");
+    if (!authenticated) {
         location.href = "index.html";
     }
-});
 
+    const client = new HttpClient();
+
+    const user1: User | null = await client.getUser(keycloak.tokenParsed.preferred_username);
+
+    if(user1 !== null) {
+        location.href = "home.html";
+    }
+
+    await renderAbilities();
+
+    document.getElementById("registerForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const data = new FormData(form);
+        const username = data.get("username") as string;
+        const birthdate = data.get("birthdate") as string;
+        const response = await client.addUser(username, birthdate);
+        if (response) {
+            location.href = "home.html";
+        } else {
+            console.error("Failed to register user");
+        }
+    });
+});
 
 async function renderAbilities() {
     const client = new HttpClient();

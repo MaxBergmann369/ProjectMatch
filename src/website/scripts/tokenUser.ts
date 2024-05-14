@@ -23,7 +23,6 @@ export class TokenUser {
         if (match) {
             this.class = match[1];
             this.department = Department[match[2] as keyof typeof Department];
-            console.log(match[2]);
             // match 3 without the s
             this.role = Role[match[3].slice(0, -1) as keyof typeof Role];
         }
