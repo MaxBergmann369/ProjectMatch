@@ -26,7 +26,7 @@ export interface ProjectMember {
     id: number;
     projectId: number;
     userId: string;
-    IsAccepted: boolean;
+    isAccepted: boolean;
 }
 
 export interface View {

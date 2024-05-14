@@ -4,6 +4,7 @@ import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 
 const authenticatedPromise = initKeycloak();
+const client = new HttpClient();
 
 document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await authenticatedPromise;
@@ -21,17 +22,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         `;
         document.getElementById("username").innerText = data;
 
-        let client = new HttpClient();
-        const user1: User | null = await client.getUser("if21");
-        console.log(user1)
-        if(user1 === null) {
-            await client.addUser("Tester", "1.1.2001");
-        }
-        console.log(user1);
+        const user1: User | null = await client.getUser(user.userId);
 
-        // TODO: check if user doesnt exist in database yet:
-        if (authenticated.toString() === keycloak.token) {
-            // TODO: redirect to register page; unreachable: do above
+        if(user1 === null) {
+            location.href = "register.html";
         }
     }
     else {

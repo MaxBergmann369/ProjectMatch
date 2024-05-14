@@ -8,7 +8,7 @@ import {
     Message,
     DirectChat,
     Notification,
-    ProjectMember
+    ProjectMember, UserAbility, ProjectAbility
 } from "../../models";
 
 const db = new sqlite3.Database('projectMatch.db');
@@ -252,7 +252,7 @@ export class Database {
 
     static async getParentIdByName(name: string): Promise<number | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT id FROM Ability WHERE name = ?`, [name], (err, row: any) => {
+            db.get(`SELECT id FROM Ability WHERE name = ?`, [name], (err, row: Ability) => {
                 if (err) {
                     reject(err);
                 } else if (row) {
@@ -268,11 +268,11 @@ export class Database {
 
     static async getUsers(): Promise<User[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM User`, (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM User`, (err, rows: User[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const users: User[] = (rows as any[]).map(row => ({
+                    const users: User[] = rows.map(row => ({
                         userId: row.userId,
                         username: row.username,
                         firstname: row.firstname,
@@ -292,7 +292,7 @@ export class Database {
 
     static async getUser(userId: string): Promise<User | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM User WHERE userId = ?`, [userId], (err, row: any) => {
+            db.get(`SELECT * FROM User WHERE userId = ?`, [userId], (err, row: User) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {
@@ -318,7 +318,7 @@ export class Database {
 
     static async isNotificationOwner(userId: string, notificationId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM Notification WHERE userId = ? AND id = ?`, [userId, notificationId], (err, row: any) => {
+            db.get(`SELECT * FROM Notification WHERE userId = ? AND id = ?`, [userId, notificationId], (err, row: Notification) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -330,11 +330,11 @@ export class Database {
 
     static async getProjects(): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project`, (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Project`, (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const projects: Project[] = (rows as any[]).map(row => ({
+                    const projects: Project[] = rows.map(row => ({
                         id: row.id,
                         name: row.name,
                         ownerId: row.ownerId,
@@ -352,7 +352,7 @@ export class Database {
 
     static async getProjectIdBy(ownerId: string, name: string): Promise<number | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT id FROM Project WHERE ownerId = ? AND name = ?`, [ownerId, name], (err, row: any) => {
+            db.get(`SELECT id FROM Project WHERE ownerId = ? AND name = ?`, [ownerId, name], (err, row: Project) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {
@@ -366,7 +366,7 @@ export class Database {
 
     static async getProject(id: number): Promise<Project | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM Project WHERE id = ?`, [id], (err, row: any) => {
+            db.get(`SELECT * FROM Project WHERE id = ?`, [id], (err, row: Project) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {
@@ -390,7 +390,7 @@ export class Database {
 
     static async isUserOwnerOfProject(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM Project WHERE id = ? AND ownerId = ?`, [projectId, userId], (err, row: any) => {
+            db.get(`SELECT * FROM Project WHERE id = ? AND ownerId = ?`, [projectId, userId], (err, row: Project) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -402,11 +402,11 @@ export class Database {
 
     static async getProjectsByOwnerId(ownerId: string): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project WHERE ownerId = ?`, [ownerId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Project WHERE ownerId = ?`, [ownerId], (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const projects: Project[] = (rows as any[]).map(row => ({
+                    const projects: Project[] = rows.map(row => ({
                         id: row.id,
                         name: row.name,
                         ownerId: row.ownerId,
@@ -424,11 +424,11 @@ export class Database {
 
     static async getAmountOfProjectsByOwnerId(ownerId: string): Promise<number> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT COUNT(*) FROM Project WHERE ownerId = ?`, [ownerId], (err, row: any) => {
+            db.get(`SELECT COUNT(*) FROM Project WHERE ownerId = ?`, [ownerId], (err, row) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(row['COUNT(*)']);
+                    resolve(row['COUNT(*)'] || 0);
                 }
             });
         });
@@ -436,15 +436,15 @@ export class Database {
 
     static async getProjectMembersByProjectId(projectId: number): Promise<ProjectMember[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM ProjectMember WHERE projectId = ? AND isAccepted = 1`, [projectId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM ProjectMember WHERE projectId = ? AND isAccepted = 1`, [projectId], (err, rows: ProjectMember[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const projectMembers: ProjectMember[] = (rows as any[]).map(row => ({
+                    const projectMembers: ProjectMember[] = rows.map(row => ({
                         id: row.id,
                         projectId: row.projectId,
                         userId: row.userId,
-                        IsAccepted: row.isAccepted
+                        isAccepted: row.isAccepted
                     }));
                     resolve(projectMembers);
                 }
@@ -454,7 +454,7 @@ export class Database {
 
     static async getAmountOfProjectMembersByProjectId(projectId: number): Promise<number> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT COUNT(*) FROM ProjectMember WHERE projectId = ? AND isAccepted = 1`, [projectId], (err, row: any) => {
+            db.get(`SELECT COUNT(*) FROM ProjectMember WHERE projectId = ? AND isAccepted = 1`, [projectId], (err, row: number) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -466,15 +466,15 @@ export class Database {
 
     static async getNotAcceptedProjectMembersByProjectId(projectId: number): Promise<ProjectMember[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM ProjectMember WHERE projectId = ? AND isAccepted = 0`, [projectId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM ProjectMember WHERE projectId = ? AND isAccepted = 0`, [projectId], (err, rows: ProjectMember[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const projectMembers: ProjectMember[] = (rows as any[]).map(row => ({
+                    const projectMembers: ProjectMember[] = rows.map(row => ({
                         id: row.id,
                         projectId: row.projectId,
                         userId: row.userId,
-                        IsAccepted: row.isAccepted
+                        isAccepted: row.isAccepted
                     }));
                     resolve(projectMembers);
                 }
@@ -484,11 +484,11 @@ export class Database {
 
     static async getProjectsWhereUserIsMember(userId: string): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM ProjectMember WHERE userId = ?)`, [userId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM ProjectMember WHERE userId = ?)`, [userId], (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const projects: Project[] = (rows as any[]).map(row => ({
+                    const projects: Project[] = rows.map(row => ({
                         id: row.id,
                         name: row.name,
                         ownerId: row.ownerId,
@@ -506,11 +506,11 @@ export class Database {
 
     static async getLikedProjectsByUserId(userId: string): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM Like WHERE userId = ?)`, [userId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM Like WHERE userId = ?)`, [userId], (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const projects: Project[] = (rows as any[]).map(row => ({
+                    const projects: Project[] = rows.map(row => ({
                         id: row.id,
                         name: row.name,
                         ownerId: row.ownerId,
@@ -528,11 +528,11 @@ export class Database {
 
     static async getViewsByProjectId(projectId: number): Promise<View[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM View WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM View WHERE projectId = ?`, [projectId], (err, rows: View[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const views: View[] = (rows as any[]).map(row => ({
+                    const views: View[] = rows.map(row => ({
                         id: row.id,
                         projectId: row.projectId,
                         userId: row.userId
@@ -545,11 +545,11 @@ export class Database {
 
     static async getViewCount(projectId: number): Promise<number> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT COUNT(*) FROM View WHERE projectId = ?`, [projectId], (err, row: any) => {
+            db.get(`SELECT COUNT(*) FROM View WHERE projectId = ?`, [projectId], (err, row) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(row['COUNT(*)']);
+                    resolve(row['COUNT(*)'] || 0);
                 }
             });
         });
@@ -557,7 +557,7 @@ export class Database {
 
     static async alreadyViewedProject(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM View WHERE userId = ? AND projectId = ?`, [userId, projectId], (err, row: any) => {
+            db.get(`SELECT * FROM View WHERE userId = ? AND projectId = ?`, [userId, projectId], (err, row: View) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -569,11 +569,11 @@ export class Database {
 
     static async getLikesByUserId(userId: string): Promise<Like[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Like WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Like WHERE userId = ?`, [userId], (err, rows: Like[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const likes: Like[] = (rows as any[]).map(row => ({
+                    const likes: Like[] = rows.map(row => ({
                         id: row.id,
                         projectId: row.projectId,
                         userId: row.userId
@@ -586,11 +586,11 @@ export class Database {
 
     static async getLikesByProjectId(projectId: number): Promise<Like[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Like WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Like WHERE projectId = ?`, [projectId], (err, rows: Like[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const likes: Like[] = (rows as any[]).map(row => ({
+                    const likes: Like[] = rows.map(row => ({
                         id: row.id,
                         projectId: row.projectId,
                         userId: row.userId
@@ -603,16 +603,16 @@ export class Database {
 
     static async getNotificationsByUserId(userId: string): Promise<Notification[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Notification WHERE userId = ?`, [userId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Notification WHERE userId = ?`, [userId], (err, rows: Notification[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const notifications: Notification[] = (rows as any[]).map(row => ({
+                    const notifications: Notification[] = rows.map(row => ({
                         id: row.id,
                         userId: row.userId,
                         title: row.title,
                         text: row.text,
-                        dateTime: row.date
+                        dateTime: row.dateTime
                     }));
                     resolve(notifications);
                 }
@@ -622,12 +622,11 @@ export class Database {
 
     static async getUserAbilitiesByUserId(userId: string): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT abilityId FROM UserAbility WHERE userId = ?`, [userId], async (err, rows: unknown[]) => {
+            db.all(`SELECT abilityId FROM UserAbility WHERE userId = ?`, [userId], async (err, rows: Ability[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const abilityIds: number[] = (rows as any[]).map(row => row.abilityId);
-                    const ability = await this.getAbilityById(1);
+                    const abilityIds: number[] = rows.map(row => row.id);
 
                     const abilities: Ability[] = [];
                     for (const abilityId of abilityIds) {
@@ -645,7 +644,7 @@ export class Database {
 
     static async userAbilityAlreadyExists(userId: string, abilityId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM UserAbility WHERE userId = ? AND abilityId = ?`, [userId, abilityId], (err, row: any) => {
+            db.get(`SELECT * FROM UserAbility WHERE userId = ? AND abilityId = ?`, [userId, abilityId], (err, row: UserAbility) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -657,16 +656,16 @@ export class Database {
 
     static getProjectAbilitiesByProjectId(projectId: number): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT abilityId FROM ProjectAbility WHERE projectId = ?`, [projectId], (err, rows: unknown[]) => {
+            db.all(`SELECT abilityId FROM ProjectAbility WHERE projectId = ?`, [projectId], (err, rows: Ability[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const abilityIds: number[] = (rows as any[]).map(row => row.abilityId);
-                    db.all(`SELECT * FROM Ability WHERE id IN (?)`, [abilityIds], (err, rows: unknown[]) => {
+                    const abilityIds: number[] = rows.map(row => row.id);
+                    db.all(`SELECT * FROM Ability WHERE id IN (?)`, [abilityIds], (err, rows: Ability[]) => {
                         if (err) {
                             reject(err);
                         } else {
-                            const abilities: Ability[] = (rows as any[]).map(row => ({
+                            const abilities: Ability[] = rows.map(row => ({
                                 id: row.id,
                                 name: row.name,
                                 parentId: row.parentId
@@ -681,7 +680,7 @@ export class Database {
 
     static async projectAbilityAlreadyExists(projectId: number, abilityId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM ProjectAbility WHERE userId = ? AND abilityId = ?`, [projectId, abilityId], (err, row: any) => {
+            db.get(`SELECT * FROM ProjectAbility WHERE userId = ? AND abilityId = ?`, [projectId, abilityId], (err, row: ProjectAbility) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -693,11 +692,11 @@ export class Database {
 
     static async getAbilities(): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Ability`, (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Ability`, (err, rows: Ability[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const abilities: Ability[] = (rows as any[]).map(row => ({
+                    const abilities: Ability[] = rows.map(row => ({
                         id: row.id,
                         name: row.name,
                         parentId: row.parentId
@@ -710,7 +709,7 @@ export class Database {
 
     static async getAbilityById(abilityId: number): Promise<Ability | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM Ability WHERE id = ?`, [abilityId], (err, row: any) => {
+            db.get(`SELECT * FROM Ability WHERE id = ?`, [abilityId], (err, row: Ability) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {
@@ -729,11 +728,11 @@ export class Database {
 
     static async getDirectChatsByUserId(userId: string): Promise<DirectChat[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM DirectChat WHERE userId = ? OR otherUserId = ?`, [userId, userId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM DirectChat WHERE userId = ? OR otherUserId = ?`, [userId, userId], (err, rows: DirectChat[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const directChats: DirectChat[] = (rows as any[]).map(row => ({
+                    const directChats: DirectChat[] = rows.map(row => ({
                         id: row.id,
                         userId: row.userId,
                         otherUserId: row.otherUserId
@@ -746,7 +745,7 @@ export class Database {
 
     static async getDirectChatByUserIds(userId: string, otherUserId: string): Promise<DirectChat | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM DirectChat WHERE userId = ? AND otherUserId = ?`, [userId, otherUserId], (err, row: any) => {
+            db.get(`SELECT * FROM DirectChat WHERE userId = ? AND otherUserId = ?`, [userId, otherUserId], (err, row: DirectChat) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {
@@ -765,7 +764,7 @@ export class Database {
 
     static async getDirectChatById(chatId: number): Promise<DirectChat | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM DirectChat WHERE id = ?`, [chatId], (err, row: any) => {
+            db.get(`SELECT * FROM DirectChat WHERE id = ?`, [chatId], (err, row: DirectChat) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {
@@ -784,16 +783,16 @@ export class Database {
 
     static async getMessagesByChatId(chatId: number): Promise<Message[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Message WHERE chatId = ?`, [chatId], (err, rows: unknown[]) => {
+            db.all(`SELECT * FROM Message WHERE chatId = ?`, [chatId], (err, rows: Message[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const messages: Message[] = (rows as any[]).map(row => ({
+                    const messages: Message[] = rows.map(row => ({
                         id: row.id,
                         chatId: row.chatId,
                         userId: row.userId,
                         message: row.message,
-                        dateTime: row.date
+                        dateTime: row.dateTime
                     }));
                     resolve(messages);
                 }
@@ -885,6 +884,39 @@ export class Database {
                     reject(err);
                 } else {
                     resolve(true);
+                }
+            });
+        });
+    }
+
+    static async addUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run("BEGIN TRANSACTION", async (beginErr) => {
+                if (beginErr) {
+                    reject(beginErr);
+                    return;
+                }
+
+                try {
+                    for (const abilityId of abilityIds) {
+                        await this.addUserAbility(userId, abilityId);
+                    }
+
+                    db.run("COMMIT", commitErr => {
+                        if (commitErr) {
+                            reject(commitErr);
+                        } else {
+                            resolve(true);
+                        }
+                    });
+                } catch (err) {
+                    db.run("ROLLBACK", rollbackErr => {
+                        if (rollbackErr) {
+                            reject(rollbackErr);
+                        } else {
+                            resolve(false);
+                        }
+                    });
                 }
             });
         });
