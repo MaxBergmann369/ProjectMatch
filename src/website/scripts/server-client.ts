@@ -94,6 +94,19 @@ export class HttpClient {
             .then(response => response.text());
     }
 
+    async getAllAbilities():Promise<Ability[]> {
+        const abs = (await fetch(`${this.baseUrl}/user/abilities`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.json()));
+        console.log(abs);
+        return abs;
+    }
+
+
     /* endregion */
 
     /* region Project */
