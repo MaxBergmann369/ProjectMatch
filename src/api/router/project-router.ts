@@ -57,7 +57,7 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/projects/:userId', async (req, res) => {
+    projectRouter.get('/projects/owner/:userId', async (req, res) => {
         try {
             const userId = req.params.userId;
 
