@@ -9,6 +9,7 @@ export class HttpClient {
     /* region User */
 
     async addUser(username: string, birthdate: string) {
+        console.log(this.bearer);
         return await fetch(`${this.baseUrl}/user`, {
             method: 'POST',
             headers: {

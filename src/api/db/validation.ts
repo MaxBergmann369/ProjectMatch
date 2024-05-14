@@ -193,7 +193,7 @@ export class EndPoints {
 
         const token = authHeader.split(" ")[1];
 
-        const decodedToken: KeycloakTokenParsed = jwt.decode(token);
+        const decodedToken: KeycloakTokenParsed = jwt.decode(token) as KeycloakTokenParsed;
         if (!decodedToken) {
             return null;
         }
