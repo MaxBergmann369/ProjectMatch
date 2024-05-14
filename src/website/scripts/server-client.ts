@@ -20,7 +20,7 @@ export class HttpClient {
                 birthdate: birthdate
             })
         })
-            .then(response => response.text());
+            .then(response => response.ok);
     }
 
     async getUser(userId: string): Promise<User | null> {
