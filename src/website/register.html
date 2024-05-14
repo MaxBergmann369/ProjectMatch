@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Register - ProjectMatch</title>
+    <link rel="stylesheet" href="styles/register.css">
+    <script src="scripts/dist/register.bundle.js"></script>
 </head>
 <body>
-    <h1>Register</h1>
+    <h1>Welcome to ProjectMatch!</h1>
+    <p>We are happy that you are here.</p>
+    <p>We just need a few more information to get you started.</p>
     <form>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
-        <label for="birthdate">Password:</label>
+        <label for="birthdate">Birthday:</label>
         <input type="date" id="birthdate" name="birthdate" required>
-        <div class="abilities">
-
+        <label for="abilities">Abilities:</label>
+        <div id="abilities">
+            <!-- the script inserts abilities here -->
         </div>
         <button type="submit">Register</button>
     </form>
