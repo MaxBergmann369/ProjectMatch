@@ -4,7 +4,7 @@ import {keycloak} from "./keycloak";
 export class HttpClient {
 
     baseUrl = "http://localhost:3000/api";
-    bearer = `Bearer ${keycloak.token}`
+    bearer = `Bearer ${keycloak.token}`;
 
     /* region User */
 
@@ -30,13 +30,8 @@ export class HttpClient {
                 Authorization: this.bearer
             }
         })
-            .then(response => {
-                if(!response.ok) {
-                    return null;
-                }
+            .then(response => response.ok? response.json() : null);
 
-                response.json()
-            });
     }
 
     async updateUser(username: string, birthdate: string) {
@@ -121,13 +116,8 @@ export class HttpClient {
                 Authorization: this.bearer
             }
         })
-            .then(response => {
-                if(!response.ok) {
-                    return null;
-                }
+            .then(response => response.ok? response.json() : null);
 
-                response.json()
-            });
     }
 
     async getProjects(): Promise<Project[] | null> {
@@ -137,13 +127,8 @@ export class HttpClient {
                 Authorization: this.bearer
             }
         })
-            .then(response => {
-                if(!response.ok) {
-                    return null;
-                }
+            .then(response => response.ok? response.json() : null);
 
-                response.json()
-            });
     }
 
     async getProjectsWhereUserIsOwner(userId: string): Promise<Project[] | null> {
@@ -153,13 +138,7 @@ export class HttpClient {
                 Authorization: this.bearer
             }
         })
-            .then(response => {
-                if(!response.ok) {
-                    return null;
-                }
-
-                response.json()
-            });
+            .then(response => response.ok? response.json() : null);
     }
 
     async updateProject(project: Project) {
@@ -423,8 +402,8 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async deleteMessage(messageId: number, chatId: number, userId: string) {
-        return await fetch(`${this.baseUrl}/messages/${chatId}/${messageId}`, {
+    async deleteMessage(messageId: number, userId: string) {
+        return await fetch(`${this.baseUrl}/messages/${userId}/${messageId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
