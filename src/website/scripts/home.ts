@@ -22,13 +22,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         `;
         document.getElementById("username").innerText = data;
 
-        let i = await client.getAbilities();
-        console.log(i);
-        await client.addUser("testss", "20.12.2001");
         const user1: User | null = await client.getUser(user.userId);
 
         if(user1 === null) {
-
+            window.location.href = "register.html";
         }
     }
     else {

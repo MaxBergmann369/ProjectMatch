@@ -3,18 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Register - ProjectMatch</title>
+    <script src="scripts/dist/register.bundle.js"></script>
 </head>
 <body>
-    <h1>Register</h1>
-    <form>
+<h1>Register</h1>
+    <form id="registerForm">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
         <label for="birthdate">Password:</label>
         <input type="date" id="birthdate" name="birthdate" required>
-        <div class="abilities">
+        <div id="abilities">
 
         </div>
-        <button type="submit">Register</button>
+        <button type="button" id="registerButton">Register</button>
     </form>
+
+    <script>
+        document.getElementById("registerButton").addEventListener("click", function(event) {
+            event.preventDefault(); // Verhindert das Standardverhalten des Formulars
+            // Hier können Sie die Funktion aufrufen, die das Formular verarbeitet
+        });
+    </script>
 </body>
 </html>
