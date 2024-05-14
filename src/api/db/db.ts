@@ -622,11 +622,11 @@ export class Database {
 
     static async getUserAbilitiesByUserId(userId: string): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT abilityId FROM UserAbility WHERE userId = ?`, [userId], async (err, rows: Ability[]) => {
+            db.all(`SELECT abilityId FROM UserAbility WHERE userId = ?`, [userId], async (err, rows: UserAbility[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const abilityIds: number[] = rows.map(row => row.id);
+                    const abilityIds: number[] = rows.map(row => row.abilityId);
 
                     const abilities: Ability[] = [];
                     for (const abilityId of abilityIds) {
@@ -656,11 +656,11 @@ export class Database {
 
     static getProjectAbilitiesByProjectId(projectId: number): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT abilityId FROM ProjectAbility WHERE projectId = ?`, [projectId], (err, rows: Ability[]) => {
+            db.all(`SELECT abilityId FROM ProjectAbility WHERE projectId = ?`, [projectId], (err, rows: ProjectAbility[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const abilityIds: number[] = rows.map(row => row.id);
+                    const abilityIds: number[] = rows.map(row => row.abilityId);
                     db.all(`SELECT * FROM Ability WHERE id IN (?)`, [abilityIds], (err, rows: Ability[]) => {
                         if (err) {
                             reject(err);
@@ -680,7 +680,7 @@ export class Database {
 
     static async projectAbilityAlreadyExists(projectId: number, abilityId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM ProjectAbility WHERE userId = ? AND abilityId = ?`, [projectId, abilityId], (err, row: ProjectAbility) => {
+            db.get(`SELECT * FROM ProjectAbility WHERE projectId = ? AND abilityId = ?`, [projectId, abilityId], (err, row: ProjectAbility) => {
                 if (err) {
                     reject(err);
                 } else {

@@ -739,7 +739,7 @@ describe('database-test-project', () => {
 
         const projectId = await Utility.getProjectId(project.name, project.ownerId);
 
-        const success = await Utility.addProjectAbility(projectId, 1);
+        const success = await Utility.addProjectAbility(projectId, 3);
         await deleteProjectByName(project.name, project.ownerId);
         await deleteUser(ifId, true);
         await Utility.deleteAbilityFromProject(projectId, 1);
@@ -835,9 +835,11 @@ describe('database-test-project', () => {
         const success = await Utility.addView(projectId, ifId);
         const dbView = await Utility.getViews(projectId);
 
-        const views = await Utility.getProjectViews(projectId);
+        const viewsByProject = await Utility.getProjectViews(projectId);
+        const views = await Utility.getViews(projectId);
 
         expect(views).toBe(1);
+        expect(viewsByProject.length).toBe(views);
 
         expect(dbView).toBe(1);
 
