@@ -9,7 +9,6 @@ export class HttpClient {
     /* region User */
 
     async addUser(username: string, birthdate: string) {
-        console.log(this.bearer);
         return await fetch(`${this.baseUrl}/user`, {
             method: 'POST',
             headers: {
@@ -94,18 +93,15 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getAllAbilities():Promise<Ability[]> {
-        const abs = (await fetch(`${this.baseUrl}/user/abilities`, {
+    async getAbilities() {
+        return await fetch(`${this.baseUrl}/user/abilities`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
             }
         })
-            .then(response => response.json()));
-        console.log(abs);
-        return abs;
+            .then(response => response.json());
     }
-
 
     /* endregion */
 

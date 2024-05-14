@@ -4,11 +4,11 @@ import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 
 const authenticatedPromise = initKeycloak();
-const client = new HttpClient();
 
 document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await authenticatedPromise;
     if (authenticated) {
+        const client = new HttpClient();
         console.log("User is authenticated");
         const user = new TokenUser(keycloak.tokenParsed);
         const data = `
@@ -22,6 +22,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         `;
         document.getElementById("username").innerText = data;
 
+        let i = await client.getAbilities();
+        console.log(i);
         await client.addUser("testss", "20.12.2001");
         const user1: User | null = await client.getUser(user.userId);
 

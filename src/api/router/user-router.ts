@@ -5,6 +5,33 @@ import {EndPoints} from "../db/validation";
 const userRouter = express.Router();
 
 export function createUserEndpoints() {
+    /* region Others */
+
+    userRouter.get('/user/abilities', async (req, res) => {
+        try {
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const abilities = await Utility.getAllAbilities();
+
+            if(abilities !== null) {
+                res.status(200).send(abilities);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
+    /* endregion */
+
     /* region User */
     userRouter.post('/user', async (req, res) => {
         try {
@@ -289,33 +316,6 @@ export function createUserEndpoints() {
             }
         } catch (e) {
             res.status(400);
-        }
-    });
-
-    /* endregion */
-
-    /* region Others */
-
-    userRouter.get('/user/abilities', async (req, res) => {
-        try {
-            const abilities = await Utility.getAllAbilities();
-
-            const authHeader = req.headers.authorization;
-
-            const tokenUser = EndPoints.getToken(authHeader);
-
-            if (tokenUser === null) {
-                res.sendStatus(400);
-                return;
-            }
-
-            if(abilities !== null) {
-                res.status(200).send(abilities);
-            } else {
-                res.sendStatus(400);
-            }
-        } catch (e) {
-            res.sendStatus(400);
         }
     });
 
