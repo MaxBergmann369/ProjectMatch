@@ -2,6 +2,8 @@ import {HttpClient} from "./server-client";
 import {initKeycloak, keycloak} from "./keycloak";
 import {Ability, User} from "../../models";
 
+
+
 const auth = initKeycloak();
 document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await auth;
@@ -41,7 +43,7 @@ async function renderAbilities() {
     const abilitiesElement = document.getElementById("abilities");
 
     if (abilitiesElement !== null) {
-        let html = "<h2>Abilities</h2>";
+        let html = "";
         const abilitiesMap: { [key: number]: Ability[] } = {};
         const topLevelAbilities: Ability[] = [];
 
@@ -58,19 +60,50 @@ async function renderAbilities() {
 
         const renderAbility = (ability: Ability, depth: number) => {
             html += `
-            <div style="margin-left: ${depth * 20}px; border: 1px solid black; padding: 5px;">
-                <input type="checkbox" id="ability_${ability.id}" name="abilities" value="${ability.id}" onchange="handleCheckboxChange(${ability.id}, this.checked)">
+            <div class="ability" style="margin-left: ${depth * 20}px;">
+                <input type="checkbox" id="ability_${ability.id}" name="abilities" value="${ability.id}">
                 <label for="ability_${ability.id}">${ability.name}</label>
             </div>
+            
             `;
 
             if (abilitiesMap[ability.id]) {
+                html += `<div class='children' id="children_${ability.id}">`;
                 abilitiesMap[ability.id].forEach(child => renderAbility(child, depth + 1));
+                html += "</div>";
             }
         };
 
         topLevelAbilities.forEach(ability => renderAbility(ability, 0));
 
         abilitiesElement.innerHTML = html;
+
+        document.querySelectorAll(".ability input").forEach((input) => {
+            input.addEventListener("change", (event) => {
+
+                const id = parseInt((event.target as HTMLInputElement).id.split("_")[1]);
+                const checked = (event.target as HTMLInputElement).checked;
+                const children = document.getElementById(`children_${id}`);
+                (children as HTMLElement).style.display = checked ? "block" : "none";
+                const childrenChildren = children.children;
+                if (checked) {
+                    for (let i = 0; i < childrenChildren.length; i++) {
+                        const child = childrenChildren.item(i);
+                        if (child instanceof HTMLElement) {
+                            const childInput = child.querySelector("input");
+                            if (childInput) {
+                                (childInput as HTMLInputElement).checked = false;
+                                childInput.dispatchEvent(new Event("change"));
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        );
     }
+
 }
+
+
+

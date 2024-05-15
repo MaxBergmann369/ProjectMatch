@@ -1,5 +1,23 @@
 form{
   display: flex;
   flex-direction: column;
+  gap: 0.4rem;
+}
+
+#abilities{
+  border: 1px solid black;
+  overflow-y: scroll;
+  height: 50vh;
+  padding: 0.5rem;
+}
+
+.ability{
+  border: 1px solid black;
+  padding: 5px;
+  background-color: #ececec;
+}
+
+.children {
+  display: none;
 }
 
