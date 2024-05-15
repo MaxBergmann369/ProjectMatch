@@ -316,6 +316,18 @@ export class Database {
         });
     }
 
+    static async getUserIdByFullName(firstname: string, lastname: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT userId FROM User WHERE firstname = ? AND lastname = ?`, [firstname, lastname], (err, row: User) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row.userId);
+                }
+            });
+        });
+    }
+
     static async isNotificationOwner(userId: string, notificationId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.get(`SELECT * FROM Notification WHERE userId = ? AND id = ?`, [userId, notificationId], (err, row: Notification) => {

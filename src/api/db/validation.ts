@@ -17,37 +17,30 @@ export class ValUser {
     static isValid(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string,
                    birthdate: Date, biografie: string, permissions: number, department: string): boolean {
         if(!this.isUserIdValid(userId)) {
-            throw new Error("Invalid UserId");
             return false;
         }
 
         if(username === undefined || username === "" || username.length > 20 || username.length < 4) {
-            throw new Error("Invalid Username");
             return false;
         }
 
         if(firstname === undefined || firstname === "" || firstname.length > 20 || firstname.length < 1) {
-            throw new Error("Invalid Firstname");
             return false;
         }
 
         if(lastname === undefined || lastname === "" || lastname.length > 20 || lastname.length < 1) {
-            throw new Error("Invalid Lastname");
             return false;
         }
 
         if(birthdate === undefined || !this.validateBirthdate(birthdate)) {
-            throw new Error("Invalid Birthdate");
             return false;
         }
 
         if(permissions === undefined || permissions < 0) {
-            throw new Error("Invalid Permissions");
             return false;
         }
 
         if(department === undefined || department === "" || !this.validateDepartment(department)) {
-            throw new Error("Invalid Department");
             return false;
         }
 
@@ -56,7 +49,6 @@ export class ValUser {
         }
 
         if(clazz === undefined || clazz === "" || clazz.length > 10 || clazz.length < 1) {
-            throw new Error("Invalid Class");
             return false;
         }
 
@@ -94,7 +86,11 @@ export class ValUser {
 
     private static containsForbiddenWords(username: string, firstname: string, lastname: string): boolean {
         //TODO: Add more forbidden words from file
-        let forbiddenWords: string[] = ["admin", "moderator", "user", "root", "guest", "login", "register", "password", "username", "firstname", "lastname", "email", "birthdate", "permissions"];
+        const forbiddenWords: string[] = ["admin", "moderator", "user", "root", "guest", "login", "register", "password", "username", "firstname", "lastname", "email", "birthdate", "permissions"];
+
+        if(!checkInvalidCharsExp(username) || !checkInvalidChars(firstname) || !checkInvalidChars(lastname)) {
+            return true;
+        }
 
         return forbiddenWords.some(word => username.toLowerCase().includes(word)) || forbiddenWords.some(word => firstname.toLowerCase().includes(word)) || forbiddenWords.some(word => lastname.toLowerCase().includes(word));
     }
@@ -115,7 +111,7 @@ export class ValUser {
 export class ValProject {
     static isValid(name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: Date, links: string, maxMembers: number): boolean {
 
-        if(name === undefined || name === "" || name.length > 30 || name.length < 1) {
+        if(name === undefined || name === "" || name.length > 30 || name.length < 1 || !checkInvalidChars(name)) {
             return false;
         }
 
@@ -127,7 +123,7 @@ export class ValProject {
             return false;
         }
 
-        if(description === undefined || description === "" || description.length > 1000 || description.length < 1) {
+        if(description === undefined || description === "" || description.length > 1000 || description.length < 1 || !checkInvalidCharsExp(description)) {
             return false;
         }
 
@@ -157,11 +153,11 @@ export class ValNotification {
             return false;
         }
 
-        if(title === undefined || title === "" || title.length > 50 || title.length < 1) {
+        if(title === undefined || title === "" || title.length > 50 || title.length < 1 || !checkInvalidCharsExp(title)) {
             return false;
         }
 
-        return !(text === undefined || text === "" || text.length > 500 || text.length < 1);
+        return !(text === undefined || text === "" || text.length > 500 || text.length < 1 || !checkInvalidCharsExp(text));
     }
 }
 
@@ -181,8 +177,22 @@ export class ValMessage {
     private static containsForbiddenWords(message: string): boolean {
         const forbiddenWords: string[] = ["admin", "moderator", "user", "root", "guest", "login", "register", "password", "username", "firstname", "lastname", "email", "birthdate", "permissions"];
 
+        if(!checkInvalidCharsExp(message)) {
+            return true;
+        }
+
         return forbiddenWords.some(word => message.toLowerCase().includes(word));
     }
+}
+
+export function checkInvalidChars(str: string): boolean {
+    const pattern = /[a-zA-ZöäüÖÄÜ]+/;
+    return pattern.test(str);
+}
+
+export function checkInvalidCharsExp(str: string): boolean {
+    const pattern = /[a-zA-ZöäüÖÄÜ0-9]+/;
+    return pattern.test(str);
 }
 
 export class EndPoints {

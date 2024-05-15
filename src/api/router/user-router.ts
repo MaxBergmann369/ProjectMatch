@@ -96,6 +96,35 @@ export function createUserEndpoints() {
         }
     });
 
+    userRouter.get('/userId/:fullName', async (req, res) => {
+        try {
+            const fullName = req.params.fullName;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const userId = await Utility.getUserIdByFullName(fullName);
+
+            if (userId !== null) {
+                res.status(200).send(userId);
+            } else {
+                res.sendStatus(404);
+            }
+
+
+
+        } catch (e) {
+            throw new Error(e);
+            res.sendStatus(400);
+        }
+    });
+
     userRouter.put('/user', async (req, res) => {
         try {
             const {

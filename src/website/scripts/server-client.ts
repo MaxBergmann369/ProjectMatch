@@ -34,6 +34,16 @@ export class HttpClient {
 
     }
 
+    async getUserId(fullName: string): Promise<string | null> {
+        return await fetch(`${this.baseUrl}/userId/${fullName}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.text() : null);
+    }
+
     async updateUser(username: string, birthdate: string) {
         return await fetch(`${this.baseUrl}/user`, {
             method: 'PUT',

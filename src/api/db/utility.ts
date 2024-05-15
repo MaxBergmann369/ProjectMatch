@@ -1,6 +1,6 @@
 
 import {Database} from "./db";
-import {ValMessage, ValNotification, ValProject, ValUser} from "./validation";
+import {checkInvalidChars, ValMessage, ValNotification, ValProject, ValUser} from "./validation";
 import {Ability, DirectChat, Like, Message, Notification, Project, ProjectMember, User, View} from "../../models";
 
 export class Utility {
@@ -38,6 +38,28 @@ export class Utility {
             }
             return user;
         } catch (e) {
+            return null;
+        }
+    }
+    
+    static async getUserIdByFullName(fullName: string): Promise<string | null> {
+        try {
+            const names = fullName.split("-");
+
+            if(fullName.length < 1 || fullName.length > 40 || names.length !== 2 || names[0].length < 1 || names[1].length < 1 || !checkInvalidChars(names[0]) || !checkInvalidChars(names[1])) {
+                return null;
+            }
+
+            //first letter uppercase and the rest lowercase
+            const firstname = names[0].charAt(0).toUpperCase() + names[0].slice(1).toLowerCase();
+
+            //first letter uppercase and the rest lowercase
+            const lastname = names[1].charAt(0).toUpperCase() + names[1].slice(1).toLowerCase();
+
+            return await Database.getUserIdByFullName(firstname, lastname);
+        }
+        catch (e) {
+            throw new Error(e);
             return null;
         }
     }
@@ -663,7 +685,7 @@ export class Utility {
             const id = userId.toLowerCase();
             const otherId = otherUserId.toLowerCase();
 
-            if(!await ValUser.isUserValid(id) || !await ValUser.isUserValid(otherId)) {
+            if(!await ValUser.isUserValid(id) || !await ValUser.isUserValid(otherId) || id === otherId) {
                 return false;
             }
 
@@ -700,7 +722,7 @@ export class Utility {
             const id = userId.toLowerCase();
             const otherId = otherUserId.toLowerCase();
 
-            if(!ValUser.isUserIdValid(id) || !ValUser.isUserIdValid(otherId)) {
+            if(!ValUser.isUserIdValid(id) || !ValUser.isUserIdValid(otherId) || id === otherId) {
                 return null;
             }
 
@@ -716,7 +738,7 @@ export class Utility {
             const id = userId.toLowerCase();
             const otherId = otherUserId.toLowerCase();
 
-            if(!ValUser.isUserIdValid(id) || !ValUser.isUserIdValid(otherId)) {
+            if(!ValUser.isUserIdValid(id) || !ValUser.isUserIdValid(otherId) || id === otherId) {
                 return false;
             }
 
