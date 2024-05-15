@@ -6,6 +6,11 @@
         "esModuleInterop": true
 
     },
+    "include": [
+        "website/scripts/**/*.ts",
+        "api/**/*.ts",
+        "app.ts"
+    ],
     "exclude": [
         "node_modules"
     ]

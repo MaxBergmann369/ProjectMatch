@@ -1,0 +1,167 @@
+import express from "express";
+import {Database} from "../db/db";
+import {Utility} from "../db/utility";
+
+const userRouter = express.Router();
+
+export function createUserEndpoints() {
+    /* region User */
+    userRouter.post('/user', async (req, res) => {
+        const {userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department} = req.body;
+
+        const token = req.headers.authorization as string;
+
+        const bd = new Date(birthdate);
+
+        if(await Utility.addUser(userId, username, firstname, lastname, email, clazz, bd, biografie, permissions, department)) {
+            res.status(200).send("User added");
+        } else {
+            res.status(400).send("User not added");
+        }
+    });
+
+    userRouter.get('/user/:userId', async (req, res) => {
+        const userId = req.params.userId;
+
+        const user = await Utility.getUser(userId);
+
+        if(user !== null) {
+            res.status(200).send(user);
+        } else {
+            res.status(400).send("User not found");
+        }
+    });
+
+    userRouter.put('/user', async (req, res) => {
+        const {userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department} = req.body;
+
+        const bd = new Date(birthdate);
+
+        if(await Utility.updateUser(userId, username, firstname, lastname, email, clazz, bd, biografie, permissions, department)) {
+            res.status(200).send("User updated");
+        } else {
+            res.status(400).send("User not updated");
+        }
+    });
+
+    userRouter.delete('/user/:userId', async (req, res) => {
+        const userId = req.params.userId;
+
+        if(await Utility.deleteUser(userId)) {
+            res.status(200).send("User deleted");
+        } else {
+            res.status(400).send("User not deleted");
+        }
+    });
+
+    /* endregion */
+
+    /* region UserAbility */
+
+    userRouter.post('/user/:userId/ability', async (req, res) => {
+        const userId = req.params.userId;
+        const abilityId = parseInt(req.body.abilityId);
+
+        if(isNaN(abilityId)) {
+            res.status(400).send("Invalid Ability Id");
+            return;
+        }
+
+        if(await Utility.addUserAbility(userId, abilityId)) {
+            res.status(200).send("User ability added");
+        } else {
+            res.status(400).send("User ability not added");
+        }
+    });
+
+    userRouter.get('/user/:userId/ability', async (req, res) => {
+        const userId = req.params.userId;
+        const userAbility = await Utility.getUserAbilities(userId);
+
+        if(userAbility !== null) {
+            res.status(200).send(userAbility);
+        } else {
+            res.status(400).send("User ability not found");
+        }
+    });
+
+    userRouter.delete('/user/:userId/ability/:abilityId', async (req, res) => {
+        const userId = req.query.userId as string;
+        const abilityId = req.query.abilityId as string;
+
+        const abId: number = parseInt(abilityId);
+
+        if (isNaN(abId)) {
+            res.status(400).send("Invalid abilityId");
+        }
+
+        if (await Utility.deleteUserAbility(userId, abId)) {
+            res.status(200).send("User ability deleted");
+        } else {
+            res.status(400).send("User ability not deleted");
+        }
+    });
+
+    /* endregion */
+
+    /* region Notification */
+
+    userRouter.post('/user/:userId/notification', async (req, res) => {
+        const {title, text} = req.body;
+        const userId = req.params.userId;
+
+        if(await Utility.addNotification(userId, title, text)) {
+            res.status(200).send("Notification added");
+        } else {
+            res.status(400).send("Notification not added");
+        }
+    });
+
+    userRouter.get('/user/:userId/notification', async (req, res) => {
+        const userId = req.params.userId;
+
+        const notification = await Utility.getNotifications(userId);
+
+        if(notification !== null) {
+            res.status(200).send(notification);
+        } else {
+            res.status(400).send("Notification not found");
+        }
+    });
+
+    userRouter.delete('/user/:userId/notification/:notId', async (req, res) => {
+        const userId = req.params.userId;
+        const notId = parseInt(req.params.notId);
+
+
+        if (isNaN(notId)) {
+            res.status(400).send("Invalid notificationId");
+        }
+
+        if (await Utility.deleteNotification(userId, notId)) {
+            res.status(200).send("Notification deleted");
+        } else {
+            res.status(400).send("Notification not deleted");
+        }
+    });
+
+    /* endregion */
+
+    /* region Others */
+
+    userRouter.get('/user/abilities', async (req, res) => {
+        const abilities = await Utility.getAllAbilities();
+
+        if(abilities !== null) {
+            res.status(200).send(abilities);
+        } else {
+            res.status(400).send("Abilities not found");
+        }
+    });
+
+    /* endregion */
+
+    return userRouter;
+}
+
+module.exports = { createUserEndpoints };

@@ -88,6 +88,23 @@
   - Benutzer können Benachrichtigungen verwalten.
   - Benachrichtigungen sind benutzerfreundlich.
 
+  #### Projekt-Detailseite
+- **Beschreibung:** Entwickeln Sie eine ansprechende Oberfläche zur Anzeige detaillierter Informationen zu einem bestimmten Projekt.
+- **Zeitaufwand:** 12 Stunden
+- **Definition of Done:**
+  - Die Detailseite zeigt alle relevanten Projektinformationen wie Titel, Beschreibung, Fähigkeiten, Links usw. übersichtlich an.
+  - Das Projekt-Thumbnail wird angezeigt.
+  - Benutzer können das Projekt bewerten und teilen, und diese Interaktionen werden in Echtzeit aktualisiert.
+
+  #### Projekt-Erstellungsformular
+- **Beschreibung:** Entwickeln Sie eine benutzerfreundliche Oberfläche über die Benutzer neue Projekte erstellen können.
+- **Zeitaufwand:** 10 Stunden
+- **Definition of Done:**
+  - Das Formular ermöglicht es Benutzern, Titel, Beschreibung, Fähigkeiten, Links und andere relevante Informationen für ein neues Projekt einzugeben.
+  - Validierung der Eingaben erfolgt sowohl clientseitig als auch serverseitig, um Fehler zu minimieren.
+  - Der Endpunkt sendet die eingegebenen Projektdaten in einem geeigneten Format (z. B. JSON) an den Backend-Server.
+  - Die Benutzeroberfläche reagiert angemessen auf die Rückmeldungen des Endpunkts und zeigt Benutzern klare Erfolgsmeldungen oder Fehlermeldungen an.
+
 ### Einstellungen
 - **Beschreibung:** Entwicklung einer Einstellungsseite.
 - **Zeitaufwand:** 5 Stunden
@@ -95,14 +112,6 @@
   - Alle Einstellungen können korrekt gespeichert und geladen werden.
   - Datenschutzeinstellungen sind benutzerfreundlich und transparent.
   - Einstellungen sind leicht zugänglich und intuitiv zu bedienen.
-
-### Report System
-- **Beschreibung:** Entwicklung einer Benutzeroberfläche für das Reporting-System.
-- **Zeitaufwand:** 4 Stunden
-- **Definition of Done:**
-  - Benutzer können erfolgreich Reports erstellen und absenden.
-  - Bilder können hochgeladen und korrekt verarbeitet werden.
-  - Reports werden korrekt gespeichert und an das Support- oder Admin-Team weitergeleitet.
 
 ### Mehrsprachige Unterstützung
 - **Beschreibung:** Implementierung einer Benutzeroberfläche für mehrsprachige Unterstützung.
@@ -136,7 +145,7 @@
 - **Definition of Done:**
   - Benutzeranmeldung und -registrierung sind sicher und robust implementiert.
   - E-Mail-Verifizierung ist implementiert und funktioniert zuverlässig.
-  - Passwort-Sicherheitsrichtlinien sind implementiert.
+  - Passwort-Verschlüsselung ist implementiert.
 
 ### Fragebogen Logik
 - **Beschreibung:** Entwicklung der Backend-Logik für den Fragebogen.
@@ -145,6 +154,14 @@
   - Fragebogen-Struktur ist korrekt implementiert und validiert.
   - Alle Fragen und Antworten werden korrekt gespeichert und verarbeitet.
   - Generierung von Projektvorschlägen basierend auf den Fragebogen-Antworten funktioniert zuverlässig.
+
+### Projekt-Empfehlungs-Algorithmus
+- **Beschreibung:** Entwicklung eines Algorithmus zur Generierung von personalisierten Projektvorschlägen.
+- **Zeitaufwand:** 5 Stunden
+- **Definition of Done:**
+  - Der Algorithmus analysiert erfolgreich die Benutzerantworten und generiert passende Projektvorschläge.
+  - Der Algorithmus berücksichtigt verschiedene Faktoren wie Projektthemen und erforderliche Fähigkeiten.
+  - Die generierten Projektvorschläge sind relevant und entsprechen den Interessen und Fähigkeiten der Benutzer.
 
 ### Benutzerprofil-Verwaltung
 - **Beschreibung:** Entwicklung der Backend-Logik für die Benutzerprofil-Verwaltung.
@@ -169,14 +186,6 @@
   - Online-Status wird korrekt angezeigt und aktualisiert.
   - Benutzer können ihren aktuellen Status (z.B. online, offline, abwesend) aktualisieren.
 
-### Report-System
-- **Beschreibung:** Implementierung der Backend-Logik zur Verarbeitung von Reports.
-- **Zeitaufwand:** 3 Stunden
-- **Definition of Done:**
-  - Benutzer können erfolgreich Reports erstellen und absenden.
-  - Bilder können hochgeladen und korrekt verarbeitet werden.
-  - Reports werden korrekt gespeichert und an das Support- oder Admin-Team weitergeleitet.
-
 ## Dokumentation
 
 ### Dokumentation Einzelner Methoden
@@ -199,3 +208,13 @@
 - **Definition of Done:**
   - API-Dokumentation ist vollständig und verständlich.
   - Alle Endpunkte, Parameter und Rückgabewerte sind dokumentiert.
+
+## Sonstige
+
+### Performance-Optimierung
+- **Beschreibung:** Durchführung von Optimierungen zur Verbesserung der Backend-Performance.
+- **Zeitaufwand:** 5 Stunden
+- **Definition of Done:**
+  - Die Backend-Performance ist nach der Optimierung spürbar verbessert.
+  - Caching- und Datenbank-Indexierungsstrategien sind implementiert und verbessern die Anwendungsleistung.
+  - Code-Optimierungen wurden durchgeführt, um überflüssige Last zu reduzieren und die Reaktionszeiten zu verkürzen.
