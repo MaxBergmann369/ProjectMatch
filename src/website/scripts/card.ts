@@ -31,9 +31,22 @@ export class Card {
     #init = () => {
         const card = document.createElement('div');
         card.classList.add('card');
+        const title = document.createElement('h2');
+        title.textContent = 'Interesting Project Title';
         const img = document.createElement('img');
         img.src = this.imageUrl;
+        const desc = document.createElement('p');
+        desc.textContent = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+        const tags = document.createElement('div');
+        tags.classList.add('tags');
+        ['CSS', 'JavaScript', 'HTML'].forEach(tag => {
+            const span = document.createElement('span');
+            span.textContent = tag;
+            tags.append(span);
+        });
+        card.append(title);
         card.append(img);
+        card.append(desc);
         this.element = card;
         if (this.#isTouchDevice()) {
             this.#listenToTouchEvents();

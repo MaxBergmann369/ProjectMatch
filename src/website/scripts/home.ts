@@ -10,8 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     addImagesFromBgFolder();
     function addImagesFromBgFolder() {
-        for (let i = 1; i <= 34; i++) {
-            urls.push(`./resources/project/backgrounds/bg${i}.jpg`);
+        for (let i = 1; i <= 33; i++) {
+            urls.push(`./resources/project/backgrounds/bg${i}.webp`);
         }
     }
 
