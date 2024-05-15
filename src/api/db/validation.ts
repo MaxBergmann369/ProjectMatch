@@ -45,7 +45,7 @@ export class ValUser {
             return false;
         }
 
-        if(clazz === undefined || clazz === "" || clazz.length > 10 || clazz.length < 1) {
+        if(clazz === undefined || clazz === "" || !this.isClassValid(clazz)) {
             return false;
         }
 
@@ -80,6 +80,11 @@ export class ValUser {
     private static isEmailValid(email: string): boolean {
         const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return pattern.test(email);
+    }
+
+    private static isClassValid(clazz: string):boolean {
+        const pattern =  /^[1-5][A-Z]{4,5}$/;
+        return pattern.test(clazz);
     }
 
     private static containsForbiddenWords(username: string, firstname: string, lastname: string): boolean {
