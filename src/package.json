@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx ts-node ./app.ts",
+    "start": "npx ts-node ./api/app.ts",
+    "run": "npx ts-node ./app.ts",
     "build": "npx webpack --watch --mode=production  && npx sass website/styles/",
     "dev": "npx webpack --watch --mode=development && npx sass website/styles/",
     "test": "jest"
