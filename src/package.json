@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "start": "npx ts-node app.ts",
-    "build": "npx tsc && npx sass website/styles/"
+    "build": "npx webpack --mode=production  && npx sass website/styles/",
+    "dev": "npx webpack --mode=development && npx sass website/styles/"
   },
   "dependencies": {
     "express": "^4.17.1",
