@@ -1,5 +1,5 @@
 import {Utility} from "../api/db/utility";
-import {Project, User} from "../api/db/models";
+import {Project, User} from "../models";
 
 describe('database-test-user', () => {
 
@@ -9,8 +9,10 @@ describe('database-test-user', () => {
     const itId1: string = 'IT123456';
     const itId2: string = 'IT210053';
     const itId3: string = 'IT210063';
+  
     const date: Date = new Date(new Date().getFullYear() - 11, 0, 1);
     const birthdateAlin: Date = new Date(2007, 2, 24);
+  
     const userIf: User = {
         userId: "IF123456",
         username: "sachSpieler",
@@ -22,7 +24,12 @@ describe('database-test-user', () => {
         biografie: "Ich spiele gerne Schach",
         permissions: 1,
         department: "Informatik"
-    }
+    };
+  
+    const ifId: string = 'if210053';
+    const ifId2: string = 'if210063';
+    const ifId3: string = 'if123456';
+    const date: Date = new Date(new Date().getFullYear() - 11, 0, 1);
 
     const userIt: User = {
         userId: itId1,
@@ -245,9 +252,13 @@ describe('database-test-user', () => {
         await deleteUser(ifId3);
     });
 
-    test('add-userIf-valid', async() => {
+    test('add-user-valid', async() => {
+        await deleteUser(user.userId, true);
+        await deleteUser(ifId2, true);
+  
         await Utility.addUser(userIf.userId, userIf.username, userIf.firstname, userIf.lastname,userIf.email, userIf.clazz, userIf.birthdate, userIf.biografie, userIf.permissions, userIf.department);
         await Utility.addUser(ifId2, userIf.username, userIf.firstname, userIf.lastname,userIf.email, userIf.clazz, userIf.birthdate, userIf.biografie, userIf.permissions, userIf.department);
+
 
         let users: User[] | null = await Utility.getUsers();
         const dbUser: User | null = await Utility.getUser(userIf.userId);
@@ -440,7 +451,7 @@ describe('database-test-user', () => {
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
-        }
+        };
 
         const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz,updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
@@ -472,7 +483,7 @@ describe('database-test-user', () => {
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
-        }
+        };
 
         const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
@@ -504,7 +515,7 @@ describe('database-test-user', () => {
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
-        }
+        };
 
         const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz,updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
@@ -536,7 +547,7 @@ describe('database-test-user', () => {
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
-        }
+        };
 
         const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
@@ -568,7 +579,7 @@ describe('database-test-user', () => {
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
-        }
+        };
 
         const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
@@ -600,7 +611,7 @@ describe('database-test-user', () => {
             biografie: "Test",
             permissions: -1,
             department: "Informatik"
-        }
+        };
 
         const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
@@ -632,7 +643,7 @@ describe('database-test-user', () => {
             biografie: "Test",
             permissions: 1,
             department: ""
-        }
+        };
 
         const success = await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz,updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
@@ -664,7 +675,7 @@ describe('database-test-user', () => {
             biografie: "Test",
             permissions: 1,
             department: "Informatik"
-        }
+        };
 
         await Utility.updateUser(updatedUser.userId, updatedUser.username, updatedUser.firstname, updatedUser.lastname, updatedUser.email, updatedUser.clazz, updatedUser.birthdate, updatedUser.biografie, updatedUser.permissions, updatedUser.department);
 
@@ -693,7 +704,7 @@ describe('database-test-user', () => {
     test('add-userIf-ability-valid', async() => {
         await Utility.addUser(ifId, userIf.username, userIf.firstname, userIf.lastname, userIf.email, userIf.clazz, userIf.birthdate, userIf.biografie, userIf.permissions, userIf.department);
 
-        let dbUser: User | null = await Utility.getUser(ifId);
+        const dbUser: User | null = await Utility.getUser(ifId);
 
         expect(dbUser).not.toBeNull();
 
@@ -736,7 +747,7 @@ describe('database-test-user', () => {
     test('add-notification-valid', async() => {
         await Utility.addUser(ifId, userIf.username, userIf.firstname, userIf.lastname, userIf.email, userIf.clazz, userIf.birthdate, userIf.biografie, userIf.permissions, userIf.department);
 
-        let dbUser: User | null = await Utility.getUser(ifId);
+        const dbUser: User | null = await Utility.getUser(ifId);
 
         expect(dbUser).not.toBeNull();
 
@@ -762,7 +773,7 @@ describe('database-test-project', () => {
         dateOfCreation: null,
         links: 'https://www.google.com;https://www.youtube.com',
         maxMembers: 5
-    }
+    };
 
     /* region addProject */
     test('add-project-invalid-name', async() => {
@@ -979,7 +990,7 @@ describe('database-test-project', () => {
 
         const projectId = await Utility.getProjectId(project.name, project.ownerId);
 
-        const success = await Utility.addProjectAbility(projectId, 1);
+        const success = await Utility.addProjectAbility(projectId, 3);
         await deleteProjectByName(project.name, project.ownerId);
         await deleteUser(ifId, true);
         await Utility.deleteAbilityFromProject(projectId, 1);
@@ -1119,11 +1130,13 @@ describe('database-test-project', () => {
         const success = await Utility.addView(projectId, ifId);
         const dbView = await Utility.getViews(projectId);
 
-        const views = await Utility.getProjectViews(projectId);
+        const viewsByProject = await Utility.getProjectViews(projectId);
+        const views = await Utility.getViews(projectId);
 
         expect(views).toBe(1);
+        expect(viewsByProject.length).toBe(views);
 
-        expect(dbView.length).toBe(1);
+        expect(dbView).toBe(1);
 
         await Utility.deleteViews(projectId);
         await deleteProjectByName(project.name, project.ownerId);
@@ -1376,7 +1389,7 @@ describe('database-test-chat', () => {
         const success1 = await Utility.addDirectChat(ifId, ifId2);
         expect(success1).toBeTruthy();
 
-        const chat = await Utility.getDirectChat(ifId, ifId2);
+        await Utility.getDirectChat(ifId, ifId2);
 
         const success = await Utility.updateMessage(1, 0, ifId, 'hello');
         await Utility.deleteDirectChat(ifId, ifId2);
@@ -1453,14 +1466,6 @@ async function deleteUser(ifId: string, flag:boolean = false) {
     await Utility.deleteUser(ifId);
 }
 
-
-
-async function deleteProject(id: number, ownerId: string) {
-    const dbProject: Project | null = await Utility.getProject(id);
-    await Utility.deleteProject(ownerId, id);
-
-    expect(dbProject).toBeNull();
-}
 
 async function deleteProjectByName(name: string, ownerId: string) {
     await Utility.deleteProjectByName(name, ownerId);

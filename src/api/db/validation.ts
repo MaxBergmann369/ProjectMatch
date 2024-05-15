@@ -1,4 +1,7 @@
 import {Utility} from "./utility";
+import jwt from "jsonwebtoken";
+import {TokenUser} from "../../website/scripts/tokenUser";
+import {KeycloakTokenParsed} from "keycloak-js";
 
 enum DepartmentTypes {
     Unset = "Unknown",
@@ -14,30 +17,37 @@ export class ValUser {
     static isValid(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string,
                    birthdate: Date, biografie: string, permissions: number, department: string): boolean {
         if(!this.isUserIdValid(userId)) {
+            throw new Error("Invalid UserId");
             return false;
         }
 
         if(username === undefined || username === "" || username.length > 20 || username.length < 4) {
+            throw new Error("Invalid Username");
             return false;
         }
 
         if(firstname === undefined || firstname === "" || firstname.length > 20 || firstname.length < 1) {
+            throw new Error("Invalid Firstname");
             return false;
         }
 
         if(lastname === undefined || lastname === "" || lastname.length > 20 || lastname.length < 1) {
+            throw new Error("Invalid Lastname");
             return false;
         }
 
         if(birthdate === undefined || !this.validateBirthdate(birthdate)) {
+            throw new Error("Invalid Birthdate");
             return false;
         }
 
         if(permissions === undefined || permissions < 0) {
+            throw new Error("Invalid Permissions");
             return false;
         }
 
         if(department === undefined || department === "" || !this.validateDepartment(department)) {
+            throw new Error("Invalid Department");
             return false;
         }
 
@@ -78,8 +88,7 @@ export class ValUser {
     }
 
     private static isEmailValid(email: string): boolean {
-        const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return pattern.test(email);
+        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
     }
 
     private static isClassValid(clazz: string):boolean {
@@ -177,5 +186,22 @@ export class ValMessage {
         const forbiddenWords: string[] = ["admin", "moderator", "user", "root", "guest", "login", "register", "password", "username", "firstname", "lastname", "email", "birthdate", "permissions"];
 
         return forbiddenWords.some(word => message.toLowerCase().includes(word));
+    }
+}
+
+export class EndPoints {
+    static getToken(authHeader: any): TokenUser | null {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        const decodedToken: KeycloakTokenParsed = jwt.decode(token) as KeycloakTokenParsed;
+        if (!decodedToken) {
+            return null;
+        }
+
+        return new TokenUser(decodedToken);
     }
 }

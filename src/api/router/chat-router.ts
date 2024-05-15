@@ -1,5 +1,6 @@
 import express from "express";
 import {Utility} from "../db/utility";
+import {EndPoints} from "../db/validation";
 
 const chatRouter = express.Router();
 
@@ -8,47 +9,100 @@ export function createChatEndpoints() {
     /* region Chat */
 
     chatRouter.post('/chats', async (req, res) => {
-        const {userId, otherUserId} = req.body;
+        try {
+            const {userId, otherUserId} = req.body;
 
-        if(await Utility.addDirectChat(userId, otherUserId)) {
-            res.status(200).send("Chat added");
-        } else {
-            res.status(400).send("Chat not added");
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if(await Utility.addDirectChat(userId, otherUserId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     chatRouter.get('/chats/:userId/:otherUserId', async (req, res) => {
-        const userId = req.params.userId;
-        const otherUserId = req.params.otherUserId;
+        try {
+            const userId = req.params.userId;
+            const otherUserId = req.params.otherUserId;
 
-        const chat = await Utility.getDirectChat(userId, otherUserId);
+            const authHeader = req.headers.authorization;
 
-        if(chat !== null) {
-            res.status(200).send(chat);
-        } else {
-            res.status(400).send("Chat not found");
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const chat = await Utility.getDirectChat(userId, otherUserId);
+
+            if (chat !== null) {
+                res.status(200).send(chat);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     chatRouter.get('/chats/:userId', async (req, res) => {
-        const userId = req.params.userId;
+        try {
+            const userId = req.params.userId;
 
-        const chats = await Utility.getDirectChats(userId);
+            const authHeader = req.headers.authorization;
 
-        if(chats !== null) {
-            res.status(200).send(chats);
-        } else {
-            res.status(400).send("Chats not found");
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const chats = await Utility.getDirectChats(userId);
+
+            if (chats !== null) {
+                res.status(200).send(chats);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     chatRouter.delete('/chats/:userId/:otherUserId', async (req, res) => {
-        const userId = req.params.userId;
-        const otherUserId = req.params.otherUserId;
-        if(await Utility.deleteDirectChat(userId, otherUserId)) {
-            res.status(200).send("Chat deleted");
-        } else {
-            res.status(400).send("Chat not deleted");
+        try {
+            const userId = req.params.userId;
+            const otherUserId = req.params.otherUserId;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if (await Utility.deleteDirectChat(userId, otherUserId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
@@ -57,66 +111,100 @@ export function createChatEndpoints() {
     /* region Message */
 
     chatRouter.post('/messages', async (req, res) => {
-        const {chatId, userId, message} = req.body;
+        try {
+            const {chatId, userId, message} = req.body;
 
-        if(await Utility.addMessage(chatId, userId, message)) {
-            res.status(200).send("Message added");
-        } else {
-            res.status(400).send("Message not added");
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if (await Utility.addMessage(chatId, userId, message)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     chatRouter.get('/messages/:chatId', async (req, res) => {
-        const chatId = req.params.chatId;
+        try {
+            const chatId = parseInt(req.params.chatId);
 
-        const id = parseInt(chatId);
+            const authHeader = req.headers.authorization;
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid chat id");
-            return;
-        }
+            const tokenUser = EndPoints.getToken(authHeader);
 
-        const messages = await Utility.getMessages(id);
+            if (tokenUser === null || isNaN(chatId)) {
+                res.sendStatus(400);
+                return;
+            }
 
-        if(messages !== null) {
-            res.status(200).send(messages);
-        } else {
-            res.status(400).send("Messages not found");
+            const messages = await Utility.getMessages(chatId);
+
+            if (messages !== null) {
+                res.status(200).send(messages);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
-    chatRouter.put('/messages', async (req, res) => {
-        const {messageId, chatId, userId, message} = req.body;
+    chatRouter.put('/messages/:chatId/:messageId', async (req, res) => {
+        try {
+            const messageId = parseInt(req.params.messageId);
+            const chatId = parseInt(req.params.chatId);
 
-        const id = parseInt(messageId);
+            const {userId, message} = req.body;
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid message id");
-            return;
-        }
+            const authHeader = req.headers.authorization;
 
-        if(await Utility.updateMessage(messageId, chatId, userId, message)) {
-            res.status(200).send("Message updated");
-        } else {
-            res.status(400).send("Message not updated");
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(messageId) || isNaN(chatId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if (await Utility.updateMessage(messageId, chatId, userId, message)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     chatRouter.delete('/messages/:userId/:messageId', async (req, res) => {
-        const userId = req.params.userId;
-        const messageId = req.params.messageId;
-        
-        const id = parseInt(messageId);
+        try {
+            const userId = req.params.userId;
+            const messageId = parseInt(req.params.messageId);
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid message id");
-            return;
-        }
+            const authHeader = req.headers.authorization;
 
-        if(await Utility.deleteMessage(userId, id)) {
-            res.status(200).send("Message deleted");
-        } else {
-            res.status(400).send("Message not deleted");
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(messageId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if(await Utility.deleteMessage(userId, messageId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
