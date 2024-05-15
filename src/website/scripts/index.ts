@@ -2,7 +2,7 @@ import {initKeycloak, keycloak} from "./keycloak";
 
 initKeycloak().then((authenticated) => {
     if (authenticated){
-        location.href = "home.html";
+        location.href = "home1.html";
     }
 });
 document.addEventListener("DOMContentLoaded", () => {

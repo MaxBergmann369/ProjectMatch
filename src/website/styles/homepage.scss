@@ -24,6 +24,7 @@
 
 :root{
   --rounded: 2rem;
+  font-family: 'Carlito', sans-serif;
 }
 
 .topRow {
@@ -84,8 +85,8 @@
 
 .center{
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -96,48 +97,51 @@
 }
 
 html,
-/*body {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}*/
+  /*body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }*/
 
 body {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
+  //display: flex;
+  //justify-content: space-evenly;
+  //align-items: center;
 }
 
 #swiper {
   height: 70vh;
   aspect-ratio: 2 / 3;
-  perspective: 1000px;
+  perspective: 50rem;
   perspective-origin: center 50%;
   transform-style: preserve-3d;
   position: relative;
 }
 
 .card {
+  padding: 1rem 3rem;
+  text-align: center;
   width: 100%;
   height: 100%;
   position: absolute;
-  border-radius: 20px;
+  border-radius: var(--rounded);
   overflow: hidden;
   transform: translateZ(calc(-30px * var(--i)));
   filter: drop-shadow(2px 2px 20px rgba(0, 0, 0, 0.5));
   cursor: pointer;
   user-select: none;
   transition: transform 0.5s;
+  background-color: white;
+  img {
+    margin-top: 1rem;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: 50% 50%;
+  }
 }
 
-.card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 50%;
-}
-
-/*#like,
+#like,
 #dislike {
   font-size: 16vh;
   border-radius: 50%;
@@ -148,10 +152,10 @@ body {
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
   animation-fill-mode: both;
-  /* don't run animation at the beginning
+  /* don't run animation at the beginning*/
   animation-play-state: paused;
 }
-*/
+
 
 #like.trigger,
 #dislike.trigger {
@@ -184,5 +188,6 @@ body {
 
 .projectView{
   width: 100%;
-  margin-top: 30%;
+  height: 100vh;
+  overflow: hidden;
 }

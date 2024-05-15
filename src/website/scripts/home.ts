@@ -3,6 +3,7 @@ import {initKeycloak, keycloak} from "./keycloak";
 import {Role, User} from "../../models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
+
 const authenticatedPromise = initKeycloak();
 
 document.addEventListener("DOMContentLoaded", async function () {
