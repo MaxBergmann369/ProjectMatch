@@ -1,5 +1,4 @@
 import { Card } from './card';
-
 document.addEventListener("DOMContentLoaded", function() {
     // DOM
     const swiper = document.querySelector('#swiper');
@@ -7,13 +6,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const dislike = document.querySelector('#dislike') as HTMLElement;
 
 // constants
-    const urls = [
-        'https://source.unsplash.com/random/1000x1000/?sky',
-        'https://source.unsplash.com/random/1000x1000/?landscape',
-        'https://source.unsplash.com/random/1000x1000/?ocean',
-        'https://source.unsplash.com/random/1000x1000/?moutain',
-        'https://source.unsplash.com/random/1000x1000/?forest'
-    ];
+    const urls = [];
+
+    addImagesFromBgFolder();
+    function addImagesFromBgFolder() {
+        for (let i = 1; i <= 34; i++) {
+            urls.push(`./resources/project/backgrounds/bg${i}.jpg`);
+        }
+    }
 
 // variables
     let cardCount = 0;
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
 // functions
     function appendNewCard() {
         const card = new Card({
-            imageUrl: urls[cardCount % 5],
+            imageUrl: urls[cardCount % urls.length],
             onDismiss: appendNewCard,
             onLike: () => {
                 like.style.animationPlayState = 'running';
@@ -41,9 +41,8 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-// first 5 cards
+// first 34 cards
     for (let i = 0; i < 5; i++) {
         appendNewCard();
     }
-
 });

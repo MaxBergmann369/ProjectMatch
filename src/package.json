@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npx ts-node ./app.ts",
     "build": "npx webpack --mode=production  && npx sass website/styles/",
-    "dev": "npx webpack --watch --mode=development && npx sass website/styles/ --watch"
+    "dev": "npx webpack --watch --mode=development && npx sass website/styles/"
   },
   "dependencies": {
     "crypto-browserify": "^3.12.0",
