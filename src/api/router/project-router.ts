@@ -1,87 +1,111 @@
 import express from "express";
 import {Utility} from "../db/utility";
+import {EndPoints} from "../db/validation";
 
 const projectRouter = express.Router();
 
 export function createProjectEndpoints() {
 
     /* region Project */
-
     projectRouter.post('/projects', async (req, res) => {
-        const {name, ownerId, thumbnail, description, links, maxMembers} = req.body;
+        try {
+            const {name, ownerId, thumbnail, description, links, maxMembers} = req.body;
 
-        if(await Utility.addProject(name, ownerId, thumbnail, description, links, maxMembers)) {
-            res.status(200).send("Project added");
-        } else {
-            res.status(400).send("Project not added");
+            if (await Utility.addProject(name, ownerId, thumbnail, description, links, maxMembers)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.get('/projects/:projId', async (req, res) => {
-        const id = parseInt(req.params.projId);
+        try {
+            const id = parseInt(req.params.projId);
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+            if (isNaN(id)) {
+                res.sendStatus(400);
+                return;
+            }
 
-        const project = await Utility.getProject(id);
+            const project = await Utility.getProject(id);
 
-        if(project !== null) {
-            res.status(200).send(project);
-        } else {
-            res.status(400).send("Project not found");
+            if (project !== null) {
+                res.status(200).send(project);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400)
         }
     });
 
     projectRouter.get('/projects', async (req, res) => {
-        const projects = await Utility.getProjects();
+        try {
+            const projects = await Utility.getProjects();
 
-        if(projects !== null) {
-            //TODO: algorithm
-            res.status(200).send(projects);
-        } else {
-            res.status(400).send("Projects not found");
+            if (projects !== null) {
+                //TODO: algorithm
+                res.status(200).send(projects);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
-    projectRouter.get('/projects/:userId', async (req, res) => {
-        const userId = req.params.userId;
+    projectRouter.get('/projects/owner/:userId', async (req, res) => {
+        try {
+            const userId = req.params.userId;
 
-        const projects = await Utility.getProjectsWhereUserIsOwner(userId);
+            const projects = await Utility.getProjectsWhereUserIsOwner(userId);
 
-        if(projects !== null) {
-            res.status(200).send(projects);
-        } else {
-            res.status(400).send("Projects not found");
+            if (projects !== null) {
+                res.status(200).send(projects);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.put('/projects', async (req, res) => {
-        const {id, name, ownerId, thumbnail, description, links, maxMembers} = req.body;
+        try {
+            const {id, name, ownerId, thumbnail, description, links, maxMembers} = req.body;
 
-        if(await Utility.updateProject(id, name, ownerId, thumbnail, description, links, maxMembers)) {
-            res.status(200).send("Project updated");
-        } else {
-            res.status(400).send("Project not updated");
+            if (await Utility.updateProject(id, name, ownerId, thumbnail, description, links, maxMembers)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.delete('/projects/:userId/:projId', async (req, res) => {
-        const userId = req.params.userId;
-        const projectId = req.params.projId;
+        try {
+            const userId = req.params.userId;
+            const projectId = req.params.projId;
 
-        const id = parseInt(projectId);
+            const id = parseInt(projectId);
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+            if (isNaN(id)) {
+                res.sendStatus(400);
+                return;
+            }
 
-        if(await Utility.deleteProject(userId, id)) {
-            res.status(200).send("Project deleted");
-        } else {
-            res.status(400).send("Project not deleted");
+            if (await Utility.deleteProject(userId, id)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
@@ -90,80 +114,108 @@ export function createProjectEndpoints() {
     /* region ProjectMember */
 
     projectRouter.post('/projects/:projId/members', async (req, res) => {
-        const {userId} = req.body;
-        const projectId = parseInt(req.params.projId);
-        if (isNaN(projectId)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+        try {
+            const {userId} = req.body;
+            const projectId = parseInt(req.params.projId);
+            if (isNaN(projectId)) {
+                res.sendStatus(400);
+                return;
+            }
 
-        if(await Utility.addProjectMember(projectId, userId)) {
-            res.status(200).send("Project member added");
-        } else {
-            res.status(400).send("Project member not added");
+            if(await Utility.addProjectMember(projectId, userId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.get('/projects/:projId', async (req, res) => {
-        const projectId = req.params.projId;
+        try {
+            const projectId = req.params.projId;
 
-        const id = parseInt(projectId);
+            const id = parseInt(projectId);
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid project id");
-            return;
+            if (isNaN(id)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const projectMembers = await Utility.getProjectMembers(id);
+
+            if (projectMembers !== null) {
+                res.status(200).send(projectMembers);
+            } else {
+                res.sendStatus(400);
+            }
         }
-
-        const projectMembers = await Utility.getProjectMembers(id);
-
-        if(projectMembers !== null) {
-            res.status(200).send(projectMembers);
-        } else {
-            res.status(400).send("Project members not found");
+        catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.get('/projects/members/:userId', async (req, res) => {
-        const userId = req.params.userId;
-        const projects = await Utility.getProjectsWhereUserIsMember(userId);
+        try {
+            const userId = req.params.userId;
+            const projects = await Utility.getProjectsWhereUserIsMember(userId);
 
-        if(projects !== null) {
-            res.status(200).send(projects);
-        } else {
-            res.status(400).send("Projects not found");
+            if (projects !== null) {
+                res.status(200).send(projects);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
-    projectRouter.put('/projects/:projId/members', async (req, res) => {
-        const { userId} = req.body;
-        const projectId = parseInt(req.params.projId);
-        if (isNaN(projectId)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+    projectRouter.put('/projects/:projId/members/:userId', async (req, res) => {
+        try {
+            const projectId = parseInt(req.params.projId);
+            const userId = req.params.userId;
 
-        if(await Utility.projectMemberAccepted(projectId, userId)) {
-            res.status(200).send("Project member updated");
-        } else {
-            res.status(400).send("Project member not updated");
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if (await Utility.projectMemberAccepted(projectId, userId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.delete('/projects/:projId/members/:userId', async (req, res) => {
-        const projectId = req.params.projId;
-        const userId = req.params.userId;
+        try {
+            const projectId = parseInt(req.params.projId);
+            const userId = req.params.userId;
 
-        const id = parseInt(projectId);
+            const authHeader = req.headers.authorization;
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+            const tokenUser = EndPoints.getToken(authHeader);
 
-        if(await Utility.deleteProjectMember(id, userId)) {
-            res.status(200).send("Project member deleted");
-        } else {
-            res.status(400).send("Project member not deleted");
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if (await Utility.deleteProjectMember(projectId, userId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
@@ -172,31 +224,52 @@ export function createProjectEndpoints() {
     /* region View */
 
     projectRouter.post('/views', async (req, res) => {
-        const {projectId, userId} = req.body;
+        try {
+            const {projectId, userId} = req.body;
 
-        if(await Utility.addView(projectId, userId)) {
-            res.status(200).send("View added");
-        } else {
-            res.status(400).send("View not added");
+            const id = parseInt(projectId);
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(id)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if (await Utility.addView(id, userId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.get('/views/:projId', async (req, res) => {
-        const projectId = req.params.projId;
+        try {
+            const projectId = parseInt(req.params.projId);
 
-        const id = parseInt(projectId);
+            const authHeader = req.headers.authorization;
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+            const tokenUser = EndPoints.getToken(authHeader);
 
-        const views = await Utility.getViews(id);
+            if (tokenUser === null || isNaN(projectId)) {
+                res.sendStatus(400);
+                return;
+            }
 
-        if(views !== null) {
-            res.status(200).send(views);
-        } else {
-            res.status(400).send("Views not found");
+            const views = await Utility.getViews(projectId);
+
+            if (views !== null) {
+                res.status(200).send(views);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
@@ -205,49 +278,76 @@ export function createProjectEndpoints() {
     /* region Like */
 
     projectRouter.post('/likes', async (req, res) => {
-        const {projectId, userId} = req.body;
+        try {
+            const {projectId, userId} = req.body;
 
-        if(await Utility.addLike(projectId, userId)) {
-            res.status(200).send("Like added");
-        } else {
-            res.status(400).send("Like not added");
+            const id = parseInt(projectId);
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(id)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if(await Utility.addLike(id, userId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.get('/likes/:projId', async (req, res) => {
-        const projectId = req.params.projId;
+        try {
+            const projectId = parseInt(req.params.projId);
 
-        const id = parseInt(projectId);
+            const authHeader = req.headers.authorization;
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+            const tokenUser = EndPoints.getToken(authHeader);
 
-        const likes = await Utility.getLikes(id);
+            if (tokenUser === null || isNaN(projectId)) {
+                res.sendStatus(400);
+                return;
+            }
 
-        if(likes !== null) {
-            res.status(200).send(likes);
-        } else {
-            res.status(400).send("Likes not found");
+            const likes = await Utility.getLikes(projectId);
+
+            if (likes !== null) {
+                res.status(200).send(likes);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.delete('/likes/:projId/:userId', async (req, res) => {
-        const projectId = req.params.projId;
-        const userId = req.params.userId;
+        try {
+            const projectId = parseInt(req.params.projId);
+            const userId = req.params.userId;
 
-        const id = parseInt(projectId);
+            const authHeader = req.headers.authorization;
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+            const tokenUser = EndPoints.getToken(authHeader);
 
-        if(await Utility.deleteLike(id, userId)) {
-            res.status(200).send("Like deleted");
-        } else {
-            res.status(400).send("Like not deleted");
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if(await Utility.deleteLike(projectId, userId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
@@ -256,60 +356,75 @@ export function createProjectEndpoints() {
     /* region projectAbility */
 
     projectRouter.post('/projects/:projId/abilities', async (req, res) => {
-        const { abilityId} = req.body
-        const projectId = parseInt(req.params.projId);
-        if (isNaN(projectId)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+        try {
+            const {abilityId} = req.body
+            const projectId = parseInt(req.params.projId);
 
-        if(await Utility.addProjectAbility(projectId, abilityId)) {
-            res.status(200).send("Project ability added");
-        } else {
-            res.status(400).send("Project ability not added");
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || isNaN(projectId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if (await Utility.addProjectAbility(projectId, abilityId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.get('/projects/:projId/abilities', async (req, res) => {
-        const projectId = req.params.projId;
+        try {
+            const projectId = parseInt(req.params.projId);
 
-        const id = parseInt(projectId);
+            const authHeader = req.headers.authorization;
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+            const tokenUser = EndPoints.getToken(authHeader);
 
-        const projectAbilities = await Utility.getAbilitiesByProjectId(id);
+            if (tokenUser === null || isNaN(projectId)) {
+                res.sendStatus(400);
+                return;
+            }
 
-        if(projectAbilities !== null) {
-            res.status(200).send(projectAbilities);
-        } else {
-            res.status(400).send("Project abilities not found");
+            const projectAbilities = await Utility.getAbilitiesByProjectId(projectId);
+
+            if(projectAbilities !== null) {
+                res.status(200).send(projectAbilities);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 
     projectRouter.delete('/projects/:projId/abilities/:abilityId', async (req, res) => {
-        const projectId = req.params.projId;
-        const abilityId = req.params.abilityId;
+        try {
+            const projectId = parseInt(req.params.projId);
+            const abilityId = parseInt(req.params.abilityId);
 
-        const id = parseInt(projectId);
-        const abId = parseInt(abilityId);
+            const authHeader = req.headers.authorization;
 
-        if(isNaN(id)) {
-            res.status(400).send("Invalid project id");
-            return;
-        }
+            const tokenUser = EndPoints.getToken(authHeader);
 
-        if(isNaN(abId)) {
-            res.status(400).send("Invalid ability id");
-            return;
-        }
+            if (tokenUser === null || isNaN(projectId) || isNaN(abilityId)) {
+                res.sendStatus(400);
+                return;
+            }
 
-        if(await Utility.deleteAbilityFromProject(id, abId)) {
-            res.status(200).send("Project ability deleted");
-        } else {
-            res.status(400).send("Project ability not deleted");
+            if (await Utility.deleteAbilityFromProject(projectId, abilityId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
         }
     });
 

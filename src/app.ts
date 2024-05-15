@@ -1,6 +1,7 @@
 import {Database} from './api/db/db';
 import http from "http";
 import express from 'express';
+import cors from 'cors';
 import session from 'express-session';
 import Keycloak from 'keycloak-connect';
 import {createUserEndpoints} from "./api/router/user-router";
@@ -30,6 +31,7 @@ app.get('/logout', keycloak.protect(), (req: any, res) => {
 
 
 app.use(express.json());
+app.use(cors());
 
 const userRouter = createUserEndpoints();
 const projectRouter = createProjectEndpoints();
@@ -49,5 +51,5 @@ Database.createTables();
 Database.initData();
 
 server.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
+    console.log(`Server listening on port http://localhost:${port}`);
 });

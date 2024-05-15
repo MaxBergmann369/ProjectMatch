@@ -1,5 +1,29 @@
 import { Card } from './card';
-document.addEventListener("DOMContentLoaded", function() {
+import {initKeycloak, keycloak} from "./keycloak";
+import {Role, User} from "../../models";
+import {TokenUser} from "./tokenUser";
+import {HttpClient} from "./server-client";
+const authenticatedPromise = initKeycloak();
+
+document.addEventListener("DOMContentLoaded", async function () {
+    const authenticated = await authenticatedPromise;
+    if (authenticated) {
+        const client = new HttpClient();
+        console.log("User is authenticated");
+        const user = new TokenUser(keycloak.tokenParsed);
+
+
+        const user1: User | null = await client.getUser(user.userId);
+
+        if(user1 === null) {
+            location.href = "register.html";
+        }
+    }
+    else {
+        console.log("User is not authenticated");
+        location.href = "index.html";
+    }
+
     // DOM
     const swiper = document.querySelector('#swiper');
     const like = document.querySelector('#like') as HTMLElement;

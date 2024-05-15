@@ -1,0 +1,35 @@
+form{
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+h1{
+    text-align: center;
+
+}
+
+#abilities{
+  border: 1px solid black;
+  overflow-y: scroll;
+  height: 50vh;
+}
+
+.ability{
+  border: 1px solid black;
+  padding: 5px;
+  background-color: #ececec;
+  label{
+    user-select: none;
+  }
+  *{
+    cursor: pointer;
+  }
+}
+
+.children {
+  display: none;
+}
+
+
+

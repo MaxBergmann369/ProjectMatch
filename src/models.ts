@@ -26,7 +26,7 @@ export interface ProjectMember {
     id: number;
     projectId: number;
     userId: string;
-    IsAccepted: boolean;
+    isAccepted: boolean;
 }
 
 export interface View {
@@ -78,5 +78,22 @@ export interface Message {
     chatId: number;
     userId: string;
     message: string;
-    date: Date;
+    dateTime: string;
+}
+
+export enum Role {
+    Unknown = 0,
+    Student = 1,
+    Teacher = 2,
+    TestUser = 3
+}
+
+export enum Department {
+    Unset = "Unknown",
+    AD = "Abendschule",
+    BG = "Biomedizin- und Gesundheitstechnik",
+    FE = "Fachschule Elektronik",
+    HE = "Höhere Elektronik",
+    IF = "Informatik",
+    IT = "Medientechnik"
 }
