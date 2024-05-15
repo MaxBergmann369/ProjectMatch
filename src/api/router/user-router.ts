@@ -159,7 +159,7 @@ export function createUserEndpoints() {
 
     /* region UserAbility */
 
-    userRouter.post('/user/:userId/ability', async (req, res) => {
+    userRouter.post('/user/:userId/abilities', async (req, res) => {
         try {
             const userId = req.params.userId;
             const abilityIds = req.body.abilityId;
@@ -186,7 +186,7 @@ export function createUserEndpoints() {
         }
     });
 
-    userRouter.get('/user/:userId/ability', async (req, res) => {
+    userRouter.get('/user/:userId/abilities', async (req, res) => {
         try {
             const userId = req.params.userId;
 
@@ -211,7 +211,7 @@ export function createUserEndpoints() {
         }
     });
 
-    userRouter.delete('/user/:userId/ability/:abilityId', async (req, res) => {
+    userRouter.delete('/user/:userId/abilities/:abilityId', async (req, res) => {
         try {
             const userId = req.query.userId as string;
             const abilityId = req.query.abilityId as string;

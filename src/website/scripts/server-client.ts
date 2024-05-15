@@ -59,22 +59,22 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async addUserAbility(userId: string, abilityId: number[]) {
-        return await fetch(`${this.baseUrl}/user/${userId}/ability`, {
+    async addUserAbilities(userId: string, abilityIds: number[]) {
+        return await fetch(`${this.baseUrl}/user/${userId}/abilities`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: this.bearer
             },
             body: JSON.stringify({
-                abilityId: abilityId
+                abilityId: abilityIds
             })
         })
-            .then(response => response.text());
+            .then(response => response.ok);
     }
 
     async getUserAbilities(userId: string) {
-        return await fetch(`${this.baseUrl}/user/${userId}/ability`, {
+        return await fetch(`${this.baseUrl}/user/${userId}/abilities`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -84,7 +84,7 @@ export class HttpClient {
     }
 
     async deleteUserAbility(userId: string, abilityId: number) {
-        return await fetch(`${this.baseUrl}/user/${userId}/ability/${abilityId}`, {
+        return await fetch(`${this.baseUrl}/user/${userId}/abilities/${abilityId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer

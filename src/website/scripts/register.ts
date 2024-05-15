@@ -29,7 +29,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const username = data.get("username") as string;
         const birthdate = data.get("birthdate") as string;
         const response = await client.addUser(username, birthdate);
-        if (response) {
+        const abilities = data.getAll("abilities") as string[];
+        const abilitiesIds = abilities.map(ability => parseInt(ability));
+        const abResponse = await client.addUserAbilities(keycloak.tokenParsed.preferred_username, abilitiesIds);
+        if (response && abResponse) {
             location.href = "home.html";
         } else {
             console.error("Failed to register user");
@@ -84,8 +87,14 @@ async function renderAbilities() {
                 const id = parseInt((event.target as HTMLInputElement).id.split("_")[1]);
                 const checked = (event.target as HTMLInputElement).checked;
                 const children = document.getElementById(`children_${id}`);
+                if (!children) {
+                    return;
+                }
                 (children as HTMLElement).style.display = checked ? "block" : "none";
                 const childrenChildren = children.children;
+                if (!childrenChildren || childrenChildren.length === 0) {
+                    return;
+                }
                 if (checked) {
                     for (let i = 0; i < childrenChildren.length; i++) {
                         const child = childrenChildren.item(i);
