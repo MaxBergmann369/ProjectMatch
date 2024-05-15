@@ -60,7 +60,7 @@ async function renderAbilities() {
 
         const renderAbility = (ability: Ability, depth: number) => {
             html += `
-            <div class="ability" style="margin-left: ${depth * 20}px;">
+            <div class="ability" style="margin-left: ${depth}rem;">
                 <input type="checkbox" id="ability_${ability.id}" name="abilities" value="${ability.id}">
                 <label for="ability_${ability.id}">${ability.name}</label>
             </div>

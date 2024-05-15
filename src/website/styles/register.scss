@@ -15,6 +15,12 @@ form{
   border: 1px solid black;
   padding: 5px;
   background-color: #ececec;
+  label{
+    user-select: none;
+  }
+  *{
+    cursor: pointer;
+  }
 }
 
 .children {
