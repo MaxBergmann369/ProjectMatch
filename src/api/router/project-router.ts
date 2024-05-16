@@ -122,7 +122,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if(await Utility.addProjectMember(projectId, userId)) {
+            if(await Utility.addMemberRequest(projectId, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);

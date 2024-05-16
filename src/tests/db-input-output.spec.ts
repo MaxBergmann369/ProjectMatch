@@ -25,11 +25,6 @@ describe('database-test-user', () => {
         permissions: 1,
         department: "Informatik"
     };
-  
-    const ifId: string = 'if210053';
-    const ifId2: string = 'if210063';
-    const ifId3: string = 'if123456';
-    const date: Date = new Date(new Date().getFullYear() - 11, 0, 1);
 
     const userIt: User = {
         userId: itId1,
@@ -253,7 +248,7 @@ describe('database-test-user', () => {
     });
 
     test('add-user-valid', async() => {
-        await deleteUser(user.userId, true);
+        await deleteUser(userIf.userId, true);
         await deleteUser(ifId2, true);
   
         await Utility.addUser(userIf.userId, userIf.username, userIf.firstname, userIf.lastname,userIf.email, userIf.clazz, userIf.birthdate, userIf.biografie, userIf.permissions, userIf.department);
@@ -1002,12 +997,12 @@ describe('database-test-project', () => {
     /* region addProjectMember */
 
     test('add-project-member-invalid-projectId', async() => {
-        const success = await Utility.addProjectMember(0, ifId);
+        const success = await Utility.addMemberRequest(0, ifId);
         expect(success).toBeFalsy();
     });
 
     test('add-project-member-invalid-userId', async() => {
-        const success = await Utility.addProjectMember(1, '');
+        const success = await Utility.addMemberRequest(1, '');
         await Utility.deleteProjectMember(1, '');
         expect(success).toBeFalsy();
     });
@@ -1018,7 +1013,7 @@ describe('database-test-project', () => {
 
         const projectId = await Utility.getProjectId(project.name, project.ownerId);
 
-        const success = await Utility.addProjectMember(projectId, ifId);
+        const success = await Utility.addMemberRequest(projectId, ifId);
         await Utility.deleteProjectMember(projectId, ifId);
         await deleteProjectByName(project.name, project.ownerId);
         await Utility.deleteUser(ifId);
@@ -1049,7 +1044,7 @@ describe('database-test-project', () => {
 
         const projectId = await Utility.getProjectId(project.name, project.ownerId);
 
-        await Utility.addProjectMember(projectId, ifId);
+        await Utility.addMemberRequest(projectId, ifId);
 
         const success = await Utility.getPendingRequests(projectId);
 
@@ -1057,7 +1052,7 @@ describe('database-test-project', () => {
 
         await Utility.addUser(ifId2, 'someone', 'Alin', 'Jasic', 'test@test.at', '3BHIF', new Date(new Date().getFullYear() - 13, 0, 1), 'HOI', 0, 'Informatik');
 
-        await Utility.addProjectMember(projectId, ifId2);
+        await Utility.addMemberRequest(projectId, ifId2);
 
         const success1 = await Utility.getPendingRequests(projectId);
 
@@ -1186,9 +1181,9 @@ describe('database-test-project', () => {
         const projectId2 = await Utility.getProjectId('test2', project.ownerId);
         const projectId3 = await Utility.getProjectId('test3', ifId2);
 
-        await Utility.addProjectMember(projectId1, ifId2);
-        await Utility.addProjectMember(projectId2, ifId2);
-        await Utility.addProjectMember(projectId3, ifId2);
+        await Utility.addMemberRequest(projectId1, ifId2);
+        await Utility.addMemberRequest(projectId2, ifId2);
+        await Utility.addMemberRequest(projectId3, ifId2);
 
         const projects1 = await Utility.getProjectsWhereUserIsMember(ifId2);
 
