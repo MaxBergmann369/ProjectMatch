@@ -29,8 +29,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const swiper = document.querySelector('#swiper');
     const like = document.querySelector('#like') as HTMLElement;
     const dislike = document.querySelector('#dislike') as HTMLElement;
-
-// constants
+    // constants
     const urls = [];
 
     addImagesFromBgFolder();
@@ -51,6 +50,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             onLike: () => {
                 like.style.animationPlayState = 'running';
                 like.classList.toggle('trigger');
+                onLike();
             },
             onDislike: () => {
                 dislike.style.animationPlayState = 'running';
@@ -70,4 +70,31 @@ document.addEventListener("DOMContentLoaded", async function () {
     for (let i = 0; i < 5; i++) {
         appendNewCard();
     }
+
+    document.addEventListener('keyup', (e:KeyboardEvent) => {
+        console.log(e.key);
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        const topCard = swiper.getElementsByClassName('card')[0];
+        if (topCard.classList.contains('dismissing')) return;
+        const event = new CustomEvent('dismiss', {
+            detail: {
+                direction: e.key === 'ArrowLeft' ? -1 : 1
+            }
+        });
+        // get top card
+
+        (topCard as HTMLElement).style.animationFillMode = 'forwards';
+        topCard.animate([
+            {transform: 'translateX(0) rotate(0)'},
+            {transform: `translateX(${e.key === 'ArrowLeft' ? -100 : 100}vw) rotate(${e.key === 'ArrowLeft' ? -90 : 90}deg)`}
+        ], {
+            duration: 1250,
+            easing: "ease"
+        });
+        topCard.dispatchEvent(event);
+    });
 });
+
+function onLike() {
+    console.log('like');
+}

@@ -15,69 +15,58 @@ export class Card {
         this.onDismiss = onDismiss;
         this.onLike = onLike;
         this.onDislike = onDislike;
-        this.#init();
+        this.init();
     }
 
     // private properties
-    #startPoint;
-    #offsetX;
-    #offsetY;
+    private startPoint : { x: number, y: number };
+    private offsetX : number;
+    private offsetY : number;
 
-    #isTouchDevice = () => {
+    private isTouchDevice = () => {
         return (('ontouchstart' in window) ||
             (navigator.maxTouchPoints > 0));
     }
 
-    #init = () => {
-        const card = document.createElement('div');
-        card.classList.add('card');
-        const title = document.createElement('h2');
-        title.textContent = 'Interesting Project Title';
-        const img = document.createElement('img');
-        img.src = this.imageUrl;
-        const desc = document.createElement('p');
-        desc.textContent = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
-        const tags = document.createElement('div');
-        tags.classList.add('tags');
-        ['CSS', 'JavaScript', 'HTML'].forEach(tag => {
-            const span = document.createElement('span');
-            span.textContent = tag;
-            tags.append(span);
-        });
-        card.append(title);
-        card.append(img);
-        card.append(desc);
-        this.element = card;
-        if (this.#isTouchDevice()) {
-            this.#listenToTouchEvents();
+    private init = () => {
+        // add keypress event listener for a and d for like and dislike without it triggering periodically
+
+        this.element = this.createCardElement();
+        if (this.isTouchDevice()) {
+            this.listenToTouchEvents();
         } else {
-            this.#listenToMouseEvents();
+            this.listenToMouseEvents();
         }
+        this.element.addEventListener('dismiss', (e:CustomEvent) => {
+
+            this.dismiss(e.detail.direction, false);
+        });
+
     }
 
-    #listenToTouchEvents = () => {
+    private listenToTouchEvents = () => {
         this.element.addEventListener('touchstart', (e) => {
             const touch = e.changedTouches[0];
             if (!touch) return;
             const { clientX, clientY } = touch;
-            this.#startPoint = { x: clientX, y: clientY }
-            document.addEventListener('touchmove', this.#handleTouchMove);
+            this.startPoint = { x: clientX, y: clientY }
+            document.addEventListener('touchmove', this.handleTouchMove);
             this.element.style.transition = 'transform 0s';
         });
 
-        document.addEventListener('touchend', this.#handleTouchEnd);
-        document.addEventListener('cancel', this.#handleTouchEnd);
+        document.addEventListener('touchend', this.handleTouchEnd);
+        document.addEventListener('cancel', this.handleTouchEnd);
     }
 
-    #listenToMouseEvents = () => {
+    private listenToMouseEvents = () => {
         this.element.addEventListener('mousedown', (e) => {
             const { clientX, clientY } = e;
-            this.#startPoint = { x: clientX, y: clientY }
-            document.addEventListener('mousemove', this.#handleMouseMove);
+            this.startPoint = { x: clientX, y: clientY }
+            document.addEventListener('mousemove', this.handleMouseMove);
             this.element.style.transition = 'transform 0s';
         });
 
-        document.addEventListener('mouseup', this.#handleMoveUp);
+        document.addEventListener('mouseup', this.handleMoveUp);
 
         // prevent card from being dragged
         this.element.addEventListener('dragstart', (e) => {
@@ -85,58 +74,66 @@ export class Card {
         });
     }
 
-    #handleMove = (x, y) => {
-        this.#offsetX = x - this.#startPoint.x;
-        this.#offsetY = y - this.#startPoint.y;
-        const rotate = this.#offsetX * 0.1;
-        this.element.style.transform = `translate(${this.#offsetX}px, ${this.#offsetY}px) rotate(${rotate}deg)`;
+    private handleMove = (x:number, y:number) => {
+        this.offsetX = x - this.startPoint.x;
+        this.offsetY = y - this.startPoint.y;
+        const rotate = this.offsetX * 0.1;
+        this.element.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px) rotate(${rotate}deg)`;
         // dismiss card
-        if (Math.abs(this.#offsetX) > this.element.clientWidth * 0.7) {
-            this.#dismiss(this.#offsetX > 0 ? 1 : -1);
+        if (Math.abs(this.offsetX) > this.element.clientWidth * 0.7) {
+            this.dismiss(this.offsetX > 0 ? 1 : -1, true);
         }
     }
 
     // mouse event handlers
-    #handleMouseMove = (e) => {
+    private handleMouseMove = (e:MouseEvent) => {
         e.preventDefault();
-        if (!this.#startPoint) return;
+        if (!this.startPoint) return;
         const { clientX, clientY } = e;
-        this.#handleMove(clientX, clientY);
+        this.handleMove(clientX, clientY);
     }
 
-    #handleMoveUp = () => {
-        this.#startPoint = null;
-        document.removeEventListener('mousemove', this.#handleMouseMove);
+    private handleMoveUp = () => {
+        this.startPoint = null;
+        document.removeEventListener('mousemove', this.handleMouseMove);
         this.element.style.transform = '';
     }
 
     // touch event handlers
-    #handleTouchMove = (e) => {
-        if (!this.#startPoint) return;
+    private handleTouchMove = (e:TouchEvent) => {
+        if (!this.startPoint) return;
         const touch = e.changedTouches[0];
         if (!touch) return;
         const { clientX, clientY } = touch;
-        this.#handleMove(clientX, clientY);
+        this.handleMove(clientX, clientY);
     }
 
-    #handleTouchEnd = () => {
-        this.#startPoint = null;
-        document.removeEventListener('touchmove', this.#handleTouchMove);
+    private handleTouchEnd = () => {
+        this.startPoint = null;
+        document.removeEventListener('touchmove', this.handleTouchMove);
         this.element.style.transform = '';
     }
 
-    #dismiss = (direction) => {
-        this.#startPoint = null;
-        document.removeEventListener('mouseup', this.#handleMoveUp);
-        document.removeEventListener('mousemove', this.#handleMouseMove);
-        document.removeEventListener('touchend', this.#handleTouchEnd);
-        document.removeEventListener('touchmove', this.#handleTouchMove);
-        this.element.style.transition = 'transform 1s';
-        this.element.style.transform = `translate(${direction * window.innerWidth}px, ${this.#offsetY}px) rotate(${90 * direction}deg)`;
-        this.element.classList.add('dismissing');
-        setTimeout(() => {
-            this.element.remove();
-        }, 1000);
+    public dismiss = (direction:number, animation:boolean) => {
+        this.startPoint = null;
+        document.removeEventListener('mouseup', this.handleMoveUp);
+        document.removeEventListener('mousemove', this.handleMouseMove);
+        document.removeEventListener('touchend', this.handleTouchEnd);
+        document.removeEventListener('touchmove', this.handleTouchMove);
+        if (animation) {
+            this.element.style.transition = 'transform 1s';
+            this.element.style.transform = `translate(${direction * window.innerWidth}px, ${this.offsetY}px) rotate(${90 * direction}deg)`;
+            this.element.classList.add('dismissing');
+            setTimeout(() => {
+                this.element.remove();
+            }, 1000);
+        }
+        else{
+            this.element.classList.add('dismissing');
+            setTimeout(() => {
+                this.element.remove();
+            }, 1000);
+        }
         if (typeof this.onDismiss === 'function') {
             this.onDismiss();
         }
@@ -146,5 +143,52 @@ export class Card {
         if (typeof this.onDislike === 'function' && direction === -1) {
             this.onDislike();
         }
+    }
+    
+    private createCardElement = () => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.style.backgroundImage = `url(${this.imageUrl})`;
+        const title = document.createElement('div');
+        title.classList.add('title');
+        const h2 = document.createElement('h2');
+        h2.textContent = 'Interesting Project Title';
+        title.append(h2);
+        const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-star\"><polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/></svg>";
+        const star = document.createElement('span');
+        star.addEventListener('click', () => {
+            // add active class
+            star.classList.toggle('active');
+        });
+        star.innerHTML = svg;
+        title.append(star);
+        const desc = document.createElement('p');
+        desc.classList.add('desc');
+        desc.textContent = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' +
+            ' Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ' +
+            'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+            + 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' +
+            'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+        const owner = document.createElement('div');
+        owner.classList.add('owner');
+        const ownerPfp = document.createElement('img');
+        ownerPfp.src = 'https://imgs.search.brave.com/jDiz6N9Qc7I67qoWe7mVB-bQ2kAoxUVD1hu4OwNHzXM/rs:fit:500:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzAxLzY2LzM5LzU0/LzM2MF9GXzE2NjM5/NTQwMl9VY2JhUzVa/NVRqMXJFYk12emhI/UjFVN0RwQ2dDV2Qz/ci5qcGc';
+        ownerPfp.alt = 'Owner Profile Picture';
+        owner.append(ownerPfp);
+        const ownerName = document.createElement('span');
+        ownerName.textContent = 'Owner: Max Mustermann';
+        owner.append(ownerName);
+        const tags = document.createElement('div');
+        tags.classList.add('tags');
+        ['CSS', 'JavaScript', 'HTML'].forEach(tag => {
+            const span = document.createElement('span');
+            span.textContent = tag;
+            tags.append(span);
+        });
+        card.append(title);
+        card.append(desc);
+        card.append(owner);
+        card.append(tags);
+        return card;
     }
 }
