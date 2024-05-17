@@ -86,8 +86,6 @@ async function renderChatProfiles() {
 async function renderChatMessages(id: number) {
     const messages : Message[] = await client.getMessages(id);
 
-    console.log(messages);
-
     const chat = document.getElementById("messageWindow");
 
     let html = "";
@@ -102,11 +100,9 @@ async function renderChatMessages(id: number) {
             const username = await client.getUser(message.userId);
             html += `<div class="own-message">${message.dateTime} ${username.username} : ${message.message}</div>`;
         }
-
-        console.log(html);
-
-        chat.innerHTML = html;
     }
+
+    chat.innerHTML = html;
 }
 
 async function sendMessage(chatId: number, message: string) {
