@@ -24,3 +24,15 @@ body {
 .chat {
   border: 1px solid black;
 }
+
+.input-bar {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 3vh;
+  margin-left: 0.3vw;
+  width: 83%;
+}
+
+#messageInput {
+  width: 83%;
+}

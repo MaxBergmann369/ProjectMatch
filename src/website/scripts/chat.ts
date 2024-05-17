@@ -54,7 +54,7 @@ async function addButtonListener() {
     sendBtn.addEventListener("click", async () => {
         const message = (document.getElementById("messageInput") as HTMLInputElement);
 
-        if(chatId !== -1) {
+        if(chatId !== -1 && message.value !== "") {
             await sendMessage(chatId, message.value);
             message.value = "";
         }
