@@ -381,7 +381,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async addMessage(userId: string, otherUserId: string, message: string) {
+    async addMessage(chatId: number, userId: string, message: string) {
         return await fetch(`${this.baseUrl}/messages`, {
             method: 'POST',
             headers: {
@@ -389,8 +389,8 @@ export class HttpClient {
                 Authorization: this.bearer
             },
             body: JSON.stringify({
+                chatId: chatId,
                 userId: userId,
-                otherUserId: otherUserId,
                 message: message
             })
         })

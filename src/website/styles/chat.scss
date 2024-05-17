@@ -1,0 +1,26 @@
+
+body {
+  height: 100vh;
+  overflow-y: hidden;
+  padding: 3%;
+}
+
+.side-bar {
+  border: 1px solid black;
+  width: 20%;
+  height: 80%;
+  overflow-y: auto;
+  float: left;
+}
+
+.chat-window {
+  border: 1px solid black;
+  width: 79%;
+  height: 80%;
+  overflow-y: auto;
+  float: right;
+}
+
+.chat {
+  border: 1px solid black;
+}

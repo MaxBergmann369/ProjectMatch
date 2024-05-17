@@ -769,7 +769,7 @@ export class Utility {
 
             const chat = await Database.getDirectChatById(chatId);
 
-            if(chat === null || (chat.userId !== id && chat.otherUserId !== id)) {
+            if(chat === null || !(chat.userId === id || chat.otherUserId === id)) {
                 return false;
             }
 

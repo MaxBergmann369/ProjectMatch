@@ -120,7 +120,6 @@ export function createUserEndpoints() {
 
 
         } catch (e) {
-            throw new Error(e);
             res.sendStatus(400);
         }
     });

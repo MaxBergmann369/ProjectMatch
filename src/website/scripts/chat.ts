@@ -1,5 +1,5 @@
 import {initKeycloak, keycloak} from "./keycloak";
-import {User} from "../../models";
+import {DirectChat, Message, User} from "../../models";
 import {HttpClient} from "./server-client";
 import {TokenUser} from "./tokenUser";
 
@@ -7,6 +7,8 @@ const authenticatedPromise = initKeycloak();
 
 let client: HttpClient;
 let user: User | null = null;
+let chats: DirectChat[] = [];
+let chatId: number = -1;
 
 document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await authenticatedPromise;
@@ -21,7 +23,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             location.href = "register.html";
         }
 
-        //await renderChatProfiles();
+        await renderChatProfiles();
+        console.log(chats);
         await addButtonListener();
     }
     else {
@@ -33,7 +36,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function addButtonListener() {
     const chatProfiles = document.getElementsByClassName("chat");
 
-    console.log("trst");
     const addBtn = document.getElementById("addChat");
 
     addBtn.addEventListener("click", async () => {
@@ -47,9 +49,21 @@ async function addButtonListener() {
         }
     });
 
+    const sendBtn = document.getElementById("sendMessage");
+
+    sendBtn.addEventListener("click", async () => {
+        const message = (document.getElementById("messageInput") as HTMLInputElement);
+
+        if(chatId !== -1) {
+            await sendMessage(chatId, message.value);
+            message.value = "";
+        }
+    });
+
     for (let i = 0; i < chatProfiles.length; i++) {
         chatProfiles[i].addEventListener("click", async (event) => {
             const id = parseInt((event.target as HTMLElement).id);
+            chatId = id;
             if(!isNaN(id)) {
                 await renderChatMessages(id);
             }
@@ -58,20 +72,44 @@ async function addButtonListener() {
 }
 
 async function renderChatProfiles() {
-    console.log("trst");
-    const chats = await client.getDirectChats(user.userId);
+    chats = await client.getDirectChats(user.userId);
 
     const list = document.getElementById("chat-list");
 
-    for(const chat of chats) {
-        const chatProfile = document.createElement("li");
-        chatProfile.innerText = chat.user1 === user.userId ? chat.user2 : chat.user1;
-        chatProfile.id = chat.id.toString();
-        chatProfile.classList.add("chat");
-        list.appendChild(chatProfile);
+    for(let i = 0; i < chats.length; i++) {
+        const otherUser = await client.getUser(chats[i].otherUserId);
+        const chatElement = `<div class="chat" id="${i+1}">${otherUser.firstname} ${otherUser.lastname}`;
+        list.innerHTML += chatElement;
     }
 }
 
 async function renderChatMessages(id: number) {
+    const messages : Message[] = await client.getMessages(id);
 
+    console.log(messages);
+
+    const chat = document.getElementById("messageWindow");
+
+    let html = "";
+
+    for(let i = 0; i < messages.length; i++) {
+        const message: Message = messages[i];
+
+        if(message.userId === user.userId) {
+            html += `<div class="own-message">${message.dateTime} ${user.username} : ${message.message}</div>`;
+        }
+        else {
+            const username = await client.getUser(message.userId);
+            html += `<div class="own-message">${message.dateTime} ${username.username} : ${message.message}</div>`;
+        }
+
+        console.log(html);
+
+        chat.innerHTML = html;
+    }
+}
+
+async function sendMessage(chatId: number, message: string) {
+    await client.addMessage(chatId, user.userId, message);
+    await renderChatMessages(chatId);
 }

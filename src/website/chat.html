@@ -4,15 +4,23 @@
     <meta charset="UTF-8">
     <title>Chat - ProjectMatch</title>
     <link rel="stylesheet" href="styles/chat.css">
+    <link rel="stylesheet" href="styles/general.css">
     <script src="scripts/dist/chat.bundle.js"></script>
 </head>
 <body>
-  <div class="side-bar">
+    <div class="nav-bar"></div>
+    <div class="side-bar">
       <input type="text" id="input-bar" placeholder="Add">
       <button id="addChat">Search</button>
       <div id="chat-list">
       </div>
-  </div>
-  <div class="chat-window"></div>
+    </div>
+    <div class="chat-window">
+        <div id="messageWindow"></div>
+        <div class="input-bar">
+            <input type="text" id="messageInput" placeholder="Type a message">
+            <button id="sendMessage">Send</button>
+        </div>
+    </div>
 </body>
 </html>

@@ -71,7 +71,7 @@ export class Database {
             userId TEXT NOT NULL,
             title TEXT NOT NULL,
             text TEXT NOT NULL,
-            date TEXT NOT NULL,
+            dateTime TEXT NOT NULL,
             FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
 
@@ -111,7 +111,7 @@ export class Database {
             chatId INTEGER NOT NULL,
             userId TEXT NOT NULL,
             message TEXT NOT NULL,
-            date TEXT NOT NULL,
+            dateTime TEXT NOT NULL,
             FOREIGN KEY(chatId) REFERENCES DirectChat(id),
             FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
@@ -879,7 +879,7 @@ export class Database {
 
     static async addNotification(userId: string, title: string, text: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Notification (userId, title, text, date) VALUES (?, ?, ?, ?)`, [userId, title, text, date], (err) => {
+            db.run(`INSERT INTO Notification (userId, title, text, dateTime) VALUES (?, ?, ?, ?)`, [userId, title, text, date], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -972,7 +972,7 @@ export class Database {
 
     static async addMessage(chatId: number, userId: string, message: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Message (chatId, userId, message, date) VALUES (?, ?, ?, ?)`, [chatId, userId, message, date], (err) => {
+            db.run(`INSERT INTO Message (chatId, userId, message, dateTime) VALUES (?, ?, ?, ?)`, [chatId, userId, message, date], (err) => {
                 if (err) {
                     reject(err);
                 } else {
