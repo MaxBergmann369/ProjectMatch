@@ -75,10 +75,17 @@ async function renderChatProfiles() {
     chats = await client.getDirectChats(user.userId);
 
     const list = document.getElementById("chat-list");
+    let chatElement: string = "";
 
     for(let i = 0; i < chats.length; i++) {
-        const otherUser = await client.getUser(chats[i].otherUserId);
-        const chatElement = `<div class="chat" id="${i+1}">${otherUser.firstname} ${otherUser.lastname}`;
+        if(chats[i].userId === user.userId) {
+            const otherUser = await client.getUser(chats[i].otherUserId);
+            chatElement = `<div class="chat" id="${i + 1}">${otherUser.firstname} ${otherUser.lastname}`;
+        }
+        else {
+            const otherUser = await client.getUser(chats[i].userId);
+            chatElement = `<div class="chat" id="${i + 1}">${otherUser.firstname} ${otherUser.lastname}`;
+        }
         list.innerHTML += chatElement;
     }
 }
@@ -98,7 +105,7 @@ async function renderChatMessages(id: number) {
         }
         else {
             const username = await client.getUser(message.userId);
-            html += `<div class="own-message">${message.dateTime} ${username.username} : ${message.message}</div>`;
+            html += `<div class="other-message">${message.message} : ${username.username} ${message.dateTime}</div>`;
         }
     }
 

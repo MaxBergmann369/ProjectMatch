@@ -59,7 +59,6 @@ export class Utility {
             return await Database.getUserIdByFullName(firstname, lastname);
         }
         catch (e) {
-            throw new Error(e);
             return null;
         }
     }

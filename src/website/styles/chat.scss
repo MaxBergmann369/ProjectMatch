@@ -2,6 +2,7 @@
 body {
   height: 100vh;
   overflow-y: hidden;
+  overflow-x: hidden;
   padding: 3%;
 }
 
@@ -16,7 +17,7 @@ body {
 .chat-window {
   border: 1px solid black;
   width: 79%;
-  height: 80%;
+  height: 75%;
   overflow-y: auto;
   float: right;
 }
@@ -28,11 +29,29 @@ body {
 .input-bar {
   position: absolute;
   bottom: 0;
-  margin-bottom: 3vh;
+  margin-bottom: 2%;
   margin-left: 0.3vw;
-  width: 83%;
+  width: 85%;
+}
+
+#messageWindow {
+  overflow-y: auto;
 }
 
 #messageInput {
   width: 83%;
+}
+
+.own-message, .other-message {
+  font-size: 2.5vh;
+}
+
+.own-message {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.other-message {
+    display: flex;
+    justify-content: flex-end;
 }
