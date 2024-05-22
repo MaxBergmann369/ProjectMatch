@@ -8,7 +8,7 @@ export class Utility {
     /* region User */
 
     /* region Base */
-    static async addUser(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string,
+    static async addUser(userId: string, username: string, firstname: string, lastname: string, pfp: string, email:string, clazz:string,
                    birthdate: Date, biografie: string, permissions: number, department: string): Promise<boolean> {
         try {
             const id = userId.toLowerCase();
@@ -17,7 +17,7 @@ export class Utility {
                 return false;
             }
 
-            return await Database.addUser(id, username, firstname, lastname, email, clazz, birthdate.toDateString(), biografie, permissions, department);
+            return await Database.addUser(id, username, firstname, lastname, pfp, email, clazz, birthdate.toDateString(), biografie, permissions, department);
         }
         catch (e) {
             return false;
@@ -63,7 +63,7 @@ export class Utility {
         }
     }
 
-    static async updateUser(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string, birthdate: Date, biografie: string, permissions: number, department: string): Promise<boolean> {
+    static async updateUser(userId: string, username: string, firstname: string, lastname: string, pfp:string, email:string, clazz:string, birthdate: Date, biografie: string, permissions: number, department: string): Promise<boolean> {
         try {
             const id = userId.toLowerCase();
 
@@ -71,7 +71,7 @@ export class Utility {
                 return false;
             }
 
-            return await Database.updateUser(id, username, firstname, lastname, email, clazz, birthdate.toDateString(), biografie, permissions, department);
+            return await Database.updateUser(id, username, firstname, lastname, pfp, email, clazz, birthdate.toDateString(), biografie, permissions, department);
         }
         catch (e) {
             return false;

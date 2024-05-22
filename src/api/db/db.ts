@@ -21,6 +21,7 @@ export class Database {
             username TEXT NOT NULL,
             firstname TEXT NOT NULL,
             lastname TEXT NOT NULL,
+            pfp TEXT,
             email TEXT NOT NULL,
             clazz TEXT NOT NULL,
             birthdate TEXT NOT NULL,
@@ -277,6 +278,7 @@ export class Database {
                         username: row.username,
                         firstname: row.firstname,
                         lastname: row.lastname,
+                        pfp: row.pfp,
                         email: row.email,
                         clazz: row.clazz,
                         birthdate: new Date(row.birthdate),
@@ -303,6 +305,7 @@ export class Database {
                         username: row.username,
                         firstname: row.firstname,
                         lastname: row.lastname,
+                        pfp: row.pfp,
                         email: row.email,
                         clazz: row.clazz,
                         birthdate: new Date(row.birthdate),
@@ -816,7 +819,7 @@ export class Database {
 
     //#region InsertDataToDB
 
-    static async addUser(userId: string, username: string, firstname: string, lastname: string, email: string, clazz: string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
+    static async addUser(userId: string, username: string, firstname: string, lastname: string, pfp:string, email: string, clazz: string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO User (userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department], (err) => {
                 if (err) {
@@ -986,7 +989,7 @@ export class Database {
 
     //#region UpdateDataInDB
 
-    static async updateUser(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
+    static async updateUser(userId: string, username: string, firstname: string, lastname: string, pfp:string, email:string, clazz:string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, email = ?, clazz = ?, birthdate = ?, biografie = ?, permissions = ?, department = ? WHERE userId = ?`, [username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department, userId], (err) => {
                 if (err) {
