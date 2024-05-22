@@ -35,12 +35,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const abilities = data.getAll("abilities") as string[];
         const abilitiesIds = abilities.map(ability => parseInt(ability));
 
-        for(const abilityId of abilitiesIds) {
-            const abResponse = await client.addProjectAbility(keycloak.tokenParsed.preferred_username, abilityId);
+        const abResponse = await client.addUserAbilities(keycloak.tokenParsed.preferred_username, abilitiesIds);
 
-            if (!abResponse) {
-                alert("Failed to add ability to project");
-            }
+        if (!abResponse) {
+            alert("Failed to add ability to project");
         }
 
         const projectTitle = data.get("project-title") as string;
