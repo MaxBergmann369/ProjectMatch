@@ -113,6 +113,3 @@ async function renderAbilities() {
     }
 
 }
-
-
-

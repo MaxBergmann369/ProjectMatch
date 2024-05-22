@@ -12,6 +12,7 @@ module.exports = {
         index: "./website/scripts/index.ts",
         home: "./website/scripts/home.ts",
         register: "./website/scripts/register.ts",
+        createProject: "./website/scripts/create-project.ts"
     },
     output: {
         path: path.resolve(__dirname,"website","scripts", "dist"),

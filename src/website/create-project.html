@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CreateProject</title>
+    <link rel="stylesheet" href="styles/general.css">
+    <link rel="stylesheet" href="styles/create-project.css">
+    <script src="scripts/dist/createProject.bundle.js"></script>
+</head>
+<body>
+<div class="nav-bar"></div>
+<label for="abilities">Abilities:</label>
+<form class="create-project">
+
+    <label for="project-name">Description</label>
+    <input type="text" id="project-name" name="project-name" placeholder="Project Title">
+
+    <div id="abilities" class="input">
+      <!-- the script inserts abilities here -->
+    </div>
+
+    <label for="description">Description</label>
+    <input type="text" id="description" name="description" placeholder="Description">
+
+    <label for="max-member">Description</label>
+    <input type="text" id="max-member" name="max-member" placeholder="max-member">
+
+    <div>
+        <label for="link">Add Link</label>
+        <input type="text" id="link" name="link" placeholder="Link">
+
+        <div class="add-link"></div>
+
+        <button id="add-link-button">Add Link</button>
+    </div>
+
+    <div>
+        <p>Add Picture</p>
+
+        <div class="add-pic"></div>
+
+        <button id="add-pic-button">Add Picture</button>
+        <button id="add-randomPic-button">Random</button>
+    </div>
+
+    <button type="submit">Add Project</button>
+</form>
+</body>
+</html>
