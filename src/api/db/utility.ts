@@ -389,7 +389,7 @@ export class Utility {
     /* endregion */
 
     /* region ProjectMember */
-    static async addProjectMember(projectId: number, userId: string): Promise<boolean> {
+    static async addMemberRequest(projectId: number, userId: string): Promise<boolean> {
         try {
             const id = userId.toLowerCase();
 
