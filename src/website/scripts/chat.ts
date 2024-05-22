@@ -24,11 +24,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         await renderChatProfiles();
-        console.log(chats);
         await addButtonListener();
     }
     else {
-        console.log("User is not authenticated");
         location.href = "index.html";
     }
 });
@@ -43,7 +41,7 @@ async function addButtonListener() {
         userFullName = userFullName.replace(" ", "-");
         if(userFullName !== "" ) {
             const userId = await client.getUserId(userFullName);
-            console.log(userId);
+
             await client.addDirectChat(user.userId, userId);
             await renderChatProfiles();
         }
@@ -66,6 +64,7 @@ async function addButtonListener() {
             chatId = id;
             if(!isNaN(id)) {
                 await renderChatMessages(id);
+                scrollToBottom();
             }
         });
     }
@@ -90,22 +89,63 @@ async function renderChatProfiles() {
     }
 }
 
-async function renderChatMessages(id: number) {
-    const messages : Message[] = await client.getMessages(id);
+const chatMessages = new Map<string, string[]>();
+
+async function loadChatMessages(id: number) {
+    const messages: Message[] = await client.getMessages(id);
+
+    for(let i = 0; i < messages.length; i++) {
+        const message = messages[i];
+
+        const data = message.dateTime.split(";");
+
+        let username = user.username;
+
+        if (message.userId !== user.userId) {
+            const user = await client.getUser(message.userId);
+            username = user.username;
+        }
+
+        const time = data[1].split(':').slice(0, 2).join(':');
+
+        const displayMessage = `${message.userId};${time} ${username} : ${message.message}`;
+
+        const recentMessages = chatMessages.get(data[0]) || [];
+
+        if(!recentMessages.includes(displayMessage)) {
+            recentMessages.push(displayMessage);
+        }
+
+        chatMessages.set(data[0], recentMessages);
+    }
+}
+
+async function renderChatMessages(id : number) {
+
+    await loadChatMessages(chatId);
 
     const chat = document.getElementById("messageWindow");
 
     let html = "";
 
-    for(let i = 0; i < messages.length; i++) {
-        const message: Message = messages[i];
+    for (let messageKey of chatMessages.keys()) {
 
-        if(message.userId === user.userId) {
-            html += `<div class="own-message">${message.dateTime} ${user.username} : ${message.message}</div>`;
-        }
-        else {
-            const username = await client.getUser(message.userId);
-            html += `<div class="other-message">${message.message} : ${username.username} ${message.dateTime}</div>`;
+        html += `<div class="date">${messageKey}</div>`;
+
+        const messages = chatMessages.get(messageKey) || [];
+
+        for(let i = 0; i < messages.length; i++) {
+
+            const data = messages[i].split(';');
+
+            const userId: string = data[0];
+            const message: string = data[1];
+
+            if (userId === user.userId) {
+                html += `<div class="own-message">${message}</div>`;
+            } else {
+                html += `<div class="other-message">${message}</div>`;
+            }
         }
     }
 
@@ -115,4 +155,10 @@ async function renderChatMessages(id: number) {
 async function sendMessage(chatId: number, message: string) {
     await client.addMessage(chatId, user.userId, message);
     await renderChatMessages(chatId);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    const chatWindow = document.getElementById("chat-window");
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 }

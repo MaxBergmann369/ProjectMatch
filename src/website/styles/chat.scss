@@ -14,7 +14,7 @@ body {
   float: left;
 }
 
-.chat-window {
+#chat-window {
   border: 1px solid black;
   width: 79%;
   height: 75%;
@@ -34,16 +34,16 @@ body {
   width: 85%;
 }
 
-#messageWindow {
-  overflow-y: auto;
-}
-
 #messageInput {
   width: 83%;
 }
 
-.own-message, .other-message {
+.own-message, .other-message, .date {
   font-size: 2.5vh;
+}
+
+.date {
+  text-align: center;
 }
 
 .own-message {
