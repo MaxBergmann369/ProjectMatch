@@ -8,6 +8,16 @@ export class HttpClient {
 
     /* region User */
 
+    async logout() {
+        return await fetch(`${this.baseUrl}/logout`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.text());
+    }
+
     async addUser(username: string, birthdate: string) {
         return await fetch(`${this.baseUrl}/user`, {
             method: 'POST',

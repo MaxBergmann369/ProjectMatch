@@ -1,28 +1,30 @@
 import { Card } from './card';
 import {initKeycloak, keycloak} from "./keycloak";
-import {Role, User} from "../../models";
+import {Project, User} from "../../models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
+import "./general"; // this tells webpack to include the general.ts file in the bundle
 
 const authenticatedPromise = initKeycloak();
 
 document.addEventListener("DOMContentLoaded", async function () {
     const authenticated = await authenticatedPromise;
-    if (authenticated) {
-        const client = new HttpClient();
-        console.log("User is authenticated");
-        const user = new TokenUser(keycloak.tokenParsed);
-
-
-        const user1: User | null = await client.getUser(user.userId);
-
-        if(user1 === null) {
-            location.href = "register.html";
-        }
-    }
-    else {
+    let client : HttpClient = null;
+    if (!authenticated) {
         console.log("User is not authenticated");
         location.href = "index.html";
+        return;
+    }
+
+    client = new HttpClient();
+    console.log("User is authenticated");
+    const user = new TokenUser(keycloak.tokenParsed);
+
+
+    const user1: User | null = await client.getUser(user.userId);
+
+    if (user1 === null) {
+        location.href = "register.html";
     }
 
     // DOM
@@ -31,31 +33,52 @@ document.addEventListener("DOMContentLoaded", async function () {
     const dislike = document.querySelector('#dislike') as HTMLElement;
     // constants
     const urls = [];
-
-    addImagesFromBgFolder();
-    function addImagesFromBgFolder() {
-        for (let i = 1; i <= 33; i++) {
-            urls.push(`./resources/project/backgrounds/bg${i}.webp`);
-        }
+    const projects = await client.getProjects();
+    console.log(projects);
+    for (let i = 1; i <= 33; i++) {
+        urls.push(`./resources/project/backgrounds/bg${i}.webp`);
     }
 
 // variables
     let cardCount = 0;
 
 // functions
-    function appendNewCard() {
+
+
+
+    async function getNextProject() : Promise<Project> {
+        if (projects.length < 3){
+            projects.push(...await client.getProjects());
+        }
+        return projects.shift();
+    }
+
+    async function appendNewCard() {
+        const project = await getNextProject();
+        const title = project.name;
+        const desc = project.description;
+        const ownerId = project.ownerId;
+        const owner = await client.getUser(ownerId);
+
         const card = new Card({
             imageUrl: urls[cardCount % urls.length],
-            onDismiss: appendNewCard,
+            onDismiss: () =>{
+                client.addView(project.id, user.userId);
+                appendNewCard();
+            },
             onLike: () => {
                 like.style.animationPlayState = 'running';
                 like.classList.toggle('trigger');
-                onLike();
+                client.addProjectMember(project.id, user.userId);
             },
             onDislike: () => {
                 dislike.style.animationPlayState = 'running';
                 dislike.classList.toggle('trigger');
-            }
+            },
+            title:title,
+            desc:desc,
+            owner:owner,
+            tags:["TypeScript", "HTML", "CSS"] // TODO: get tags
         });
         swiper.append(card.element);
         cardCount++;
@@ -94,7 +117,3 @@ document.addEventListener("DOMContentLoaded", async function () {
         topCard.dispatchEvent(event);
     });
 });
-
-function onLike() {
-    console.log('like');
-}

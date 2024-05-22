@@ -1,20 +1,35 @@
+import {User} from "../../models";
+
 export class Card {
     imageUrl: string;
     onDismiss: () => void;
     onLike: () => void;
     onDislike: () => void;
     element: HTMLElement;
+    title: string;
+    desc: string;
+    owner: User;
+    tags: string[];
 
     constructor({
                     imageUrl,
                     onDismiss,
                     onLike,
-                    onDislike
+                    onDislike,
+                    title,
+                    desc,
+                    owner,
+                    tags
                 }) {
         this.imageUrl = imageUrl;
         this.onDismiss = onDismiss;
         this.onLike = onLike;
         this.onDislike = onDislike;
+        this.title = title;
+        this.desc = desc;
+        this.owner = owner;
+        this.tags = tags;
+
         this.init();
     }
 
@@ -26,7 +41,7 @@ export class Card {
     private isTouchDevice = () => {
         return (('ontouchstart' in window) ||
             (navigator.maxTouchPoints > 0));
-    }
+    };
 
     private init = () => {
         // add keypress event listener for a and d for like and dislike without it triggering periodically
@@ -42,7 +57,7 @@ export class Card {
             this.dismiss(e.detail.direction, false);
         });
 
-    }
+    };
 
     private listenToTouchEvents = () => {
         this.element.addEventListener('touchstart', (e) => {
@@ -56,7 +71,7 @@ export class Card {
 
         document.addEventListener('touchend', this.handleTouchEnd);
         document.addEventListener('cancel', this.handleTouchEnd);
-    }
+    };
 
     private listenToMouseEvents = () => {
         this.element.addEventListener('mousedown', (e) => {
@@ -72,7 +87,7 @@ export class Card {
         this.element.addEventListener('dragstart', (e) => {
             e.preventDefault();
         });
-    }
+    };
 
     private handleMove = (x:number, y:number) => {
         this.offsetX = x - this.startPoint.x;
@@ -83,7 +98,7 @@ export class Card {
         if (Math.abs(this.offsetX) > this.element.clientWidth * 0.7) {
             this.dismiss(this.offsetX > 0 ? 1 : -1, true);
         }
-    }
+    };
 
     // mouse event handlers
     private handleMouseMove = (e:MouseEvent) => {
@@ -91,13 +106,13 @@ export class Card {
         if (!this.startPoint) return;
         const { clientX, clientY } = e;
         this.handleMove(clientX, clientY);
-    }
+    };
 
     private handleMoveUp = () => {
         this.startPoint = null;
         document.removeEventListener('mousemove', this.handleMouseMove);
         this.element.style.transform = '';
-    }
+    };
 
     // touch event handlers
     private handleTouchMove = (e:TouchEvent) => {
@@ -106,13 +121,13 @@ export class Card {
         if (!touch) return;
         const { clientX, clientY } = touch;
         this.handleMove(clientX, clientY);
-    }
+    };
 
     private handleTouchEnd = () => {
         this.startPoint = null;
         document.removeEventListener('touchmove', this.handleTouchMove);
         this.element.style.transform = '';
-    }
+    };
 
     public dismiss = (direction:number, animation:boolean) => {
         this.startPoint = null;
@@ -143,7 +158,7 @@ export class Card {
         if (typeof this.onDislike === 'function' && direction === -1) {
             this.onDislike();
         }
-    }
+    };
     
     private createCardElement = () => {
         const card = document.createElement('div');
@@ -152,7 +167,7 @@ export class Card {
         const title = document.createElement('div');
         title.classList.add('title');
         const h2 = document.createElement('h2');
-        h2.textContent = 'Interesting Project Title';
+        h2.textContent = this.title; //'Interesting Project Title';
         title.append(h2);
         const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-star\"><polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/></svg>";
         const star = document.createElement('span');
@@ -164,23 +179,23 @@ export class Card {
         title.append(star);
         const desc = document.createElement('p');
         desc.classList.add('desc');
-        desc.textContent = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' +
+        desc.textContent = this.desc; /*'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' +
             ' Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ' +
             'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
             + 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' +
-            'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+            'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'; */
         const owner = document.createElement('div');
         owner.classList.add('owner');
         const ownerPfp = document.createElement('img');
         ownerPfp.src = 'https://imgs.search.brave.com/jDiz6N9Qc7I67qoWe7mVB-bQ2kAoxUVD1hu4OwNHzXM/rs:fit:500:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzAxLzY2LzM5LzU0/LzM2MF9GXzE2NjM5/NTQwMl9VY2JhUzVa/NVRqMXJFYk12emhI/UjFVN0RwQ2dDV2Qz/ci5qcGc';
-        ownerPfp.alt = 'Owner Profile Picture';
+        ownerPfp.alt = this.owner.username + "'s Profile Picture"; //'Owner Profile Picture';
         owner.append(ownerPfp);
         const ownerName = document.createElement('span');
-        ownerName.textContent = 'Owner: Max Mustermann';
+        ownerName.textContent = 'Owner: ' + this.owner.username; //'Owner: John Doe';
         owner.append(ownerName);
         const tags = document.createElement('div');
         tags.classList.add('tags');
-        ['CSS', 'JavaScript', 'HTML'].forEach(tag => {
+        this.tags.forEach(tag => {
             const span = document.createElement('span');
             span.textContent = tag;
             tags.append(span);
@@ -190,5 +205,5 @@ export class Card {
         card.append(owner);
         card.append(tags);
         return card;
-    }
+    };
 }

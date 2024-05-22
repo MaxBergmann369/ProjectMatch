@@ -397,6 +397,11 @@ export class Utility {
                 return false;
             }
 
+            const members = await this.getProjectMembers(projectId);
+            if (members === null || members.some(member => member.userId === id)) {
+                return false;
+            }
+
             return await Database.addProjectMember(id, projectId);
         }
         catch (e) {
