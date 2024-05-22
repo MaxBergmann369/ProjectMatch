@@ -61,6 +61,11 @@ async function addButtonListener() {
     for (let i = 0; i < chatProfiles.length; i++) {
         chatProfiles[i].addEventListener("click", async (event) => {
             const id = parseInt((event.target as HTMLElement).id);
+
+            if(chatId !== id) {
+                chatMessages.clear();
+            }
+
             chatId = id;
             if(!isNaN(id)) {
                 await renderChatMessages(id);
@@ -79,11 +84,11 @@ async function renderChatProfiles() {
     for(let i = 0; i < chats.length; i++) {
         if(chats[i].userId === user.userId) {
             const otherUser = await client.getUser(chats[i].otherUserId);
-            chatElement = `<div class="chat" id="${i + 1}">${otherUser.firstname} ${otherUser.lastname}`;
+            chatElement = `<div class="chat" id="${chats[i].id}">${otherUser.firstname} ${otherUser.lastname}`;
         }
         else {
             const otherUser = await client.getUser(chats[i].userId);
-            chatElement = `<div class="chat" id="${i + 1}">${otherUser.firstname} ${otherUser.lastname}`;
+            chatElement = `<div class="chat" id="${chats[i].id}">${otherUser.firstname} ${otherUser.lastname}`;
         }
         list.innerHTML += chatElement;
     }
@@ -122,7 +127,7 @@ async function loadChatMessages(id: number) {
 
 async function renderChatMessages(id : number) {
 
-    await loadChatMessages(chatId);
+    await loadChatMessages(id);
 
     const chat = document.getElementById("messageWindow");
 
