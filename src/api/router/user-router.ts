@@ -1,5 +1,5 @@
 import express from "express";
-import {Utility} from "../db/utility";
+import {UserUtility} from "../db/utility/user-utility";;
 import {EndPoints} from "../db/validation";
 
 const userRouter = express.Router();
@@ -18,7 +18,7 @@ export function createUserEndpoints() {
                 return;
             }
 
-            const abilities = await Utility.getAllAbilities();
+            const abilities = await UserUtility.getAllAbilities();
 
             if(abilities !== null) {
                 res.status(200).send(abilities);
@@ -58,7 +58,7 @@ export function createUserEndpoints() {
 
             const bd = new Date(birthdate);
 
-            if(await Utility.addUser(userId, username, firstname, lastname, email, clazz, bd, "", 1, department)) {
+            if(await UserUtility.addUser(userId, username, firstname, lastname, "", email, clazz, bd, "", 1, department)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -84,7 +84,7 @@ export function createUserEndpoints() {
 
             /* endregion */
 
-            const user = await Utility.getUser(userId);
+            const user = await UserUtility.getUser(userId);
 
             if (user !== null) {
                 res.status(200).send(user);
@@ -109,7 +109,7 @@ export function createUserEndpoints() {
                 return;
             }
 
-            const userId = await Utility.getUserIdByFullName(fullName);
+            const userId = await UserUtility.getUserIdByFullName(fullName);
 
             if (userId !== null) {
                 res.status(200).send(userId);
@@ -129,14 +129,8 @@ export function createUserEndpoints() {
             const {
                 userId,
                 username,
-                firstname,
-                lastname,
-                email,
-                clazz,
                 birthdate,
-                biografie,
-                permissions,
-                department
+                pfp
             } = req.body;
 
             const authHeader = req.headers.authorization;
@@ -150,7 +144,9 @@ export function createUserEndpoints() {
 
             const bd = new Date(birthdate);
 
-            if (await Utility.updateUser(userId, username, firstname, lastname, email, clazz, bd, biografie, permissions, department)) {
+            const user = await UserUtility.getUser(userId);
+
+            if (await UserUtility.updateUser(userId, username, user.firstname, user.lastname, pfp, user.email, user.clazz, bd, user.biografie, user.permissions, user.department)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -173,7 +169,7 @@ export function createUserEndpoints() {
                 return;
             }
 
-            if (await Utility.deleteUser(userId)) {
+            if (await UserUtility.deleteUser(userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -203,7 +199,7 @@ export function createUserEndpoints() {
 
             for(const abilityId of abilityIds) {
                 const abId: number = parseInt(abilityId);
-                if (!isNaN(abId) && await Utility.addUserAbility(userId, abId)) {
+                if (!isNaN(abId) && await UserUtility.addUserAbility(userId, abId)) {
                     res.sendStatus(200);
                 } else {
                     res.sendStatus(400);
@@ -227,7 +223,7 @@ export function createUserEndpoints() {
                 return;
             }
 
-            const userAbility = await Utility.getUserAbilities(userId);
+            const userAbility = await UserUtility.getUserAbilities(userId);
 
             if (userAbility !== null) {
                 res.status(200).send(userAbility);
@@ -259,7 +255,7 @@ export function createUserEndpoints() {
                 res.sendStatus(400);
             }
 
-            if (await Utility.deleteUserAbility(userId, abId)) {
+            if (await UserUtility.deleteUserAbility(userId, abId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -287,7 +283,7 @@ export function createUserEndpoints() {
                 return;
             }
 
-            if(await Utility.addNotification(userId, title, text)) {
+            if(await UserUtility.addNotification(userId, title, text)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -311,7 +307,7 @@ export function createUserEndpoints() {
                 return;
             }
 
-            const notification = await Utility.getNotifications(userId);
+            const notification = await UserUtility.getNotifications(userId);
 
             if(notification !== null) {
                 res.status(200).send(notification);
@@ -337,7 +333,7 @@ export function createUserEndpoints() {
                 return;
             }
 
-            if (await Utility.deleteNotification(userId, notId)) {
+            if (await UserUtility.deleteNotification(userId, notId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);

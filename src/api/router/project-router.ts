@@ -1,5 +1,5 @@
 import express from "express";
-import {Utility} from "../db/utility";
+import {ProjectUtility} from "../db/utility/project-utility";;
 import {EndPoints} from "../db/validation";
 
 const projectRouter = express.Router();
@@ -11,7 +11,7 @@ export function createProjectEndpoints() {
         try {
             const {name, ownerId, thumbnail, description, links, maxMembers} = req.body;
 
-            if (await Utility.addProject(name, ownerId, thumbnail, description, links, maxMembers)) {
+            if (await ProjectUtility.addProject(name, ownerId, thumbnail, description, links, maxMembers)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -30,7 +30,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            const project = await Utility.getProject(id);
+            const project = await ProjectUtility.getProject(id);
 
             if (project !== null) {
                 res.status(200).send(project);
@@ -44,7 +44,7 @@ export function createProjectEndpoints() {
 
     projectRouter.get('/projects', async (req, res) => {
         try {
-            const projects = await Utility.getProjects();
+            const projects = await ProjectUtility.getProjects();
 
             if (projects !== null) {
                 //TODO: algorithm
@@ -61,7 +61,7 @@ export function createProjectEndpoints() {
         try {
             const userId = req.params.userId;
 
-            const projects = await Utility.getProjectsWhereUserIsOwner(userId);
+            const projects = await ProjectUtility.getProjectsWhereUserIsOwner(userId);
 
             if (projects !== null) {
                 res.status(200).send(projects);
@@ -77,7 +77,7 @@ export function createProjectEndpoints() {
         try {
             const {id, name, ownerId, thumbnail, description, links, maxMembers} = req.body;
 
-            if (await Utility.updateProject(id, name, ownerId, thumbnail, description, links, maxMembers)) {
+            if (await ProjectUtility.updateProject(id, name, ownerId, thumbnail, description, links, maxMembers)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -99,7 +99,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if (await Utility.deleteProject(userId, id)) {
+            if (await ProjectUtility.deleteProject(userId, id)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -122,7 +122,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if(await Utility.addProjectMember(projectId, userId)) {
+            if(await ProjectUtility.addProjectMember(projectId, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -143,7 +143,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            const projectMembers = await Utility.getProjectMembers(id);
+            const projectMembers = await ProjectUtility.getProjectMembers(id);
 
             if (projectMembers !== null) {
                 res.status(200).send(projectMembers);
@@ -159,7 +159,7 @@ export function createProjectEndpoints() {
     projectRouter.get('/projects/members/:userId', async (req, res) => {
         try {
             const userId = req.params.userId;
-            const projects = await Utility.getProjectsWhereUserIsMember(userId);
+            const projects = await ProjectUtility.getProjectsWhereUserIsMember(userId);
 
             if (projects !== null) {
                 res.status(200).send(projects);
@@ -185,7 +185,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if (await Utility.projectMemberAccepted(projectId, userId)) {
+            if (await ProjectUtility.projectMemberAccepted(projectId, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -209,7 +209,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if (await Utility.deleteProjectMember(projectId, userId)) {
+            if (await ProjectUtility.deleteProjectMember(projectId, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -238,7 +238,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if (await Utility.addView(id, userId)) {
+            if (await ProjectUtility.addView(id, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -261,7 +261,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            const views = await Utility.getViews(projectId);
+            const views = await ProjectUtility.getViews(projectId);
 
             if (views !== null) {
                 res.status(200).send(views);
@@ -292,7 +292,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if(await Utility.addLike(id, userId)) {
+            if(await ProjectUtility.addLike(id, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -315,7 +315,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            const likes = await Utility.getLikes(projectId);
+            const likes = await ProjectUtility.getLikes(projectId);
 
             if (likes !== null) {
                 res.status(200).send(likes);
@@ -341,7 +341,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if(await Utility.deleteLike(projectId, userId)) {
+            if(await ProjectUtility.deleteLike(projectId, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -369,7 +369,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if (await Utility.addProjectAbility(projectId, abilityId)) {
+            if (await ProjectUtility.addProjectAbility(projectId, abilityId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -392,7 +392,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            const projectAbilities = await Utility.getAbilitiesByProjectId(projectId);
+            const projectAbilities = await ProjectUtility.getAbilitiesByProjectId(projectId);
 
             if(projectAbilities !== null) {
                 res.status(200).send(projectAbilities);
@@ -418,7 +418,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if (await Utility.deleteAbilityFromProject(projectId, abilityId)) {
+            if (await ProjectUtility.deleteAbilityFromProject(projectId, abilityId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);

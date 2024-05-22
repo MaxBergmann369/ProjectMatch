@@ -1,5 +1,5 @@
 import express from "express";
-import {Utility} from "../db/utility";
+import {ChatUtility} from "../db/utility/chat-utility";;
 import {EndPoints} from "../db/validation";
 
 const chatRouter = express.Router();
@@ -21,7 +21,7 @@ export function createChatEndpoints() {
                 return;
             }
 
-            if(await Utility.addDirectChat(userId, otherUserId)) {
+            if(await ChatUtility.addDirectChat(userId, otherUserId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -45,7 +45,7 @@ export function createChatEndpoints() {
                 return;
             }
 
-            const chat = await Utility.getDirectChat(userId, otherUserId);
+            const chat = await ChatUtility.getDirectChat(userId, otherUserId);
 
             if (chat !== null) {
                 res.status(200).send(chat);
@@ -70,7 +70,7 @@ export function createChatEndpoints() {
                 return;
             }
 
-            const chats = await Utility.getDirectChats(userId);
+            const chats = await ChatUtility.getDirectChats(userId);
 
             if (chats !== null) {
                 res.status(200).send(chats);
@@ -96,7 +96,7 @@ export function createChatEndpoints() {
                 return;
             }
 
-            if (await Utility.deleteDirectChat(userId, otherUserId)) {
+            if (await ChatUtility.deleteDirectChat(userId, otherUserId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -123,7 +123,7 @@ export function createChatEndpoints() {
                 return;
             }
 
-            if (await Utility.addMessage(chatId, userId, message)) {
+            if (await ChatUtility.addMessage(chatId, userId, message)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -146,7 +146,7 @@ export function createChatEndpoints() {
                 return;
             }
 
-            const messages = await Utility.getMessages(chatId);
+            const messages = await ChatUtility.getMessages(chatId);
 
             if (messages !== null) {
                 res.status(200).send(messages);
@@ -174,7 +174,7 @@ export function createChatEndpoints() {
                 return;
             }
 
-            if (await Utility.updateMessage(messageId, chatId, userId, message)) {
+            if (await ChatUtility.updateMessage(messageId, chatId, userId, message)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -198,7 +198,7 @@ export function createChatEndpoints() {
                 return;
             }
 
-            if(await Utility.deleteMessage(userId, messageId)) {
+            if(await ChatUtility.deleteMessage(userId, messageId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);

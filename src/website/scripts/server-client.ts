@@ -44,7 +44,7 @@ export class HttpClient {
             .then(response => response.ok? response.text() : null);
     }
 
-    async updateUser(username: string, birthdate: string) {
+    async updateUser(userId: string, username:string, birthdate: string, pfp: string) {
         return await fetch(`${this.baseUrl}/user`, {
             method: 'PUT',
             headers: {
@@ -52,8 +52,10 @@ export class HttpClient {
                 Authorization: this.bearer
             },
             body: JSON.stringify({
+                userId: userId,
                 username: username,
-                birthdate: birthdate
+                birthdate: birthdate,
+                pfp: pfp
             })
         })
             .then(response => response.text());

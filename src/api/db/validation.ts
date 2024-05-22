@@ -1,7 +1,7 @@
-import {Utility} from "./utility";
 import jwt from "jsonwebtoken";
 import {TokenUser} from "../../website/scripts/tokenUser";
 import {KeycloakTokenParsed} from "keycloak-js";
+import {UserUtility} from "./utility/user-utility";
 
 enum DepartmentTypes {
     Unset = "Unknown",
@@ -75,7 +75,7 @@ export class ValUser {
             return false;
         }
 
-        const user = await Utility.getUser(userId);
+        const user = await UserUtility.getUser(userId);
 
         return user !== null;
     }
