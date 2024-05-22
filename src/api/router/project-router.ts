@@ -381,23 +381,19 @@ export function createProjectEndpoints() {
 
     projectRouter.get('/projects/:projId/abilities', async (req, res) => {
         try {
+            const {abilityIds} = req.body;
             const projectId = parseInt(req.params.projId);
 
-            const authHeader = req.headers.authorization;
-
-            const tokenUser = EndPoints.getToken(authHeader);
-
-            if (tokenUser === null || isNaN(projectId)) {
+            if (isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            const projectAbilities = await ProjectUtility.getAbilitiesByProjectId(projectId);
-
-            if(projectAbilities !== null) {
-                res.status(200).send(projectAbilities);
-            } else {
-                res.sendStatus(400);
+            for (const abilityId of abilityIds) {
+                const id = parseInt(abilityId);
+                if (isNaN(id) || !await ProjectUtility.addProjectAbility(projectId, id)) {
+                    res.sendStatus(400);
+                }
             }
         } catch (e) {
             res.sendStatus(400);

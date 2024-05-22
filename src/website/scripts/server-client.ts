@@ -300,7 +300,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async addProjectAbility(projectId: number, abilityId: number) {
+    async addProjectAbilities(projectId: number, abilityIds: number[]) {
         return await fetch(`${this.baseUrl}/projects/${projectId}/abilities`, {
             method: 'POST',
             headers: {
@@ -308,7 +308,7 @@ export class HttpClient {
                 Authorization: this.bearer
             },
             body: JSON.stringify({
-                abilityId: abilityId
+                abilityIds: abilityIds
             })
         })
             .then(response => response.text());
