@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
     async function getNextProject() : Promise<Project> {
-        if (projects.length < 3){
+        if (projects.length === 0){
             projects.push(...await client.getProjects());
         }
         return projects.shift();
