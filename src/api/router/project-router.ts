@@ -109,6 +109,27 @@ export function createProjectEndpoints() {
         }
     });
 
+    projectRouter.post('/projects/:projId/abilities', async (req, res) => {
+        try {
+            const {abilityIds} = req.body;
+            const projectId = parseInt(req.params.projId);
+
+            if (isNaN(projectId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            for (const abilityId of abilityIds) {
+                const id = parseInt(abilityId);
+                if (isNaN(id) || !await Utility.addProjectAbility(projectId, id)) {
+                    res.sendStatus(400);
+                    return;
+                }
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
     /* endregion */
 
     /* region ProjectMember */

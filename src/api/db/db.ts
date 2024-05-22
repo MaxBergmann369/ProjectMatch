@@ -889,39 +889,6 @@ export class Database {
         });
     }
 
-    static async addUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            db.run("BEGIN TRANSACTION", async (beginErr) => {
-                if (beginErr) {
-                    reject(beginErr);
-                    return;
-                }
-
-                try {
-                    for (const abilityId of abilityIds) {
-                        await this.addUserAbility(userId, abilityId);
-                    }
-
-                    db.run("COMMIT", commitErr => {
-                        if (commitErr) {
-                            reject(commitErr);
-                        } else {
-                            resolve(true);
-                        }
-                    });
-                } catch (err) {
-                    db.run("ROLLBACK", rollbackErr => {
-                        if (rollbackErr) {
-                            reject(rollbackErr);
-                        } else {
-                            resolve(false);
-                        }
-                    });
-                }
-            });
-        });
-    }
-
     static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO ProjectAbility (projectId, abilityId) VALUES (?, ?)`, [projectId, abilityId], (err) => {

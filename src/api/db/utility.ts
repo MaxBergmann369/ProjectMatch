@@ -96,6 +96,10 @@ export class Utility {
                 return false;
             }
 
+            if(await Database.getAbilityById(abilityId) === null) {
+                return false;
+            }
+
             return await Database.addUserAbility(id, abilityId);
         }
         catch (e) {
@@ -614,6 +618,10 @@ export class Utility {
             }
 
             if(await Database.projectAbilityAlreadyExists(projectId, abilityId)) {
+                return false;
+            }
+
+            if(await Database.getAbilityById(abilityId) === null) {
                 return false;
             }
 
