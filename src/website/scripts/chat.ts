@@ -2,6 +2,7 @@ import {initKeycloak, keycloak} from "./keycloak";
 import {DirectChat, Message, User} from "../../models";
 import {HttpClient} from "./server-client";
 import {TokenUser} from "./tokenUser";
+import e from "express";
 
 const authenticatedPromise = initKeycloak();
 
@@ -115,6 +116,15 @@ async function loadChatMessages(id: number) {
     const maxLayer = Math.ceil(messageAmount / maxRenderAmount);
 
     const renderAmount = Math.ceil(messageAmount / maxLayer);
+
+    const layerUp = document.getElementById("layer-up");
+
+    if(layer >= maxLayer - 1) {
+        layerUp.style.display = "none";
+    }
+    else {
+        layerUp.style.display = "block";
+    }
 
     if(layer >= maxLayer) {
         layer--;
@@ -233,6 +243,7 @@ async function renderChatMessages(id : number) {
     chat.innerHTML = html;
 
     const layerDown = document.getElementById("layer-down");
+
 
     if(layer > 0) {
         layerDown.style.display = "block";
