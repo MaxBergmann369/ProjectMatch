@@ -5,7 +5,7 @@ import {TokenUser} from "./tokenUser";
 
 const authenticatedPromise = initKeycloak();
 
-const renderAmount: number = 50;
+const maxRenderAmount: number = 50;
 
 let client: HttpClient;
 let user: User | null = null;
@@ -78,7 +78,9 @@ async function addButtonListener() {
                 const layerUp = document.getElementById("layer-up");
                 layerUp.style.display = "block";
 
-                console.log(id);
+                const data = await client.getMessages(id, 0, 1);
+                messageAmount = data[0];
+
                 await renderChatMessages(id);
             }
         });
@@ -110,7 +112,11 @@ const chatMessages = new Map<string, string[]>();
 async function loadChatMessages(id: number) {
     chatMessages.clear();
 
-    if(layer * renderAmount > messageAmount) {
+    const maxLayer = Math.ceil(messageAmount / maxRenderAmount);
+
+    const renderAmount = Math.ceil(messageAmount / maxLayer);
+
+    if(layer >= maxLayer) {
         layer--;
     }
 
@@ -159,8 +165,6 @@ async function loadChatMessages(id: number) {
     }
 
     chatMessages.set(lastDate, recentMessages);
-
-    console.log(chatMessages);
 }
 
 async function loadChatButtons() {
@@ -169,13 +173,11 @@ async function loadChatButtons() {
 
     layerUp.addEventListener("click", async () => {
         layer++;
-        console.log(layer);
         await renderChatMessages(chatId);
     });
 
     layerDown.addEventListener("click", async () => {
         layer--;
-        console.log(layer);
         await renderChatMessages(chatId);
     });
 }
