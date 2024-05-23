@@ -146,7 +146,7 @@ export function createChatEndpoints() {
                 return;
             }
 
-            const messages = await ChatUtility.getMessages(chatId);
+            const messages = await ChatUtility.getMessages(chatId, tokenUser.userId);
 
             if (messages !== null) {
                 res.status(200).send(messages);

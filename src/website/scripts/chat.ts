@@ -133,7 +133,7 @@ async function renderChatMessages(id : number) {
 
     let html = "";
 
-    for (let messageKey of chatMessages.keys()) {
+    for (const messageKey of chatMessages.keys()) {
 
         html += `<div class="date">${messageKey}</div>`;
 

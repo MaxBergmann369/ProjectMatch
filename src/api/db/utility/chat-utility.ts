@@ -58,6 +58,19 @@ export class ChatUtility {
         }
     }
 
+    static async getDirectChatById(chatId: number): Promise<DirectChat | null> {
+        try {
+            if(chatId < 1) {
+                return null;
+            }
+
+            return await Database.getDirectChatById(chatId);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
     static async deleteDirectChat(userId: string, otherUserId: string): Promise<boolean> {
         try {
             const id = userId.toLowerCase();
@@ -109,8 +122,15 @@ export class ChatUtility {
         }
     }
 
-    static async getMessages(chatId: number): Promise<Message[]> {
+    static async getMessages(chatId: number, userId: string): Promise<Message[] | null> {
         try {
+
+            const chat = await this.getDirectChatById(chatId);
+
+            if(chat === null || !(chat.userId === userId || chat.otherUserId === userId)) {
+                return null;
+            }
+
             return await Database.getMessagesByChatId(chatId);
         }
         catch (e) {
