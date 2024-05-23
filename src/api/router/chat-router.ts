@@ -133,9 +133,11 @@ export function createChatEndpoints() {
         }
     });
 
-    chatRouter.get('/messages/:chatId', async (req, res) => {
+    chatRouter.get('/messages/:chatId/:min/:max', async (req, res) => {
         try {
             const chatId = parseInt(req.params.chatId);
+            const min = parseInt(req.params.min);
+            const max = parseInt(req.params.max);
 
             const authHeader = req.headers.authorization;
 
@@ -146,7 +148,7 @@ export function createChatEndpoints() {
                 return;
             }
 
-            const messages = await ChatUtility.getMessages(chatId, tokenUser.userId);
+            const messages = await ChatUtility.getMessages(chatId, tokenUser.userId, min, max);
 
             if (messages !== null) {
                 res.status(200).send(messages);

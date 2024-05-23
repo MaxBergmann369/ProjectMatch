@@ -15,11 +15,22 @@ body {
 }
 
 #chat-window {
+  background-image: url('../resources/chat/chat-bg.jpg');
+  background-size: cover;
   border: 1px solid black;
   width: 79%;
   height: 75%;
   overflow-y: auto;
   float: right;
+}
+
+#credits {
+  font-size: 0.8rem;
+  position: absolute;
+  float: left;
+  bottom: 2%;
+  text-decoration: none;
+  color: grey;
 }
 
 .chat {

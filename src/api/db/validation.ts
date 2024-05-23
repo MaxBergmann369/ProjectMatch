@@ -177,7 +177,7 @@ export class ValMessage {
     private static containsForbiddenWords(message: string): boolean {
         const forbiddenWords: string[] = ["admin", "moderator", "user", "root", "guest", "login", "register", "password", "username", "firstname", "lastname", "email", "birthdate", "permissions"];
 
-        if(!checkInvalidCharsExp(message)) {
+        if(!checkInvalidCharsChat(message)) {
             return true;
         }
 
@@ -195,8 +195,13 @@ export function checkInvalidCharsExp(str: string): boolean {
     return pattern.test(str);
 }
 
+export function checkInvalidCharsChat(str: string): boolean {
+    const pattern = /[a-zA-ZöäüÖÄÜß0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]+/;
+    return pattern.test(str);
+}
+
 export class EndPoints {
-    static getToken(authHeader: any): TokenUser | null {
+    static getToken(authHeader: string): TokenUser | null {
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return null;
         }

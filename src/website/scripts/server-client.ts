@@ -399,8 +399,8 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getMessages(chatId: number) {
-        return await fetch(`${this.baseUrl}/messages/${chatId}`, {
+    async getMessages(chatId: number, min: number, max: number) {
+        return await fetch(`${this.baseUrl}/messages/${chatId}/${min}/${max}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer

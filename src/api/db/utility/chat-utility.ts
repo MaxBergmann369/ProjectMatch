@@ -111,27 +111,28 @@ export class ChatUtility {
                 return false;
             }
 
-            const date = new Date(Date.now());
+            const data = new Date(Date.now());
 
-            const dateTime = `${date.toLocaleDateString()};${date.toLocaleTimeString()}`;
+            const date = data.toLocaleDateString();
+            const time = data.toLocaleTimeString();
 
-            return await Database.addMessage(chatId, id, message, dateTime);
+            return await Database.addMessage(chatId, id, message, date, time);
         }
         catch (e) {
             return false;
         }
     }
 
-    static async getMessages(chatId: number, userId: string): Promise<Message[] | null> {
+    static async getMessages(chatId: number, userId: string, min: number, max:number): Promise<Message[] | null> {
         try {
 
             const chat = await this.getDirectChatById(chatId);
 
-            if(chat === null || !(chat.userId === userId || chat.otherUserId === userId)) {
+            if(chat === null || !(chat.userId === userId || chat.otherUserId === userId) || min < 0 || max < 0 || min > max || max > 100) {
                 return null;
             }
 
-            return await Database.getMessagesByChatId(chatId);
+            return await Database.getMessagesByChatId(chatId, min, max);
         }
         catch (e) {
             return null;

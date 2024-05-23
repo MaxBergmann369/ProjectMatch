@@ -112,7 +112,8 @@ export class Database {
             chatId INTEGER NOT NULL,
             userId TEXT NOT NULL,
             message TEXT NOT NULL,
-            dateTime TEXT NOT NULL,
+            date TEXT NOT NULL,
+            time TEXT NOT NULL,
             FOREIGN KEY(chatId) REFERENCES DirectChat(id),
             FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
@@ -796,9 +797,9 @@ export class Database {
         });
     }
 
-    static async getMessagesByChatId(chatId: number): Promise<Message[]> {
+    static async getMessagesByChatId(chatId: number, min: number, max:number): Promise<Message[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Message WHERE chatId = ?`, [chatId], (err, rows: Message[]) => {
+            db.all(`SELECT * FROM Message WHERE chatId = ? ORDER BY id DESC LIMIT ? OFFSET ?`, [chatId, max, min], (err, rows: Message[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -807,7 +808,8 @@ export class Database {
                         chatId: row.chatId,
                         userId: row.userId,
                         message: row.message,
-                        dateTime: row.dateTime
+                        date: row.date,
+                        time: row.time
                     }));
                     resolve(messages);
                 }
@@ -973,9 +975,9 @@ export class Database {
         });
     }
 
-    static async addMessage(chatId: number, userId: string, message: string, date: string): Promise<boolean> {
+    static async addMessage(chatId: number, userId: string, message: string, date: string, time: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Message (chatId, userId, message, dateTime) VALUES (?, ?, ?, ?)`, [chatId, userId, message, date], (err) => {
+            db.run(`INSERT INTO Message (chatId, userId, message, date, time) VALUES (?, ?, ?, ?, ?)`, [chatId, userId, message, date, time], (err) => {
                 if (err) {
                     reject(err);
                 } else {

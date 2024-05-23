@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         await renderChatProfiles();
+        manageMessages();
         await addButtonListener();
     }
     else {
@@ -69,7 +70,6 @@ async function addButtonListener() {
             chatId = id;
             if(!isNaN(id)) {
                 await renderChatMessages(id);
-                scrollToBottom();
             }
         });
     }
@@ -97,12 +97,12 @@ async function renderChatProfiles() {
 const chatMessages = new Map<string, string[]>();
 
 async function loadChatMessages(id: number) {
-    const messages: Message[] = await client.getMessages(id);
+    const messages: Message[] = await client.getMessages(id, 0, 100);
+
+    messages.reverse();
 
     for(let i = 0; i < messages.length; i++) {
         const message = messages[i];
-
-        const data = message.dateTime.split(";");
 
         let username = user.username;
 
@@ -111,21 +111,45 @@ async function loadChatMessages(id: number) {
             username = user.username;
         }
 
-        const time = data[1].split(':').slice(0, 2).join(':');
+        const time = message.time.slice(0, 5);
+        const date = message.date;
 
-        const displayMessage = `${message.userId};${time} ${username} : ${message.message}`;
+        const displayMessage = `${message.userId};${time};${username};${message.message}`;
 
-        const recentMessages = chatMessages.get(data[0]) || [];
+        const recentMessages = chatMessages.get(date) || [];
 
         if(!recentMessages.includes(displayMessage)) {
             recentMessages.push(displayMessage);
         }
 
-        chatMessages.set(data[0], recentMessages);
+        chatMessages.set(date, recentMessages);
     }
 }
 
+async function manageMessages() {
+    // eslint-disable-next-line no-constant-condition
+    while(true) {
+        if(chatId !== -1) {
+            shortMessagesMap();
+            await renderChatMessages(chatId);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 5000));
+    }
+}
+
+function shortMessagesMap(max: number = 10) {
+    //remove from the map if the key with the newest messages has more than 10 messages than remove all other keys
+    //and fromm the key with the oldest messages remove all messages except the last 10
+    //if the key with the newest messages has less than 10 messages than remove from the other key all messages so that the total amount of messages is 10
+
+}
+
 async function renderChatMessages(id : number) {
+
+    const chatWindow = document.getElementById("chat-window");
+
+    const check = Math.ceil(chatWindow.scrollTop + chatWindow.clientHeight) === chatWindow.scrollHeight;
 
     await loadChatMessages(id);
 
@@ -144,17 +168,21 @@ async function renderChatMessages(id : number) {
             const data = messages[i].split(';');
 
             const userId: string = data[0];
-            const message: string = data[1];
+            const time: string = data[1];
+            const username: string = data[2];
+            const message: string = data[3];
 
             if (userId === user.userId) {
-                html += `<div class="own-message">${message}</div>`;
+                html += `<div class="own-message"><span class="time">${time}</span><span class="username">${username}</span><span class="message">${message}</span></div>`;
             } else {
-                html += `<div class="other-message">${message}</div>`;
+                html += `<div class="other-message"><span class="message">${message}</span><span class="username">${username}</span><span class="time">${time}</span></div>`;
             }
         }
     }
 
     chat.innerHTML = html;
+
+    scrollToBottom(check);
 }
 
 async function sendMessage(chatId: number, message: string) {
@@ -163,7 +191,10 @@ async function sendMessage(chatId: number, message: string) {
     scrollToBottom();
 }
 
-function scrollToBottom() {
+function scrollToBottom(below: boolean = true) {
     const chatWindow = document.getElementById("chat-window");
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    if(below) {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
 }
