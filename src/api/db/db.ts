@@ -799,7 +799,7 @@ export class Database {
 
     static async getMessagesByChatId(chatId: number, min: number, max:number): Promise<Message[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Message WHERE chatId = ? ORDER BY id DESC LIMIT ? OFFSET ?`, [chatId, max, min], (err, rows: Message[]) => {
+            db.all(`SELECT * FROM Message WHERE chatId = ? ORDER BY id DESC LIMIT ? OFFSET ?`, [chatId, max - min, min], (err, rows: Message[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -812,6 +812,18 @@ export class Database {
                         time: row.time
                     }));
                     resolve(messages);
+                }
+            });
+        });
+    }
+
+    static async getAmountOfMessages(chatId: number): Promise<number> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT COUNT(*) FROM Message WHERE chatId = ?`, [chatId], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row['COUNT(*)'] || 0);
                 }
             });
         });

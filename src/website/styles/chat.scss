@@ -24,6 +24,11 @@ body {
   float: right;
 }
 
+#layer-down, #layer-up {
+  text-align: center;
+  display: none;
+}
+
 #credits {
   font-size: 0.8rem;
   position: absolute;

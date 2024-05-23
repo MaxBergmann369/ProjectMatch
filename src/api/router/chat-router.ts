@@ -148,10 +148,11 @@ export function createChatEndpoints() {
                 return;
             }
 
+            const amount = await ChatUtility.getAmountOfMessages(chatId);
             const messages = await ChatUtility.getMessages(chatId, tokenUser.userId, min, max);
 
-            if (messages !== null) {
-                res.status(200).send(messages);
+            if (messages !== null && amount !== -1) {
+                res.status(200).send([amount, messages]);
             } else {
                 res.sendStatus(400);
             }

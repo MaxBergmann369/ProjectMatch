@@ -128,14 +128,36 @@ export class ChatUtility {
 
             const chat = await this.getDirectChatById(chatId);
 
-            if(chat === null || !(chat.userId === userId || chat.otherUserId === userId) || min < 0 || max < 0 || min > max || max > 100) {
+            const diff = max - min;
+
+            if(chat === null || !(chat.userId === userId || chat.otherUserId === userId) || min < 0 || max < 0 || min > max || diff > 100) {
                 return null;
+            }
+
+            const amount = await Database.getAmountOfMessages(chatId);
+
+            if(amount < max) {
+                max = amount;
+                min = amount - diff < 0 ? 0 : amount - diff;
             }
 
             return await Database.getMessagesByChatId(chatId, min, max);
         }
         catch (e) {
             return null;
+        }
+    }
+
+    static async getAmountOfMessages(chatId: number): Promise<number> {
+        try {
+            if(chatId < 1) {
+                return -1;
+            }
+
+            return await Database.getAmountOfMessages(chatId);
+        }
+        catch (e) {
+            return -1;
         }
     }
 

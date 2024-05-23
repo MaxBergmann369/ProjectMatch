@@ -5,10 +5,14 @@ import {TokenUser} from "./tokenUser";
 
 const authenticatedPromise = initKeycloak();
 
+const renderAmount: number = 50;
+
 let client: HttpClient;
 let user: User | null = null;
 let chats: DirectChat[] = [];
 let chatId: number = -1;
+let layer: number = 0;
+let messageAmount: number = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await authenticatedPromise;
@@ -59,6 +63,8 @@ async function addButtonListener() {
         }
     });
 
+    await loadChatButtons();
+
     for (let i = 0; i < chatProfiles.length; i++) {
         chatProfiles[i].addEventListener("click", async (event) => {
             const id = parseInt((event.target as HTMLElement).id);
@@ -69,6 +75,10 @@ async function addButtonListener() {
 
             chatId = id;
             if(!isNaN(id)) {
+                const layerUp = document.getElementById("layer-up");
+                layerUp.style.display = "block";
+
+                console.log(id);
                 await renderChatMessages(id);
             }
         });
@@ -84,22 +94,37 @@ async function renderChatProfiles() {
     for(let i = 0; i < chats.length; i++) {
         if(chats[i].userId === user.userId) {
             const otherUser = await client.getUser(chats[i].otherUserId);
-            chatElement = `<div class="chat" id="${chats[i].id}">${otherUser.firstname} ${otherUser.lastname}`;
+            chatElement += `<div class="chat" id="${chats[i].id}">${otherUser.firstname} ${otherUser.lastname}`;
         }
         else {
             const otherUser = await client.getUser(chats[i].userId);
-            chatElement = `<div class="chat" id="${chats[i].id}">${otherUser.firstname} ${otherUser.lastname}`;
+            chatElement += `<div class="chat" id="${chats[i].id}">${otherUser.firstname} ${otherUser.lastname}`;
         }
-        list.innerHTML += chatElement;
     }
+
+    list.innerHTML = chatElement;
 }
 
 const chatMessages = new Map<string, string[]>();
 
 async function loadChatMessages(id: number) {
-    const messages: Message[] = await client.getMessages(id, 0, 100);
+    chatMessages.clear();
+
+    if(layer * renderAmount > messageAmount) {
+        layer--;
+    }
+
+    const data = await client.getMessages(id, renderAmount * layer, renderAmount * (layer + 1));
+    const messages: Message[] = data[1];
+    messageAmount = data[0];
 
     messages.reverse();
+
+    let otherUsername: string | undefined = undefined;
+
+    let lastDate = "";
+
+    let recentMessages: string[] = [];
 
     for(let i = 0; i < messages.length; i++) {
         const message = messages[i];
@@ -107,42 +132,63 @@ async function loadChatMessages(id: number) {
         let username = user.username;
 
         if (message.userId !== user.userId) {
-            const user = await client.getUser(message.userId);
-            username = user.username;
+
+            if (!otherUsername) {
+                otherUsername = (await client.getUser(message.userId)).username;
+            }
+
+            username = otherUsername;
         }
 
         const time = message.time.slice(0, 5);
         const date = message.date;
 
-        const displayMessage = `${message.userId};${time};${username};${message.message}`;
-
-        const recentMessages = chatMessages.get(date) || [];
-
-        if(!recentMessages.includes(displayMessage)) {
-            recentMessages.push(displayMessage);
+        if(lastDate === "") {
+            lastDate = date;
+            recentMessages = chatMessages.get(date) || [];
+        }
+        else if(lastDate !== date) {
+            lastDate = date;
+            chatMessages.set(date, recentMessages);
+            recentMessages = chatMessages.get(date) || [];
         }
 
-        chatMessages.set(date, recentMessages);
+        const displayMessage = `${message.userId};${time};${username};${message.message}`;
+
+        recentMessages.push(displayMessage);
     }
+
+    chatMessages.set(lastDate, recentMessages);
+
+    console.log(chatMessages);
+}
+
+async function loadChatButtons() {
+    const layerUp = document.getElementById("layer-up");
+    const layerDown = document.getElementById("layer-down");
+
+    layerUp.addEventListener("click", async () => {
+        layer++;
+        console.log(layer);
+        await renderChatMessages(chatId);
+    });
+
+    layerDown.addEventListener("click", async () => {
+        layer--;
+        console.log(layer);
+        await renderChatMessages(chatId);
+    });
 }
 
 async function manageMessages() {
     // eslint-disable-next-line no-constant-condition
     while(true) {
-        if(chatId !== -1) {
-            shortMessagesMap();
-            await renderChatMessages(chatId);
+        if(chatId !== -1 && layer === 0) {
+            await loadChatMessages(chatId);
         }
 
         await new Promise(resolve => setTimeout(resolve, 5000));
     }
-}
-
-function shortMessagesMap(max: number = 10) {
-    //remove from the map if the key with the newest messages has more than 10 messages than remove all other keys
-    //and fromm the key with the oldest messages remove all messages except the last 10
-    //if the key with the newest messages has less than 10 messages than remove from the other key all messages so that the total amount of messages is 10
-
 }
 
 async function renderChatMessages(id : number) {
@@ -156,6 +202,8 @@ async function renderChatMessages(id : number) {
     const chat = document.getElementById("messageWindow");
 
     let html = "";
+
+    chat.innerHTML = "";
 
     for (const messageKey of chatMessages.keys()) {
 
@@ -182,11 +230,21 @@ async function renderChatMessages(id : number) {
 
     chat.innerHTML = html;
 
+    const layerDown = document.getElementById("layer-down");
+
+    if(layer > 0) {
+        layerDown.style.display = "block";
+    }
+    else {
+        layerDown.style.display = "none";
+    }
+
     scrollToBottom(check);
 }
 
 async function sendMessage(chatId: number, message: string) {
     await client.addMessage(chatId, user.userId, message);
+    layer = 0;
     await renderChatMessages(chatId);
     scrollToBottom();
 }
