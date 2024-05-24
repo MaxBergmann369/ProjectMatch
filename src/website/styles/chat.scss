@@ -25,6 +25,10 @@ body {
   position: absolute;
 }
 
+#messageWindow {
+  padding: 1rem;
+}
+
 #chat-window {
   background-image: url('../resources/chat/chat-bg.jpg');
   background-size: cover;

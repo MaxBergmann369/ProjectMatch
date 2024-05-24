@@ -82,10 +82,10 @@ async function loadChatProfileButtons() {
             chatId = id;
             if(!isNaN(id)) {
                 const layerUp = document.getElementById("layer-up");
-                layerUp.style.display = "block";
 
-                const data = await client.getMessages(id, 0, 1);
-                messageAmount = data[0];
+                if(messageAmount <= maxRenderAmount) {
+                    layerUp.style.display = "block";
+                }
 
                 await renderChatMessages(id);
             }
@@ -95,12 +95,16 @@ async function loadChatProfileButtons() {
 
 async function addUserButtons() {
     const userProfiles = document.getElementsByClassName("user");
+    const input = document.getElementById("input-bar") as HTMLInputElement;
+    const userList = document.getElementById("user-list");
 
     for (let i = 0; i < userProfiles.length; i++) {
         userProfiles[i].addEventListener("click", async (event) => {
             const id = (event.target as HTMLElement).id;
 
             if(id !== "") {
+                input.value = "";
+                userList.style.display = "none";
                 await client.addDirectChat(user.userId, id);
                 await renderChatProfiles();
                 await loadChatProfileButtons();
@@ -149,7 +153,7 @@ async function manageMessages() {
     // eslint-disable-next-line no-constant-condition
     while(true) {
         if(chatId !== -1 && layer === 0) {
-            await loadChatMessages(chatId);
+            await renderChatMessages(chatId);
         }
 
         await new Promise(resolve => setTimeout(resolve, 5000));
@@ -163,7 +167,7 @@ async function loadChatMessages(id: number) {
 
     const maxLayer = Math.ceil(messageAmount / maxRenderAmount);
 
-    const renderAmount = Math.ceil(messageAmount / maxLayer);
+    const renderAmount = isNaN(Math.ceil(messageAmount / maxLayer)) ? 0 : Math.ceil(messageAmount / maxLayer);
 
     const layerUp = document.getElementById("layer-up");
 
@@ -174,11 +178,19 @@ async function loadChatMessages(id: number) {
         layerUp.style.display = "block";
     }
 
-    if(layer >= maxLayer) {
+    if(layer >= maxLayer && layer !== 0) {
         layer--;
     }
 
-    const data = await client.getMessages(id, renderAmount * layer, renderAmount * (layer + 1));
+    const min: number =  renderAmount * layer;
+    const max: number  =  renderAmount * (layer + 1);
+
+    const data = await client.getMessages(id, min < 0 ? 0 : min, max < 0 ? 0 : max);
+
+    if(data === null) {
+        return;
+    }
+
     const messages: Message[] = data[1];
     messageAmount = data[0];
 
@@ -227,6 +239,9 @@ async function loadChatMessages(id: number) {
 }
 
 async function renderChatMessages(id : number, scrollDown: boolean = false) {
+    const data = await client.getMessages(id, 0, 1);
+
+    messageAmount = data[0];
 
     const chatWindow = document.getElementById("chat-window");
 
@@ -280,6 +295,7 @@ async function renderChatMessages(id : number, scrollDown: boolean = false) {
 async function sendMessage(chatId: number, message: string) {
     await client.addMessage(chatId, user.userId, message);
     layer = 0;
+
     await renderChatMessages(chatId);
     scrollToBottom();
 }
