@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     const urls = [];
     let allowRepeats = false;
     const projects: Project[] = [];
-    console.log(projects);
     for (let i = 1; i <= 33; i++) {
         urls.push(`./resources/project/backgrounds/bg${i}.webp`);
     }
@@ -76,8 +75,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function getNextProject() : Promise<Project> {
         if (projects.length === 0){
-            console.log(allowRepeats);
-
             let arr = await client.getProjects(allowRepeats);
             if ((!arr || arr.length === 0)) {
                 if (!allowRepeats){
