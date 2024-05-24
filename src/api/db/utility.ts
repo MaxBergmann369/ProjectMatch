@@ -378,11 +378,12 @@ export class Utility {
         }
     }
 
-    static async getProjects(): Promise<Project[] | null> {
+    static async getProjects(userId: string, showOld: boolean, limit: number, lastViews: number[]): Promise<Project[] | null> {
         try {
-            return await Database.getProjects();
+            return await Database.getProjects(userId,showOld, limit, lastViews);
         }
         catch (e) {
+            // throw e;
             return null;
         }
     }

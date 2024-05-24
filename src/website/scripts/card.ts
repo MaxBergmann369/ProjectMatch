@@ -5,6 +5,7 @@ export class Card {
     onDismiss: () => void;
     onLike: () => void;
     onDislike: () => void;
+    onFavorite: () => void;
     element: HTMLElement;
     title: string;
     desc: string;
@@ -16,6 +17,7 @@ export class Card {
                     onDismiss,
                     onLike,
                     onDislike,
+                    onFavorite,
                     title,
                     desc,
                     owner,
@@ -25,6 +27,7 @@ export class Card {
         this.onDismiss = onDismiss;
         this.onLike = onLike;
         this.onDislike = onDislike;
+        this.onFavorite =onFavorite;
         this.title = title;
         this.desc = desc;
         this.owner = owner;
@@ -64,7 +67,7 @@ export class Card {
             const touch = e.changedTouches[0];
             if (!touch) return;
             const { clientX, clientY } = touch;
-            this.startPoint = { x: clientX, y: clientY }
+            this.startPoint = { x: clientX, y: clientY };
             document.addEventListener('touchmove', this.handleTouchMove);
             this.element.style.transition = 'transform 0s';
         });
@@ -76,7 +79,7 @@ export class Card {
     private listenToMouseEvents = () => {
         this.element.addEventListener('mousedown', (e) => {
             const { clientX, clientY } = e;
-            this.startPoint = { x: clientX, y: clientY }
+            this.startPoint = { x: clientX, y: clientY };
             document.addEventListener('mousemove', this.handleMouseMove);
             this.element.style.transition = 'transform 0s';
         });
@@ -162,36 +165,33 @@ export class Card {
     
     private createCardElement = () => {
         const card = document.createElement('div');
+        const fullname = `${this.owner.firstname} ${this.owner.lastname}`;
         card.classList.add('card');
         card.style.backgroundImage = `url(${this.imageUrl})`;
         const title = document.createElement('div');
         title.classList.add('title');
         const h2 = document.createElement('h2');
-        h2.textContent = this.title; //'Interesting Project Title';
+        h2.textContent = this.title;
         title.append(h2);
         const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-star\"><polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/></svg>";
         const star = document.createElement('span');
         star.addEventListener('click', () => {
-            // add active class
             star.classList.toggle('active');
+            this.onFavorite();
         });
         star.innerHTML = svg;
         title.append(star);
         const desc = document.createElement('p');
         desc.classList.add('desc');
-        desc.textContent = this.desc; /*'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' +
-            ' Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ' +
-            'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
-            + 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' +
-            'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'; */
+        desc.textContent = this.desc;
         const owner = document.createElement('div');
         owner.classList.add('owner');
         const ownerPfp = document.createElement('img');
         ownerPfp.src = 'https://imgs.search.brave.com/jDiz6N9Qc7I67qoWe7mVB-bQ2kAoxUVD1hu4OwNHzXM/rs:fit:500:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzAxLzY2LzM5LzU0/LzM2MF9GXzE2NjM5/NTQwMl9VY2JhUzVa/NVRqMXJFYk12emhI/UjFVN0RwQ2dDV2Qz/ci5qcGc';
-        ownerPfp.alt = this.owner.username + "'s Profile Picture"; //'Owner Profile Picture';
+        ownerPfp.alt = fullname + "'s Profile Picture"; //'Owner Profile Picture';
         owner.append(ownerPfp);
         const ownerName = document.createElement('span');
-        ownerName.textContent = 'Owner: ' + this.owner.username; //'Owner: John Doe';
+        ownerName.textContent = 'Owner: ' + fullname;
         owner.append(ownerName);
         const tags = document.createElement('div');
         tags.classList.add('tags');

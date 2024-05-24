@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const user1: User | null = await client.getUser(keycloak.tokenParsed.preferred_username);
 
     if(user1 !== null) {
-        location.href = "home1.html";
+        location.href = "home.html";
     }
 
     await renderAbilities();

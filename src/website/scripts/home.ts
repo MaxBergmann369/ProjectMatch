@@ -33,7 +33,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     const dislike = document.querySelector('#dislike') as HTMLElement;
     // constants
     const urls = [];
-    const projects = await client.getProjects();
+    let allowRepeats = false;
+    const projects: Project[] = [];
     console.log(projects);
     for (let i = 1; i <= 33; i++) {
         urls.push(`./resources/project/backgrounds/bg${i}.webp`);
@@ -44,22 +45,66 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 // functions
 
-
+    async function appendEndCard() {
+        const card = new Card({
+            imageUrl: urls[cardCount % urls.length],
+            onDismiss: () => {
+                appendNewCard();
+            },
+            onLike: () => {
+                like.style.animationPlayState = 'running';
+                like.classList.toggle('trigger');
+            },
+            onDislike: () => {
+                dislike.style.animationPlayState = 'running';
+                dislike.classList.toggle('trigger');
+            },
+            onFavorite: () => {
+            },
+            title: "No more projects",
+            desc: "You have seen all the projects! Check back later or continue swiping to see projects, you already have seen, again.",
+            owner: user1,
+            tags: []
+        });
+        swiper.append(card.element);
+        cardCount++;
+        const cards = swiper.querySelectorAll('.card:not(.dismissing)');
+        cards.forEach((card: HTMLElement, index) => {
+            card.style.setProperty('--i', index.toString());
+        });
+    }
 
     async function getNextProject() : Promise<Project> {
         if (projects.length === 0){
-            projects.push(...await client.getProjects());
+            console.log(allowRepeats);
+
+            let arr = await client.getProjects(allowRepeats);
+            if ((!arr || arr.length === 0)) {
+                if (!allowRepeats){
+                    allowRepeats = true;
+                    await appendEndCard();
+                    return null;
+                }
+                arr = await client.getProjects(allowRepeats);
+            }
+            projects.push(...arr);
         }
         return projects.shift();
     }
 
     async function appendNewCard() {
         const project = await getNextProject();
+        if (!project){
+            return;
+        }
         const title = project.name;
         const desc = project.description;
         const ownerId = project.ownerId;
         const owner = await client.getUser(ownerId);
-
+        let tags = (await client.getProjectAbilities(project.id)).map(value => value.name);
+        if (tags.length > 6){
+            tags= tags.slice(0,6);
+        }
         const card = new Card({
             imageUrl: urls[cardCount % urls.length],
             onDismiss: () =>{
@@ -75,10 +120,17 @@ document.addEventListener("DOMContentLoaded", async function () {
                 dislike.style.animationPlayState = 'running';
                 dislike.classList.toggle('trigger');
             },
+            onFavorite: () => {
+                client.addLike(project.id, user.userId).then((value) => {
+                    if (!value){
+                        client.deleteLike(project.id, user.userId);
+                    }
+                });
+            },
             title:title,
             desc:desc,
             owner:owner,
-            tags:["TypeScript", "HTML", "CSS"] // TODO: get tags
+            tags:tags
         });
         swiper.append(card.element);
         cardCount++;
@@ -91,11 +143,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 // first 34 cards
     for (let i = 0; i < 5; i++) {
-        appendNewCard();
+        await appendNewCard();
     }
 
     document.addEventListener('keyup', (e:KeyboardEvent) => {
-        console.log(e.key);
         if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
         const topCard = swiper.getElementsByClassName('card')[0];
         if (topCard.classList.contains('dismissing')) return;

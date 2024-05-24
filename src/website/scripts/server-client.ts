@@ -1,4 +1,4 @@
-import {User, Project, View, Like, Message, DirectChat, Notification, ProjectMember, UserAbility, Ability, ProjectAbility} from "../../models";
+import {User, Project, Message, DirectChat, ProjectMember, Ability} from "../../models";
 import {keycloak} from "./keycloak";
 
 export class HttpClient {
@@ -83,7 +83,7 @@ export class HttpClient {
             .then(response => response.ok);
     }
 
-    async getUserAbilities(userId: string) {
+    async getUserAbilities(userId: string) : Promise<Ability[] | null> {
         return await fetch(`${this.baseUrl}/user/${userId}/abilities`, {
             method: 'GET',
             headers: {
@@ -103,7 +103,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getAbilities() {
+    async getAbilities() : Promise<Ability[] | null> {
         return await fetch(`${this.baseUrl}/user/abilities`, {
             method: 'GET',
             headers: {
@@ -130,7 +130,7 @@ export class HttpClient {
     }
 
     async getProject(projectId: number): Promise<Project | null> {
-        return await fetch(`${this.baseUrl}/projects/${projectId}`, {
+        return await fetch(`${this.baseUrl}/id/projects/${projectId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -140,8 +140,11 @@ export class HttpClient {
 
     }
 
-    async getProjects(): Promise<Project[] | null> {
-        return await fetch(`${this.baseUrl}/projects`, {
+    async getProjects(showOldProjects?:boolean): Promise<Project[] | null> {
+        if (showOldProjects === undefined) {
+            showOldProjects = false;
+        }
+        return await fetch(`${this.baseUrl}/projects/${showOldProjects}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -197,7 +200,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getProjectMembers(projectId: number) {
+    async getProjectMembers(projectId: number) : Promise<ProjectMember[] | null> {
         return await fetch(`${this.baseUrl}/projects/${projectId}`, {
             method: 'GET',
             headers: {
@@ -207,7 +210,7 @@ export class HttpClient {
             .then(response => response.json());
     }
 
-    async getProjectsWhereUserIsMember(userId: string) {
+    async getProjectsWhereUserIsMember(userId: string):Promise<Project[] | null> {
         return await fetch(`${this.baseUrl}/projects/members/${userId}`, {
             method: 'GET',
             headers: {
@@ -250,7 +253,7 @@ export class HttpClient {
                 userId: userId
             })
         })
-            .then(response => response.text());
+            .then(response => response.ok);
     }
 
     async getViews(projectId: number) {
@@ -275,7 +278,7 @@ export class HttpClient {
                 userId: userId
             })
         })
-            .then(response => response.text());
+            .then(response => response.ok);
     }
 
     async getLikes(projectId: number) {
@@ -312,7 +315,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getProjectAbilities(projectId: number) {
+    async getProjectAbilities(projectId: number):Promise<Ability[]> {
         return await fetch(`${this.baseUrl}/projects/${projectId}/abilities`, {
             method: 'GET',
             headers: {
@@ -351,7 +354,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getDirectChat(userId: string, otherUserId: string) {
+    async getDirectChat(userId: string, otherUserId: string) : Promise<DirectChat> {
         return await fetch(`${this.baseUrl}/chats/${userId}/${otherUserId}`, {
             method: 'GET',
             headers: {
@@ -361,7 +364,7 @@ export class HttpClient {
             .then(response => response.json());
     }
 
-    async getDirectChats(userId: string) {
+    async getDirectChats(userId: string):Promise<DirectChat[]> {
         return await fetch(`${this.baseUrl}/chats/${userId}`, {
             method: 'GET',
             headers: {
@@ -397,7 +400,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getMessages(chatId: number) {
+    async getMessages(chatId: number):Promise<Message[]> {
         return await fetch(`${this.baseUrl}/messages/${chatId}`, {
             method: 'GET',
             headers: {

@@ -37,7 +37,7 @@ describe('database-test-user', () => {
         biografie: "test",
         permissions: 1,
         department: "Medientechnik"
-    }
+    };
 
 
     /* region addUser */
@@ -114,7 +114,7 @@ describe('database-test-user', () => {
         await deleteUser('IF123456d');
 
         const success14 = await Utility.addUser('IF12!456', userIf.username, userIf.firstname, userIf.lastname, userIf.email, userIf.clazz, userIf.birthdate, userIf.biografie, userIf.permissions, userIf.department);
-        expect(success6).toBeFalsy();
+        expect(success14).toBeFalsy();
 
         await deleteUser('IF12!456');
 
@@ -1158,7 +1158,7 @@ describe('database-test-project', () => {
 
         expect(projects2).toBe(null);
 
-        const projects3 = await Utility.getProjects();
+        const projects3 = await Utility.getProjects(undefined, undefined, undefined, undefined);
 
         expect(projects3.length).toBe(2);
 
@@ -1189,7 +1189,7 @@ describe('database-test-project', () => {
 
         expect(projects1.length).toBe(3);
 
-        const projects3 = await Utility.getProjects();
+        const projects3 = await Utility.getProjects(undefined, undefined, undefined, undefined);
 
         expect(projects3.length).toBe(3);
 
