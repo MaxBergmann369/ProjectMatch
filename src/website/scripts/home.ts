@@ -96,12 +96,21 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
         const title = project.name;
-        const desc = project.description;
+        let desc = project.description;
         const ownerId = project.ownerId;
         const owner = await client.getUser(ownerId);
         let tags = (await client.getProjectAbilities(project.id)).map(value => value.name);
         if (tags.length > 6){
             tags= tags.slice(0,6);
+        }
+        if (desc.length > 500){
+            const index = desc.lastIndexOf(" ", 500);
+            if (index !== -1){
+                desc = desc.substring(0, index) + "...";
+            }
+            else {
+                desc = desc.substring(0, 500) + "...";
+            }
         }
         const card = new Card({
             imageUrl: urls[cardCount % urls.length],
