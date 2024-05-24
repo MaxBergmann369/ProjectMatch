@@ -125,7 +125,6 @@ export class ChatUtility {
 
     static async getMessages(chatId: number, userId: string, min: number, max:number): Promise<Message[] | null> {
         try {
-
             const chat = await this.getDirectChatById(chatId);
 
             const diff = max - min;

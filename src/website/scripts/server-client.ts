@@ -34,6 +34,16 @@ export class HttpClient {
 
     }
 
+    async getTop10UserMatching(fullName: string) {
+        return await fetch(`${this.baseUrl}/user/top10/${fullName}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.json() : null);
+    }
+
     async getUserId(fullName: string): Promise<string | null> {
         return await fetch(`${this.baseUrl}/userId/${fullName}`, {
             method: 'GET',
@@ -406,7 +416,7 @@ export class HttpClient {
                 Authorization: this.bearer
             }
         })
-            .then(response => response.json());
+            .then(response => response.ok ? response.json() : null);
     }
 
     async editMessage(messageId: number, chatId: number, userId: string, message: string) {

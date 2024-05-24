@@ -30,6 +30,31 @@ export function createUserEndpoints() {
         }
     });
 
+    userRouter.get('/user/top10/:fullName', async (req, res) => {
+        try {
+            const fullName = req.params.fullName;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const users = await UserUtility.getTop10UserMatching(fullName);
+
+            if (users !== null) {
+                res.status(200).send(users);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
     /* endregion */
 
     /* region User */

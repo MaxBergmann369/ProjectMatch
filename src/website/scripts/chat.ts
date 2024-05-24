@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         await renderChatProfiles();
+        loadUsernames();
         manageMessages();
         await addButtonListener();
     }
@@ -37,7 +38,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function addButtonListener() {
-    const chatProfiles = document.getElementsByClassName("chat");
 
     const addBtn = document.getElementById("addChat");
 
@@ -49,6 +49,7 @@ async function addButtonListener() {
 
             await client.addDirectChat(user.userId, userId);
             await renderChatProfiles();
+            await loadChatProfileButtons();
         }
     });
 
@@ -64,6 +65,11 @@ async function addButtonListener() {
     });
 
     await loadChatButtons();
+    await loadChatProfileButtons();
+}
+
+async function loadChatProfileButtons() {
+    const chatProfiles = document.getElementsByClassName("chat");
 
     for (let i = 0; i < chatProfiles.length; i++) {
         chatProfiles[i].addEventListener("click", async (event) => {
@@ -85,6 +91,23 @@ async function addButtonListener() {
             }
         });
     }
+}
+
+async function addUserButtons() {
+    const userProfiles = document.getElementsByClassName("user");
+
+    for (let i = 0; i < userProfiles.length; i++) {
+        userProfiles[i].addEventListener("click", async (event) => {
+            const id = (event.target as HTMLElement).id;
+
+            if(id !== "") {
+                await client.addDirectChat(user.userId, id);
+                await renderChatProfiles();
+                await loadChatProfileButtons();
+            }
+        });
+    }
+
 }
 
 async function renderChatProfiles() {
@@ -269,6 +292,38 @@ function scrollToBottom(below: boolean = true) {
     }
 }
 
-function loadUsernames() {
+async function loadUsernames() {
+    const input = document.getElementById("input-bar") as HTMLInputElement;
 
+    input.addEventListener("input", async () => {
+        let fullName = input.value.replace(" ", "-");
+        const list = document.getElementById("user-list");
+        let html = "";
+
+        if(fullName === "") {
+            list.style.display = "none";
+            return;
+        }
+
+        if(!fullName.includes("-")) {
+            fullName += "-";
+        }
+
+        const users = await client.getTop10UserMatching(fullName);
+
+        if(users === null || users.length === 0) {
+            list.style.display = "none";
+            return;
+        }
+
+        list.style.display = "block";
+
+        for(let i = 0; i < users.length; i++) {
+            html += `<div class="user" id="${users[i][0]}">${users[i][1]}</div>`;
+        }
+
+        list.innerHTML = html;
+
+        await addUserButtons();
+    });
 }

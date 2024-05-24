@@ -136,8 +136,11 @@ export function createChatEndpoints() {
     chatRouter.get('/messages/:chatId/:min/:max', async (req, res) => {
         try {
             const chatId = parseInt(req.params.chatId);
-            const min = parseInt(req.params.min);
-            const max = parseInt(req.params.max);
+            let min = parseInt(req.params.min);
+            let max = parseInt(req.params.max);
+
+            min = min < 0 ? 0 : min;
+            max = max < 0 ? 0 : max;
 
             const authHeader = req.headers.authorization;
 

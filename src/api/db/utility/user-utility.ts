@@ -38,6 +38,22 @@ export class UserUtility {
         }
     }
 
+    static async getTop10UserMatching(fullName:string) {
+        const names = fullName.split("-");
+
+        if(fullName.length < 1 || fullName.length > 40) {
+            return null;
+        }
+
+        //first letter uppercase and the rest lowercase
+        const firstname = names[0].charAt(0).toUpperCase() + names[0].slice(1).toLowerCase();
+
+        //first letter uppercase and the rest lowercase
+        const lastname = names[1].charAt(0).toUpperCase() + names[1].slice(1).toLowerCase();
+
+        return await Database.getTop10UserMatching(firstname, lastname);
+    }
+
     static async getUserIdByFullName(fullName: string): Promise<string | null> {
         try {
             const names = fullName.split("-");

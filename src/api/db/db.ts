@@ -332,6 +332,20 @@ export class Database {
         });
     }
 
+    static async getTop10UserMatching(firstname: string, lastname: string): Promise<[string, string][]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT userId, firstname, lastname FROM User WHERE firstname LIKE ? AND lastname LIKE ? ORDER BY LENGTH(firstname), LENGTH(lastname), firstname, lastname LIMIT 10`, [firstname + '%', lastname + '%'], (err, rows: User[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    //create a touple with the userId and the fullname
+                    const users: [string, string][] = rows.map(row => [row.userId, row.firstname + " " + row.lastname]);
+                    resolve(users);
+                }
+            });
+        });
+    }
+
     static async isNotificationOwner(userId: string, notificationId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.get(`SELECT * FROM Notification WHERE userId = ? AND id = ?`, [userId, notificationId], (err, row: Notification) => {
@@ -761,7 +775,7 @@ export class Database {
 
     static async getDirectChatByUserIds(userId: string, otherUserId: string): Promise<DirectChat | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM DirectChat WHERE userId = ? AND otherUserId = ?`, [userId, otherUserId], (err, row: DirectChat) => {
+            db.get(`SELECT * FROM DirectChat WHERE (userId = ? AND otherUserId = ?) OR (userId = ? AND otherUserId = ?)`, [userId, otherUserId, otherUserId, userId], (err, row: DirectChat) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {

@@ -14,6 +14,17 @@ body {
   float: left;
 }
 
+#user-list {
+  display: none;
+  width: 10rem;
+  margin-left: 0.5rem;
+  min-height: 1.5rem;
+  background: white;
+  border: 1px solid black;
+  float: left;
+  position: absolute;
+}
+
 #chat-window {
   background-image: url('../resources/chat/chat-bg.jpg');
   background-size: cover;
