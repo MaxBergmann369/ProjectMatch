@@ -84,6 +84,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 }
                 arr = await client.getProjects(allowRepeats);
             }
+            console.log(arr);
             projects.push(...arr);
         }
         return projects.shift();

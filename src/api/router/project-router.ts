@@ -54,11 +54,15 @@ export function createProjectEndpoints() {
                 res.sendStatus(400);
                 return;
             }
-            const showOld = req.params.showOld === "true";
+            let showOld = req.params.showOld === "true";
             const prevViews = userToViews.get(tokenUser.userId)??[];
-            const projects = await Utility.getProjects(tokenUser.userId, showOld, 5, prevViews);
+            const limit = 5;
+            const projects = await Utility.getProjects(tokenUser.userId, showOld, limit, prevViews);
             if (projects !== null) {
                 const views = projects.map(value => value.id);
+                if (projects.length < limit){
+                    showOld = true;
+                }
                 userToViews.set(tokenUser.userId, showOld? prevViews.concat(views) : views);
                 //TODO: algorithm
                 res.status(200).send(projects);
