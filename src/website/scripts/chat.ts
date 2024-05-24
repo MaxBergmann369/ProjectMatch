@@ -2,7 +2,6 @@ import {initKeycloak, keycloak} from "./keycloak";
 import {DirectChat, Message, User} from "../../models";
 import {HttpClient} from "./server-client";
 import {TokenUser} from "./tokenUser";
-import e from "express";
 
 const authenticatedPromise = initKeycloak();
 
@@ -108,6 +107,32 @@ async function renderChatProfiles() {
     list.innerHTML = chatElement;
 }
 
+async function loadChatButtons() {
+    const layerUp = document.getElementById("layer-up");
+    const layerDown = document.getElementById("layer-down");
+
+    layerUp.addEventListener("click", async () => {
+        layer++;
+        await renderChatMessages(chatId, true);
+    });
+
+    layerDown.addEventListener("click", async () => {
+        layer--;
+        await renderChatMessages(chatId);
+    });
+}
+
+async function manageMessages() {
+    // eslint-disable-next-line no-constant-condition
+    while(true) {
+        if(chatId !== -1 && layer === 0) {
+            await loadChatMessages(chatId);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 5000));
+    }
+}
+
 const chatMessages = new Map<string, string[]>();
 
 async function loadChatMessages(id: number) {
@@ -139,6 +164,7 @@ async function loadChatMessages(id: number) {
     let otherUsername: string | undefined = undefined;
 
     let lastDate = "";
+    let date = "";
 
     let recentMessages: string[] = [];
 
@@ -157,16 +183,16 @@ async function loadChatMessages(id: number) {
         }
 
         const time = message.time.slice(0, 5);
-        const date = message.date;
+        date = message.date;
 
         if(lastDate === "") {
             lastDate = date;
             recentMessages = chatMessages.get(date) || [];
         }
         else if(lastDate !== date) {
+            chatMessages.set(lastDate, recentMessages);
             lastDate = date;
-            chatMessages.set(date, recentMessages);
-            recentMessages = chatMessages.get(date) || [];
+            recentMessages = [];
         }
 
         const displayMessage = `${message.userId};${time};${username};${message.message}`;
@@ -174,40 +200,14 @@ async function loadChatMessages(id: number) {
         recentMessages.push(displayMessage);
     }
 
-    chatMessages.set(lastDate, recentMessages);
+    chatMessages.set(date, recentMessages);
 }
 
-async function loadChatButtons() {
-    const layerUp = document.getElementById("layer-up");
-    const layerDown = document.getElementById("layer-down");
-
-    layerUp.addEventListener("click", async () => {
-        layer++;
-        await renderChatMessages(chatId);
-    });
-
-    layerDown.addEventListener("click", async () => {
-        layer--;
-        await renderChatMessages(chatId);
-    });
-}
-
-async function manageMessages() {
-    // eslint-disable-next-line no-constant-condition
-    while(true) {
-        if(chatId !== -1 && layer === 0) {
-            await loadChatMessages(chatId);
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 5000));
-    }
-}
-
-async function renderChatMessages(id : number) {
+async function renderChatMessages(id : number, scrollDown: boolean = false) {
 
     const chatWindow = document.getElementById("chat-window");
 
-    const check = Math.ceil(chatWindow.scrollTop + chatWindow.clientHeight) === chatWindow.scrollHeight;
+    const check = Math.ceil(chatWindow.scrollTop + chatWindow.clientHeight) === chatWindow.scrollHeight || scrollDown;
 
     await loadChatMessages(id);
 
@@ -244,7 +244,6 @@ async function renderChatMessages(id : number) {
 
     const layerDown = document.getElementById("layer-down");
 
-
     if(layer > 0) {
         layerDown.style.display = "block";
     }
@@ -266,6 +265,10 @@ function scrollToBottom(below: boolean = true) {
     const chatWindow = document.getElementById("chat-window");
 
     if(below) {
-        chatWindow.scrollTop = chatWindow.scrollHeight;
+        chatWindow.scrollTop = chatWindow.scrollHeight + chatWindow.clientHeight;
     }
+}
+
+function loadUsernames() {
+
 }
