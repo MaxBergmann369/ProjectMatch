@@ -58,7 +58,7 @@ export function createProjectEndpoints() {
             const prevViews = userToViews.get(tokenUser.userId)??[];
             const limit = 5;
             const projects = await Utility.getProjects(tokenUser.userId, showOld, limit, prevViews);
-            if (projects !== null) {
+            if (projects !== null && projects.length > 0) {
                 const views = projects.map(value => value.id);
                 if (projects.length < limit){
                     showOld = true;
@@ -73,7 +73,6 @@ export function createProjectEndpoints() {
                 res.sendStatus(404);
             }
         } catch (e) {
-            // throw e;
             res.sendStatus(400);
         }
     });

@@ -368,7 +368,7 @@ export class Database {
                     db.all("SELECT * FROM Project LIMIT ?",arr,callback);
                 }
                 else{
-                    db.all("SELECT * FROM Project WHERE id not in (${placeholders}) LIMIT ?",arr,callback);
+                    db.all(`SELECT * FROM Project WHERE id not in (${placeholders}) LIMIT ?`,arr,callback);
                 }
             }
             else{
