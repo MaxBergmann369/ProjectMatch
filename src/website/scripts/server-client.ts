@@ -34,6 +34,16 @@ export class HttpClient {
 
     }
 
+    async getFullNameByUserId(userId: string): Promise<string | null> {
+        return await fetch(`${this.baseUrl}/user/fullName/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.text() : null);
+    }
+
     async getTop10UserMatching(fullName: string) {
         return await fetch(`${this.baseUrl}/user/top10/${fullName}`, {
             method: 'GET',

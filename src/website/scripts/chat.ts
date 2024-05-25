@@ -9,10 +9,11 @@ const maxRenderAmount: number = 50;
 
 let client: HttpClient;
 let user: User | null = null;
-let chats: DirectChat[] = [];
+let chats: [DirectChat[], string[]] = [[], []];
 let chatId: number = -1;
 let layer: number = 0;
 let messageAmount: number = 0;
+let searching: boolean = false;
 
 document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await authenticatedPromise;
@@ -28,16 +29,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         await renderChatProfiles();
-        loadUsernames();
         manageMessages();
-        await addButtonListener();
+        await addEventListener();
     }
     else {
         location.href = "index.html";
     }
 });
 
-async function addButtonListener() {
+async function addEventListener() {
 
     const addBtn = document.getElementById("addChat");
 
@@ -62,10 +62,15 @@ async function addButtonListener() {
             await sendMessage(chatId, message.value);
             message.value = "";
         }
+        else {
+            alert("Please select a chat and write a message");
+        }
     });
 
     await loadChatButtons();
     await loadChatProfileButtons();
+    await loadUsernames();
+    await searchForChat();
 }
 
 async function loadChatProfileButtons() {
@@ -95,7 +100,7 @@ async function loadChatProfileButtons() {
 
 async function addUserButtons() {
     const userProfiles = document.getElementsByClassName("user");
-    const input = document.getElementById("input-bar") as HTMLInputElement;
+    const input = document.getElementById("input-user") as HTMLInputElement;
     const userList = document.getElementById("user-list");
 
     for (let i = 0; i < userProfiles.length; i++) {
@@ -114,20 +119,40 @@ async function addUserButtons() {
 
 }
 
-async function renderChatProfiles() {
-    chats = await client.getDirectChats(user.userId);
+async function renderChatProfiles(load: boolean = true) {
+    if(load) {
+        chats[0] = await client.getDirectChats(user.userId);
+        chats[1] = [];
+    }
 
     const list = document.getElementById("chat-list");
     let chatElement: string = "";
 
-    for(let i = 0; i < chats.length; i++) {
-        if(chats[i].userId === user.userId) {
-            const otherUser = await client.getUser(chats[i].otherUserId);
-            chatElement += `<div class="chat" id="${chats[i].id}">${otherUser.firstname} ${otherUser.lastname}`;
+    for(let i = 0; i < chats[0].length; i++) {
+        if(chats[0][i].userId === user.userId) {
+            let fullName: string;
+
+            if(load) {
+                fullName = await client.getFullNameByUserId(chats[0][i].otherUserId);
+                chats[1].push(fullName);
+            }
+            else {
+                fullName = chats[1][i];
+            }
+
+            chatElement += `<div class="chat" id="${chats[0][i].id}">${fullName}`;
         }
         else {
-            const otherUser = await client.getUser(chats[i].userId);
-            chatElement += `<div class="chat" id="${chats[i].id}">${otherUser.firstname} ${otherUser.lastname}`;
+            let fullName: string;
+            if(load) {
+                fullName = await client.getFullNameByUserId(chats[0][i].userId);
+                chats[1].push(fullName);
+            }
+            else {
+                fullName = chats[1][i];
+            }
+
+            chatElement += `<div class="chat" id="${chats[0][i].id}">${fullName}`;
         }
     }
 
@@ -154,6 +179,10 @@ async function manageMessages() {
     while(true) {
         if(chatId !== -1 && layer === 0) {
             await renderChatMessages(chatId);
+        }
+
+        if(!searching) {
+            await renderChatProfiles();
         }
 
         await new Promise(resolve => setTimeout(resolve, 5000));
@@ -309,7 +338,7 @@ function scrollToBottom(below: boolean = true) {
 }
 
 async function loadUsernames() {
-    const input = document.getElementById("input-bar") as HTMLInputElement;
+    const input = document.getElementById("input-user") as HTMLInputElement;
 
     input.addEventListener("input", async () => {
         let fullName = input.value.replace(" ", "-");
@@ -341,5 +370,35 @@ async function loadUsernames() {
         list.innerHTML = html;
 
         await addUserButtons();
+    });
+}
+
+async function searchForChat() {
+    const input = document.getElementById("input-chat") as HTMLInputElement;
+
+    input.addEventListener("input", async () => {
+        const search = input.value.toLowerCase();
+
+        if(search === "") {
+            searching = false;
+            await renderChatProfiles();
+            return;
+        }
+
+        searching = true;
+
+        //sort the chats by the search input
+        const sortedChats: [DirectChat[], string[]] = [[], []];
+
+        for(let i = 0; i < chats[0].length; i++) {
+            if(chats[1][i].toLowerCase().startsWith(search)) {
+                sortedChats[0].push(chats[0][i]);
+                sortedChats[1].push(chats[1][i]);
+            }
+        }
+
+        chats = sortedChats;
+
+        await renderChatProfiles(false);
     });
 }

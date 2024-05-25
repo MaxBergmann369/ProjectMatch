@@ -30,6 +30,31 @@ export function createUserEndpoints() {
         }
     });
 
+    userRouter.get('/user/fullName/:userId', async (req, res) => {
+        try {
+            const userId = req.params.userId;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const fullName = await UserUtility.getFullNameByUserId(userId);
+
+            if (fullName !== null) {
+                res.status(200).send(fullName);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
     userRouter.get('/user/top10/:fullName', async (req, res) => {
         try {
             const fullName = req.params.fullName;

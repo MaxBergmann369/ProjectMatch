@@ -38,6 +38,20 @@ export class UserUtility {
         }
     }
 
+    static async getFullNameByUserId(userId: string): Promise<string | null> {
+        try {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id)) {
+                return null;
+            }
+
+            return Database.getFullNameByUserId(id);
+        } catch (e) {
+            return null;
+        }
+    }
+
     static async getTop10UserMatching(fullName:string) {
         const names = fullName.split("-");
 

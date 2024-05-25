@@ -332,13 +332,24 @@ export class Database {
         });
     }
 
+    static async getFullNameByUserId(userId: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT firstname, lastname FROM User WHERE userId = ?`, [userId], (err, row: User) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row.firstname + " " + row.lastname);
+                }
+            });
+        });
+    }
+
     static async getTop10UserMatching(firstname: string, lastname: string): Promise<[string, string][]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT userId, firstname, lastname FROM User WHERE firstname LIKE ? AND lastname LIKE ? ORDER BY LENGTH(firstname), LENGTH(lastname), firstname, lastname LIMIT 10`, [firstname + '%', lastname + '%'], (err, rows: User[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    //create a touple with the userId and the fullname
                     const users: [string, string][] = rows.map(row => [row.userId, row.firstname + " " + row.lastname]);
                     resolve(users);
                 }

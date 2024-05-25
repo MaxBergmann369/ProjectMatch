@@ -11,6 +11,7 @@ body {
   width: 20%;
   height: 80%;
   overflow-y: auto;
+  overflow-x: hidden;
   float: left;
 }
 
@@ -27,6 +28,10 @@ body {
 
 #messageWindow {
   padding: 1rem;
+}
+
+#input-chat {
+  width: 95%;
 }
 
 #chat-window {
