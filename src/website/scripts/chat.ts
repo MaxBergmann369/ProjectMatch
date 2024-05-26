@@ -66,6 +66,9 @@ async function addEventListener() {
             await sendMessage(chatId, message.value);
             message.value = "";
         }
+        else if(message.value === "") {
+            alert("Please write a message");
+        }
         else {
             alert("Please select a chat and write a message");
         }
@@ -112,14 +115,11 @@ async function addUserButtons() {
 
     for (let i = 0; i < userProfiles.length; i++) {
         userProfiles[i].addEventListener("click", async (event) => {
-            const id = (event.target as HTMLElement).id;
+            const element = event.target as HTMLElement;
 
-            if(id !== "") {
-                input.value = "";
+            if(element.id !== "") {
+                input.value = element.innerText;
                 userList.style.display = "none";
-                await client.addDirectChat(user.userId, id);
-                await renderChatProfiles();
-                await loadChatProfileButtons();
             }
         });
     }
@@ -164,6 +164,8 @@ async function renderChatProfiles(load: boolean = true) {
     }
 
     list.innerHTML = chatElement;
+
+    await loadChatProfileButtons();
 }
 
 async function loadChatButtons() {
