@@ -10,7 +10,7 @@ body {
   border: 1px solid black;
   width: 20%;
   height: 80%;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   float: left;
 }
@@ -32,6 +32,17 @@ body {
 
 #input-chat {
   width: 95%;
+}
+
+.add-chat {
+  position: relative;
+  top: 10%;
+  width: 100%;
+}
+
+#chat-list {
+  overflow-y: auto;
+  height: 80%;
 }
 
 #chat-window {
