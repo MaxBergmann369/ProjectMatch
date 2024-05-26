@@ -42,7 +42,11 @@ async function addEventListener() {
     const addBtn = document.getElementById("addChat");
 
     addBtn.addEventListener("click", async () => {
-        let userFullName = (document.getElementById("input-bar") as HTMLInputElement).value;
+        const input = document.getElementById("input-user") as HTMLInputElement;
+        let userFullName = input.value;
+
+        input.value = "";
+
         userFullName = userFullName.replace(" ", "-");
         if(userFullName !== "" ) {
             const userId = await client.getUserId(userFullName);
@@ -79,12 +83,15 @@ async function loadChatProfileButtons() {
     for (let i = 0; i < chatProfiles.length; i++) {
         chatProfiles[i].addEventListener("click", async (event) => {
             const id = parseInt((event.target as HTMLElement).id);
+            console.log(id);
 
             if(chatId !== id) {
                 chatMessages.clear();
             }
+            console.log("loaded");
 
             chatId = id;
+
             if(!isNaN(id)) {
                 const layerUp = document.getElementById("layer-up");
 
