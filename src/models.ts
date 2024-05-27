@@ -72,6 +72,10 @@ export interface DirectChat {
     id: number;
     userId: string;
     otherUserId: string;
+    userLastOpenedDate: string,
+    userLastOpenedTime: string,
+    otherLastOpenedDate: string,
+    otherLastOpenedTime: string
 }
 
 export interface Message {

@@ -130,37 +130,28 @@ async function renderChatProfiles(load: boolean = true) {
     if(load) {
         chats[0] = await client.getDirectChats(user.userId);
         chats[1] = [];
+        await updateChats();
     }
 
     const list = document.getElementById("chat-list");
     let chatElement: string = "";
 
     for(let i = 0; i < chats[0].length; i++) {
-        if(chats[0][i].userId === user.userId) {
-            let fullName: string;
+        const userId = chats[0][i].userId === user.userId ? chats[0][i].otherUserId : chats[0][i].userId;
 
-            if(load) {
-                fullName = await client.getFullNameByUserId(chats[0][i].otherUserId);
-                chats[1].push(fullName);
-            }
-            else {
-                fullName = chats[1][i];
-            }
+        let fullName: string;
+        let unreadMessages: number = 0;
 
-            chatElement += `<div class="chat" id="${chats[0][i].id}">${fullName}`;
+        if(load) {
+            unreadMessages = await client.getUnreadMessages(chats[0][i].id, userId);
+            fullName = await client.getFullNameByUserId(userId);
+            chats[1].push(fullName);
         }
         else {
-            let fullName: string;
-            if(load) {
-                fullName = await client.getFullNameByUserId(chats[0][i].userId);
-                chats[1].push(fullName);
-            }
-            else {
-                fullName = chats[1][i];
-            }
-
-            chatElement += `<div class="chat" id="${chats[0][i].id}">${fullName}`;
+            fullName = chats[1][i];
         }
+
+        chatElement += `<div class="chat" id="${chats[0][i].id}">${fullName} ${unreadMessages}</div>`;
     }
 
     list.innerHTML = chatElement;
@@ -411,3 +402,15 @@ async function searchForChat() {
         await renderChatProfiles(false);
     });
 }
+
+async function updateChats() {
+    const directChats = chats[0];
+
+    for(const chat of directChats) {
+        await client.updateDirectChat(chat.id, user.userId);
+    }
+}
+
+document.addEventListener("unload", async () => {
+    await updateChats();
+});

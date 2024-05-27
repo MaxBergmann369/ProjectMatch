@@ -1,5 +1,5 @@
 import express from "express";
-import {ChatUtility} from "../db/utility/chat-utility";;
+import {ChatUtility} from "../db/utility/chat-utility";
 import {EndPoints} from "../db/validation";
 
 const chatRouter = express.Router();
@@ -74,6 +74,35 @@ export function createChatEndpoints() {
 
             if (chats !== null) {
                 res.status(200).send(chats);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
+    chatRouter.put('/chats/:chatId/:userId', async (req, res) => {
+        try {
+            const userId = req.params.userId;
+            const chatId = parseInt(req.params.chatId);
+
+            if(isNaN(chatId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if (await ChatUtility.updateDirectChat(chatId, userId)) {
+                res.sendStatus(200);
             } else {
                 res.sendStatus(400);
             }
@@ -160,6 +189,43 @@ export function createChatEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
+    chatRouter.get('/messages/unread/:chatId/:userId', async (req, res) => {
+        try {
+            const userId = req.params.userId;
+            const chatId = parseInt(req.params.chatId);
+
+            console.log("sus");
+
+            if(isNaN(chatId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                console.log("Invalid user id or chat id 1");
+                res.sendStatus(400);
+                return;
+            }
+
+            console.log(userId);
+            const amount = await ChatUtility.getUnreadMessages(chatId, userId);
+
+            if (amount !== -1) {
+                res.status(200).send(amount);
+            } else {
+                console.log("Invalid user id or chat id 2" );
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            throw e;
             res.sendStatus(400);
         }
     });

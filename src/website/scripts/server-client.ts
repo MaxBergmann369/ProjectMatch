@@ -393,6 +393,26 @@ export class HttpClient {
             .then(response => response.json());
     }
 
+    async getUnreadMessages(chatId: number, userId: string): Promise<number> {
+        return await fetch(`${this.baseUrl}/messages/unread/${chatId}/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.json() : 0);
+    }
+
+    async updateDirectChat(chatId: number, userId: string) {
+        return await fetch(`${this.baseUrl}/chats/${chatId}/${userId}`, {
+            method: 'PUT',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.text());
+    }
+
     async deleteDirectChat(userId: string, otherUserId: string) {
         return await fetch(`${this.baseUrl}/chats/${userId}/${otherUserId}`, {
             method: 'DELETE',

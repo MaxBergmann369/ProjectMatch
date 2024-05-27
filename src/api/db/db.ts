@@ -103,6 +103,10 @@ export class Database {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userId TEXT NOT NULL,
             otherUserId TEXT NOT NULL,
+            userLastOpenedDate TEXT,
+            userLastOpenedTime TEXT,
+            otherLastOpenedDate TEXT,
+            otherLastOpenedTime TEXT,
             FOREIGN KEY(userId) REFERENCES User(userId),
             FOREIGN KEY(otherUserId) REFERENCES User(userId)
         )`);
@@ -776,7 +780,11 @@ export class Database {
                     const directChats: DirectChat[] = rows.map(row => ({
                         id: row.id,
                         userId: row.userId,
-                        otherUserId: row.otherUserId
+                        otherUserId: row.otherUserId,
+                        userLastOpenedDate: row.userLastOpenedDate,
+                        userLastOpenedTime: row.userLastOpenedTime,
+                        otherLastOpenedDate: row.otherLastOpenedDate,
+                        otherLastOpenedTime: row.otherLastOpenedTime
                     }));
                     resolve(directChats);
                 }
@@ -795,7 +803,11 @@ export class Database {
                     const directChat: DirectChat = {
                         id: row.id,
                         userId: row.userId,
-                        otherUserId: row.otherUserId
+                        otherUserId: row.otherUserId,
+                        userLastOpenedDate: row.userLastOpenedDate,
+                        userLastOpenedTime: row.userLastOpenedTime,
+                        otherLastOpenedDate: row.otherLastOpenedDate,
+                        otherLastOpenedTime: row.otherLastOpenedTime
                     };
                     resolve(directChat);
                 }
@@ -814,9 +826,39 @@ export class Database {
                     const directChat: DirectChat = {
                         id: row.id,
                         userId: row.userId,
-                        otherUserId: row.otherUserId
+                        otherUserId: row.otherUserId,
+                        userLastOpenedDate: row.userLastOpenedDate,
+                        userLastOpenedTime: row.userLastOpenedTime,
+                        otherLastOpenedDate: row.otherLastOpenedDate,
+                        otherLastOpenedTime: row.otherLastOpenedTime
                     };
                     resolve(directChat);
+                }
+            });
+        });
+    }
+
+    static async getUnreadMessagesByChatId(chatId: number, userId: string): Promise<number> {
+        return new Promise((resolve, reject) => {
+            // Get the DirectChat record
+            db.get(`SELECT * FROM DirectChat WHERE id = ? AND (userId = ? OR otherUserId = ?)`, [chatId, userId, userId], (err, row: DirectChat) => {
+                if (err) {
+                    reject(err);
+                } else if (!row) {
+                    resolve(0);
+                } else {
+                    // Determine the last opened date and time for the user
+                    const lastOpenedDate = row.userId === userId ? row.userLastOpenedDate : row.otherLastOpenedDate;
+                    const lastOpenedTime = row.userId === userId ? row.userLastOpenedTime : row.otherLastOpenedTime;
+
+                    // Get the count of messages that were sent after the last opened date and time
+                    db.get(`SELECT COUNT(*) FROM Message WHERE chatId = ? AND date > ? OR (date = ? AND time > ?)`, [chatId, lastOpenedDate, lastOpenedDate, lastOpenedTime], (err, row) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(row['COUNT(*)'] || 0);
+                        }
+                    });
                 }
             });
         });
@@ -1000,9 +1042,9 @@ export class Database {
         });
     }
 
-    static async addDirectChat(userId: string, otherUserId: string): Promise<boolean> {
+    static async addDirectChat(userId: string, otherUserId: string, date: string, time: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO DirectChat (userId, otherUserId) VALUES (?, ?)`, [userId, otherUserId], (err) => {
+            db.run(`INSERT INTO DirectChat (userId, otherUserId, userLastOpenedDate, userLastOpenedTime) VALUES (?, ?, ?, ?, ?, ?)`, [userId, otherUserId, date, time], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1059,6 +1101,29 @@ export class Database {
                     reject(err);
                 } else {
                     resolve(true);
+                }
+            });
+        });
+    }
+
+    static async updateDirectChatLastOpened(chatId: number, userId: string, date: string, time: string): Promise<boolean> {
+        //you have to look if userId === userId than userLastOpenedDate else userId === otherUserId otherLastOpenedDate
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM DirectChat WHERE id = ?`, [chatId], (err, row: DirectChat) => {
+                if (err) {
+                    reject(err);
+                } else if (!row) {
+                    reject(new Error("Chat not found"));
+                } else {
+                    const lastOpenedDate = row.userId === userId ? 'userLastOpenedDate' : 'otherLastOpenedDate';
+                    const lastOpenedTime = row.userId === userId ? 'userLastOpenedTime' : 'otherLastOpenedTime';
+                    db.run(`UPDATE DirectChat SET ${lastOpenedDate} = ?, ${lastOpenedTime} = ? WHERE id = ?`, [date, time, chatId], (err) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(true);
+                        }
+                    });
                 }
             });
         });

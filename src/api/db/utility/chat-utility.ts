@@ -20,7 +20,12 @@ export class ChatUtility {
                 return false;
             }
 
-            return await Database.addDirectChat(id, otherId);
+            const data = new Date(Date.now());
+
+            const date = data.toLocaleDateString();
+            const time = data.toLocaleTimeString();
+
+            return await Database.addDirectChat(id, otherId, date, time);
         }
         catch (e) {
             return false;
@@ -68,6 +73,32 @@ export class ChatUtility {
         }
         catch (e) {
             return null;
+        }
+    }
+
+    static async updateDirectChat(chatId: number, userId: string): Promise<boolean> {
+        try {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id) || chatId < 1) {
+                return false;
+            }
+
+            const chat = await Database.getDirectChatById(chatId);
+
+            if(chat === null || !(chat.userId === id || chat.otherUserId === id)) {
+                return false;
+            }
+
+            const data = new Date(Date.now());
+
+            const date = data.toLocaleDateString();
+            const time = data.toLocaleTimeString();
+
+            return await Database.updateDirectChatLastOpened(chatId, userId, date, time);
+        }
+        catch (e) {
+            return false;
         }
     }
 
@@ -154,6 +185,22 @@ export class ChatUtility {
             }
 
             return await Database.getAmountOfMessages(chatId);
+        }
+        catch (e) {
+            return -1;
+        }
+    }
+
+    static async getUnreadMessages(chatId: number, userId: string): Promise<number> {
+        try {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id) || chatId < 1) {
+                console.log("Invalid user id or chat id");
+                return -1;
+            }
+
+            return await Database.getUnreadMessagesByChatId(chatId, id);
         }
         catch (e) {
             return -1;
