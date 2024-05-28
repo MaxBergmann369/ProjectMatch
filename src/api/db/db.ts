@@ -852,7 +852,7 @@ export class Database {
                     const lastOpenedTime = row.userId === userId ? row.userLastOpenedTime : row.otherLastOpenedTime;
 
                     // Get the count of messages that were sent after the last opened date and time
-                    db.get(`SELECT COUNT(*) FROM Message WHERE chatId = ? AND date > ? OR (date = ? AND time > ?)`, [chatId, lastOpenedDate, lastOpenedDate, lastOpenedTime], (err, row) => {
+                    db.get(`SELECT COUNT(*) FROM Message WHERE chatId = ? AND userId != ? AND date > ? OR (date = ? AND time > ?)`, [chatId, userId, lastOpenedDate, lastOpenedDate, lastOpenedTime], (err, row) => {
                         if (err) {
                             reject(err);
                         } else {

@@ -182,7 +182,6 @@ export function createChatEndpoints() {
             }
 
             const amount = await ChatUtility.getUnreadMessages(chatId, userId);
-            console.log(amount);
 
             if (amount !== -1) {
                 res.status(200).send(amount.toString());

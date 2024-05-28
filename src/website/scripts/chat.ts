@@ -182,6 +182,7 @@ async function manageMessages() {
     while(true) {
         if(chatId !== -1 && layer === 0) {
             await renderChatMessages(chatId);
+            await client.updateDirectChat(chatId, user.userId);
         }
 
         if(!searching) {
