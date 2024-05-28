@@ -176,12 +176,13 @@ export function createChatEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null) {
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()){
                 res.sendStatus(400);
                 return;
             }
 
             const amount = await ChatUtility.getUnreadMessages(chatId, userId);
+            console.log(amount);
 
             if (amount !== -1) {
                 res.status(200).send(amount.toString());

@@ -196,7 +196,6 @@ export class ChatUtility {
             const id = userId.toLowerCase();
 
             if(!ValUser.isUserIdValid(id) || chatId < 1) {
-                console.log("Invalid user id or chat id");
                 return -1;
             }
 

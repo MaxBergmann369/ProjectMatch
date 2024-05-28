@@ -86,12 +86,16 @@ async function loadChatProfileButtons() {
     for (let i = 0; i < chatProfiles.length; i++) {
         chatProfiles[i].addEventListener("click", async (event) => {
             const id = parseInt((event.target as HTMLElement).id);
-            console.log(id);
 
             if(chatId !== id) {
                 chatMessages.clear();
             }
-            console.log("loaded");
+
+            await client.updateDirectChat(id, user.userId);
+
+            if(chatId !== -1) {
+                await client.updateDirectChat(chatId, user.userId);
+            }
 
             chatId = id;
 
@@ -130,7 +134,6 @@ async function renderChatProfiles(load: boolean = true) {
     if(load) {
         chats[0] = await client.getDirectChats(user.userId);
         chats[1] = [];
-        await updateChats();
     }
 
     const list = document.getElementById("chat-list");
@@ -143,7 +146,7 @@ async function renderChatProfiles(load: boolean = true) {
         let unreadMessages: number = 0;
 
         if(load) {
-            unreadMessages = await client.getUnreadMessages(chats[0][i].id, userId);
+            unreadMessages = await client.getUnreadMessages(chats[0][i].id, user.userId);
             fullName = await client.getFullNameByUserId(userId);
             chats[1].push(fullName);
         }
@@ -403,14 +406,6 @@ async function searchForChat() {
     });
 }
 
-async function updateChats() {
-    const directChats = chats[0];
-
-    for(const chat of directChats) {
-        await client.updateDirectChat(chat.id, user.userId);
-    }
-}
-
 document.addEventListener("unload", async () => {
-    await updateChats();
+    await client.updateDirectChat(chatId, user.userId);
 });
