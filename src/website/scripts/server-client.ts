@@ -393,16 +393,6 @@ export class HttpClient {
             .then(response => response.json());
     }
 
-    async getUnreadMessages(chatId: number, userId: string): Promise<number> {
-        return await fetch(`${this.baseUrl}/messages/unread/${chatId}/${userId}`, {
-            method: 'GET',
-            headers: {
-                Authorization: this.bearer
-            }
-        })
-            .then(response => response.ok? response.json() : 0);
-    }
-
     async updateDirectChat(chatId: number, userId: string) {
         return await fetch(`${this.baseUrl}/chats/${chatId}/${userId}`, {
             method: 'PUT',
@@ -447,6 +437,16 @@ export class HttpClient {
             }
         })
             .then(response => response.ok ? response.json() : null);
+    }
+
+    async getUnreadMessages(chatId: number, userId: string): Promise<number> {
+        return await fetch(`${this.baseUrl}/messages/unread/${chatId}/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.json() : 0);
     }
 
     async editMessage(messageId: number, chatId: number, userId: string, message: string) {

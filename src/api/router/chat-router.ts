@@ -162,6 +162,37 @@ export function createChatEndpoints() {
         }
     });
 
+    chatRouter.get('/messages/unread/:chatId/:userId', async (req, res) => {
+        try {
+            const userId = req.params.userId;
+            const chatId = parseInt(req.params.chatId);
+
+            if(isNaN(chatId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const amount = await ChatUtility.getUnreadMessages(chatId, userId);
+
+            if (amount !== -1) {
+                res.status(200).send(amount.toString());
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
     chatRouter.get('/messages/:chatId/:min/:max', async (req, res) => {
         try {
             const chatId = parseInt(req.params.chatId);
@@ -189,43 +220,6 @@ export function createChatEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
-            res.sendStatus(400);
-        }
-    });
-
-    chatRouter.get('/messages/unread/:chatId/:userId', async (req, res) => {
-        try {
-            const userId = req.params.userId;
-            const chatId = parseInt(req.params.chatId);
-
-            console.log("sus");
-
-            if(isNaN(chatId)) {
-                res.sendStatus(400);
-                return;
-            }
-
-            const authHeader = req.headers.authorization;
-
-            const tokenUser = EndPoints.getToken(authHeader);
-
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
-                console.log("Invalid user id or chat id 1");
-                res.sendStatus(400);
-                return;
-            }
-
-            console.log(userId);
-            const amount = await ChatUtility.getUnreadMessages(chatId, userId);
-
-            if (amount !== -1) {
-                res.status(200).send(amount);
-            } else {
-                console.log("Invalid user id or chat id 2" );
-                res.sendStatus(400);
-            }
-        } catch (e) {
-            throw e;
             res.sendStatus(400);
         }
     });
