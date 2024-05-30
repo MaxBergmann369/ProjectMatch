@@ -176,22 +176,28 @@ export class ProjectUtility {
         }
     }
 
-    static async getProjects(): Promise<Project[] | null> {
+    static async getProjects(userId: string, showOld: boolean, limit: number, lastViews: number[]): Promise<Project[] | null> {
         try {
-            return await Database.getProjects();
+            return await Database.getProjects(userId,showOld, limit, lastViews);
         }
         catch (e) {
+            // throw e;
             return null;
         }
     }
     /* endregion */
 
     /* region ProjectMember */
-    static async addProjectMember(projectId: number, userId: string): Promise<boolean> {
+    static async addMemberRequest(projectId: number, userId: string): Promise<boolean> {
         try {
             const id = userId.toLowerCase();
 
             if(!await ValUser.isUserValid(id) || projectId < 1 || await Database.getProject(projectId) === null) {
+                return false;
+            }
+
+            const members = await this.getProjectMembers(projectId);
+            if (members === null || members.some(member => member.userId === id)) {
                 return false;
             }
 

@@ -24,9 +24,9 @@ Das Endergebnis des Projekts wird eine voll funktionsfähige Website sein, die B
 | Phase | Meilenstein / Ergebnis | Soll-Termin |
 |-------|------------------------|-------------|
 | 1     | Fertigstellung der Projektidee, -antrag, -auftrag, Mockups, Vorstudie, Variantenbildung | 18. April 2024 |
-| 2     | Fertigstellung der ganzen Unit-Tests | 30. April 2024 |
-| 3     | Fertigstellung des ganzen Frontends | 15. Mai 2024 |
-| 4     | Fertigstellung des ganzen code | 30. Mai 2024 |
+| 2     | Fertigstellung der ganzen Unit-Tests | 6. Juni 2024 |
+| 3     | Fertigstellung des ganzen Frontends | 10. Juni 2024 |
+| 4     | Fertigstellung des ganzen code | 14. Juni 2024 |
 | 5     | Fertigstellung des ganzen Projekts(Fixen von Bugs, Designändern) | 15. Juni 2024 |
 
 ## Projektstart:

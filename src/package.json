@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx ts-node ./app.ts",
-    "build": "npx webpack --mode=production && npx sass website/styles/",
-    "dev": "npx webpack --mode=development && npx sass website/styles/",
+    "start": "npx ts-node ./api/app.ts",
+    "run": "npx ts-node ./app.ts",
+    "build": "npx webpack --mode=production  && npx sass ./src/styles/*.scss ./dist/styles/",
+    "dev": "npx webpack --mode=development && npx sass ./src/styles/*.scss ./dist/styles/",
     "watch": "npx webpack --watch --mode=development",
     "test": "jest"
   },

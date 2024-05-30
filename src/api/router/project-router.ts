@@ -4,6 +4,8 @@ import {EndPoints} from "../db/validation";
 
 const projectRouter = express.Router();
 
+const userToViews = new Map<string, number[]>();
+
 export function createProjectEndpoints() {
 
     /* region Project */
@@ -21,7 +23,7 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/projects/:projId', async (req, res) => {
+    projectRouter.get('/projects/id/:projId', async (req, res) => {
         try {
             const id = parseInt(req.params.projId);
 
@@ -38,19 +40,36 @@ export function createProjectEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
-            res.sendStatus(400)
+            res.sendStatus(400);
         }
     });
 
-    projectRouter.get('/projects', async (req, res) => {
+    projectRouter.get('/projects/:showOld', async (req, res) => {
         try {
-            const projects = await ProjectUtility.getProjects();
+            const authHeader = req.headers.authorization;
 
-            if (projects !== null) {
+            const tokenUser = EndPoints.getToken(authHeader);
+            if (!tokenUser){
+                res.sendStatus(400);
+                return;
+            }
+            let showOld = req.params.showOld === "true";
+            const prevViews = userToViews.get(tokenUser.userId)??[];
+            const limit = 5;
+            const projects = await ProjectUtility.getProjects(tokenUser.userId, showOld, limit, prevViews);
+            if (projects !== null && projects.length > 0) {
+                const views = projects.map(value => value.id);
+                if (projects.length < limit){
+                    showOld = true;
+                }
+                userToViews.set(tokenUser.userId, showOld? prevViews.concat(views) : views);
                 //TODO: algorithm
                 res.status(200).send(projects);
             } else {
-                res.sendStatus(400);
+                if (showOld){
+                    userToViews.set(tokenUser.userId, []);
+                }
+                res.sendStatus(404);
             }
         } catch (e) {
             res.sendStatus(400);
@@ -357,7 +376,7 @@ export function createProjectEndpoints() {
 
     projectRouter.post('/projects/:projId/abilities', async (req, res) => {
         try {
-            const {abilityId} = req.body
+            const {abilityId} = req.body;
             const projectId = parseInt(req.params.projId);
 
             const authHeader = req.headers.authorization;
@@ -381,19 +400,21 @@ export function createProjectEndpoints() {
 
     projectRouter.get('/projects/:projId/abilities', async (req, res) => {
         try {
-            const {abilityIds} = req.body;
             const projectId = parseInt(req.params.projId);
 
-            if (isNaN(projectId)) {
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
-
-            for (const abilityId of abilityIds) {
-                const id = parseInt(abilityId);
-                if (isNaN(id) || !await ProjectUtility.addProjectAbility(projectId, id)) {
-                    res.sendStatus(400);
-                }
+            const projectAbilities = await ProjectUtility.getAbilitiesByProjectId(projectId);
+            if(projectAbilities !== null) {
+                res.status(200).send(projectAbilities);
+            } else {
+                res.sendStatus(400);
             }
         } catch (e) {
             res.sendStatus(400);

@@ -373,9 +373,19 @@ export class Database {
         });
     }
 
-    static async getProjects(): Promise<Project[]> {
+    static async getProjects(userId: string, showOld: boolean, limit: number, lastViews: number[]): Promise<Project[]> {
+        if (showOld === undefined){
+            showOld = true;
+        }
+        if (!limit){
+            limit = 100;
+        }
+        if (!lastViews){
+            lastViews = [];
+        }
+
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project`, (err, rows: Project[]) => {
+            const callback = (err:never, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -391,7 +401,32 @@ export class Database {
                     }));
                     resolve(projects);
                 }
-            });
+            };
+            const placeholders: string = lastViews.map(() => "?").join(", ");
+            const arr : string[] = lastViews.map((value) => value.toString());
+            if (!userId){
+                db.all("SELECT * FROM Project LIMIT ?",arr,callback);
+            }
+            else if (showOld){
+                arr.push(limit.toString());
+                if (arr.length === 1){
+                    db.all("SELECT * FROM Project LIMIT ?",arr,callback);
+                }
+                else{
+                    db.all(`SELECT * FROM Project WHERE id not in (${placeholders}) LIMIT ?`,arr,callback);
+                }
+            }
+            else{
+                if (arr.length === 0){
+                    db.all(`SELECT * FROM Project WHERE id NOT IN (SELECT projectId FROM View WHERE userId = ?) LIMIT ?`, [userId,limit], callback);
+                }
+                else{
+                    arr.push(userId);
+                    arr.push(limit.toString());
+                    db.all(`SELECT * FROM Project WHERE id not in (${placeholders}) and id NOT IN (SELECT projectId FROM View WHERE userId = ?) LIMIT ?`,arr,callback);
+                }
+            }
+
         });
     }
 
@@ -706,7 +741,9 @@ export class Database {
                     reject(err);
                 } else {
                     const abilityIds: number[] = rows.map(row => row.abilityId);
-                    db.all(`SELECT * FROM Ability WHERE id IN (?)`, [abilityIds], (err, rows: Ability[]) => {
+                    const placeholder = abilityIds.map(() => "?").join(", ");
+
+                    db.all(`SELECT * FROM Ability WHERE id IN (${placeholder})`, abilityIds, (err, rows: Ability[]) => {
                         if (err) {
                             reject(err);
                         } else {
