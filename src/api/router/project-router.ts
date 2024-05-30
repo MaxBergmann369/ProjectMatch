@@ -1,5 +1,5 @@
 import express from "express";
-import {ProjectUtility} from "../db/utility/project-utility";;
+import {ProjectUtility} from "../db/utility/project-utility";
 import {EndPoints} from "../db/validation";
 
 const projectRouter = express.Router();
@@ -141,7 +141,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if(await ProjectUtility.addProjectMember(projectId, userId)) {
+            if(await ProjectUtility.addMemberRequest(projectId, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);

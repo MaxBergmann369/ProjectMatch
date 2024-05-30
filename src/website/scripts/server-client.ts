@@ -442,7 +442,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getMessages(chatId: number, min: number, max: number) :Promise<Message[]>  {
+    async getMessages(chatId: number, min: number, max: number) :Promise<[number, Message[]]>  {
         return await fetch(`${this.baseUrl}/messages/${chatId}/${min}/${max}`, {
             method: 'GET',
             headers: {
