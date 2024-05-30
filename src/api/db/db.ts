@@ -606,6 +606,18 @@ export class Database {
         });
     }
 
+    static async isProjectLikedByUser(userId: string, projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM Like WHERE userId = ? AND projectId = ?`, [userId, projectId], (err, row: Like) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row !== undefined);
+                }
+            });
+        });
+    }
+
     static async getViewsByProjectId(projectId: number): Promise<View[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM View WHERE projectId = ?`, [projectId], (err, rows: View[]) => {

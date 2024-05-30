@@ -321,6 +321,30 @@ export function createProjectEndpoints() {
         }
     });
 
+    projectRouter.get('/isLiked/:projId/:userId', async (req, res) => {
+        try {
+            const projectId = parseInt(req.params.projId);
+            const userId = req.params.userId;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || isNaN(projectId)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if(await ProjectUtility.isProjectLikedByUser(projectId, userId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
     projectRouter.get('/likes/:projId', async (req, res) => {
         try {
             const projectId = parseInt(req.params.projId);

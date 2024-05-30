@@ -85,6 +85,21 @@ document.addEventListener("DOMContentLoaded", async function () {
                 arr = await client.getProjects(allowRepeats);
             }
             console.log(arr);
+
+
+            //TODO: check if user has already liked the project
+            const isliked = await client.isLiked(arr[0].id, user.userId);
+
+            console.log(isliked);
+
+            if(isliked){
+                const span = document.getElementsByTagName("span");
+
+                //set class of span to active
+                span[0].classList.add("active");
+                console.log(span[0].classList);
+            }
+
             projects.push(...arr);
         }
         return projects.shift();
@@ -172,6 +187,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             duration: 1250,
             easing: "ease"
         });
+
         topCard.dispatchEvent(event);
     });
 });

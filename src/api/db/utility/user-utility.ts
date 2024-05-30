@@ -135,7 +135,7 @@ export class UserUtility {
         try {
             const id = userId.toLowerCase();
 
-            if(!await ValUser.isUserValid(id) || abilityId < 1) {
+            if(!(await ValUser.isUserValid(id)) || abilityId < 1) {
                 return false;
             }
 
@@ -154,7 +154,7 @@ export class UserUtility {
         try {
             const id = userId.toLowerCase();
 
-            if(!await ValUser.isUserValid(id)) {
+            if(!(await ValUser.isUserValid(id))) {
                 return null;
             }
 
@@ -188,7 +188,7 @@ export class UserUtility {
                 return false;
             }
 
-            if(!await ValUser.isUserValid(id)) {
+            if(!(await ValUser.isUserValid(id))) {
                 return false;
             }
 
