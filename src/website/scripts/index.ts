@@ -13,5 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
             location.href = "home.html";
         });
     });
+
+
 });
+
+
 

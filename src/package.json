@@ -6,8 +6,8 @@
   "scripts": {
     "start": "npx ts-node ./api/app.ts",
     "run": "npx ts-node ./app.ts",
-    "build": "npx webpack --watch --mode=production  && npx sass website/styles/",
-    "dev": "npx webpack --watch --mode=development && npx sass website/styles/",
+"build": "npx webpack --mode=production  && npx sass ./src/styles/*.scss ./dist/styles/",
+"dev": "npx webpack --mode=development && npx sass ./src/styles/*.scss ./dist/styles/",
     "test": "jest"
   },
   "dependencies": {
