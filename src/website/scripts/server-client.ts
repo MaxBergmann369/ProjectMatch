@@ -44,7 +44,37 @@ export class HttpClient {
 
     }
 
-    async updateUser(username: string, birthdate: string) {
+    async getFullNameByUserId(userId: string): Promise<string | null> {
+        return await fetch(`${this.baseUrl}/user/fullName/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.text() : null);
+    }
+
+    async getTop10UserMatching(fullName: string) {
+        return await fetch(`${this.baseUrl}/user/top10/${fullName}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.json() : null);
+    }
+
+    async getUserId(fullName: string): Promise<string | null> {
+        return await fetch(`${this.baseUrl}/userId/${fullName}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.text() : null);
+    }
+
+    async updateUser(userId: string, username:string, birthdate: string, pfp: string) {
         return await fetch(`${this.baseUrl}/user`, {
             method: 'PUT',
             headers: {
@@ -52,8 +82,10 @@ export class HttpClient {
                 Authorization: this.bearer
             },
             body: JSON.stringify({
+                userId: userId,
                 username: username,
-                birthdate: birthdate
+                birthdate: birthdate,
+                pfp: pfp
             })
         })
             .then(response => response.text());
@@ -301,7 +333,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async addProjectAbility(projectId: number, abilityId: number) {
+    async addProjectAbilities(projectId: number, abilityIds: number[]) {
         return await fetch(`${this.baseUrl}/projects/${projectId}/abilities`, {
             method: 'POST',
             headers: {
@@ -309,7 +341,7 @@ export class HttpClient {
                 Authorization: this.bearer
             },
             body: JSON.stringify({
-                abilityId: abilityId
+                abilityIds: abilityIds
             })
         })
             .then(response => response.text());
@@ -374,6 +406,16 @@ export class HttpClient {
             .then(response => response.json());
     }
 
+    async updateDirectChat(chatId: number, userId: string) {
+        return await fetch(`${this.baseUrl}/chats/${chatId}/${userId}`, {
+            method: 'PUT',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.text());
+    }
+
     async deleteDirectChat(userId: string, otherUserId: string) {
         return await fetch(`${this.baseUrl}/chats/${userId}/${otherUserId}`, {
             method: 'DELETE',
@@ -384,7 +426,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async addMessage(userId: string, otherUserId: string, message: string) {
+    async addMessage(chatId: number, userId: string, message: string) {
         return await fetch(`${this.baseUrl}/messages`, {
             method: 'POST',
             headers: {
@@ -392,22 +434,32 @@ export class HttpClient {
                 Authorization: this.bearer
             },
             body: JSON.stringify({
+                chatId: chatId,
                 userId: userId,
-                otherUserId: otherUserId,
                 message: message
             })
         })
             .then(response => response.text());
     }
 
-    async getMessages(chatId: number):Promise<Message[]> {
-        return await fetch(`${this.baseUrl}/messages/${chatId}`, {
+    async getMessages(chatId: number, min: number, max: number) :Promise<[number, Message[]]>  {
+        return await fetch(`${this.baseUrl}/messages/${chatId}/${min}/${max}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
             }
         })
-            .then(response => response.json());
+            .then(response => response.ok ? response.json() : null);
+    }
+
+    async getUnreadMessages(chatId: number, userId: string): Promise<number> {
+        return await fetch(`${this.baseUrl}/messages/unread/${chatId}/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.json() : 0);
     }
 
     async editMessage(messageId: number, chatId: number, userId: string, message: string) {

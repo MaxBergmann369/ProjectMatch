@@ -3,6 +3,7 @@ export interface User {
     username: string;
     firstname: string;
     lastname: string;
+    pfp: string;
     email: string;
     clazz: string;
     birthdate: Date;
@@ -71,6 +72,10 @@ export interface DirectChat {
     id: number;
     userId: string;
     otherUserId: string;
+    userLastOpenedDate: string,
+    userLastOpenedTime: string,
+    otherLastOpenedDate: string,
+    otherLastOpenedTime: string
 }
 
 export interface Message {
@@ -78,7 +83,8 @@ export interface Message {
     chatId: number;
     userId: string;
     message: string;
-    dateTime: string;
+    date: string;
+    time: string;
 }
 
 export enum Role {
