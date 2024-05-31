@@ -6,6 +6,7 @@ export class Card {
     onLike: () => void;
     onDislike: () => void;
     onFavorite: () => void;
+    favorite: boolean;
     element: HTMLElement;
     title: string;
     desc: string;
@@ -18,6 +19,7 @@ export class Card {
                     onLike,
                     onDislike,
                     onFavorite,
+                    favorite,
                     title,
                     desc,
                     owner,
@@ -28,6 +30,7 @@ export class Card {
         this.onLike = onLike;
         this.onDislike = onDislike;
         this.onFavorite =onFavorite;
+        this.favorite = favorite;
         this.title = title;
         this.desc = desc;
         this.owner = owner;
@@ -179,6 +182,11 @@ export class Card {
             star.classList.toggle('active');
             this.onFavorite();
         });
+
+        if (this.favorite) {
+            star.classList.add('active');
+        }
+
         star.innerHTML = svg;
         title.append(star);
         const desc = document.createElement('p');

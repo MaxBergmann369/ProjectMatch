@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             },
             onFavorite: () => {
             },
+            favorite: false,
             title: "No more projects",
             desc: "You have seen all the projects! Check back later or continue swiping to see projects, you already have seen, again.",
             owner: user1,
@@ -86,20 +87,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
             console.log(arr);
 
-
-            //TODO: check if user has already liked the project
-            const isliked = await client.isLiked(arr[0].id, user.userId);
-
-            console.log(isliked);
-
-            if(isliked){
-                const span = document.getElementsByTagName("span");
-
-                //set class of span to active
-                span[0].classList.add("active");
-                console.log(span[0].classList);
-            }
-
             projects.push(...arr);
         }
         return projects.shift();
@@ -115,6 +102,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const ownerId = project.ownerId;
         const owner = await client.getUser(ownerId);
         let tags = (await client.getProjectAbilities(project.id)).map(value => value.name);
+        const favourite = await client.isLiked(project.id, user.userId);
         if (tags.length > 6){
             tags= tags.slice(0,6);
         }
@@ -149,6 +137,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     }
                 });
             },
+            favorite: favourite,
             title:title,
             desc:desc,
             owner:owner,
