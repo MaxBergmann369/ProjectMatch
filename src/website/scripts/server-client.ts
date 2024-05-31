@@ -323,6 +323,16 @@ export class HttpClient {
             .then(response => response.text());
     }
 
+    async isLiked(projectId: number, userId: string): Promise<boolean> {
+        return await fetch(`${this.baseUrl}/isLiked/${projectId}/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok);
+    }
+
     async deleteLike(projectId: number, userId: string) {
         return await fetch(`${this.baseUrl}/likes/${projectId}/${userId}`, {
             method: 'DELETE',

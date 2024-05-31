@@ -10,7 +10,7 @@ export class ChatUtility {
             const id = userId.toLowerCase();
             const otherId = otherUserId.toLowerCase();
 
-            if(!await ValUser.isUserValid(id) || !await ValUser.isUserValid(otherId) || id === otherId) {
+            if(!(await ValUser.isUserValid(id)) || !await ValUser.isUserValid(otherId) || id === otherId) {
                 return false;
             }
 

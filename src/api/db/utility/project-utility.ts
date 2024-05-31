@@ -192,7 +192,7 @@ export class ProjectUtility {
         try {
             const id = userId.toLowerCase();
 
-            if(!await ValUser.isUserValid(id) || projectId < 1 || await Database.getProject(projectId) === null) {
+            if(!(await ValUser.isUserValid(id)) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
@@ -301,17 +301,15 @@ export class ProjectUtility {
         try {
             const id = userId.toLowerCase();
 
-            if(!await ValUser.isUserValid(id) || projectId < 1 || await Database.getProject(projectId) === null) {
+            if(!(await ValUser.isUserValid(id)) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
             //Problems with getLikesByUserId
-            const likes = await Database.getLikesByUserId(id);
+            const liked = await Database.isProjectLikedByUser(id, projectId);
 
-            for(const like of likes) {
-                if(like.projectId === projectId) {
-                    return false;
-                }
+            if(liked) {
+                return false;
             }
 
             return await Database.addLike(id, projectId);
@@ -345,6 +343,21 @@ export class ProjectUtility {
         }
     }
 
+    static async isProjectLikedByUser(projectId: number, userId: string): Promise<boolean> {
+        try {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id) || projectId < 1) {
+                return false;
+            }
+
+            return await Database.isProjectLikedByUser(id, projectId);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
     static async deleteLike(projectId: number, userId: string): Promise<boolean> {
         try {
             const id = userId.toLowerCase();
@@ -367,7 +380,7 @@ export class ProjectUtility {
         try {
             const id = userId.toLowerCase();
 
-            if(!await ValUser.isUserValid(id) || projectId < 1 || await Database.getProject(projectId) === null) {
+            if(!(await ValUser.isUserValid(id)) || projectId < 1 || await Database.getProject(projectId) === null) {
                 return false;
             }
 
