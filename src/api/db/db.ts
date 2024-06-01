@@ -502,6 +502,50 @@ export class Database {
         });
     }
 
+    static async getProjectsAlgorithm(userId: string, viewed: boolean, limit: number, likes:boolean, views:boolean): Promise<number[]> {
+        return new Promise((resolve, reject) => {
+            const orderLikes = likes ? 'DESC' : 'ASC';
+            const orderViews = views ? 'DESC' : 'ASC';
+            const viewedCondition = viewed ? '' : `AND pa.projectId NOT IN (SELECT projectId FROM View WHERE userId = ?)`;
+            const memberCondition = `AND pa.projectId NOT IN (SELECT projectId FROM ProjectMember WHERE userId = ?)`;
+
+            let sql = '';
+            if (!likes && !views) {
+                sql = `SELECT pa.projectId
+                   FROM ProjectAbility pa
+                   INNER JOIN Project p ON pa.projectId = p.id
+                   WHERE pa.abilityId IN (SELECT abilityId FROM UserAbility WHERE userId = ?)
+                   ${viewedCondition}
+                   ${memberCondition}
+                   GROUP BY pa.projectId
+                   ORDER BY p.dateOfCreation DESC
+                   LIMIT ?`;
+            } else {
+                sql = `SELECT pa.projectId, COUNT(pa.abilityId) as abilityCount,
+                   (SELECT COUNT(*) FROM Like l WHERE l.projectId = pa.projectId) as likeCount,
+                   (SELECT COUNT(*) FROM View v WHERE v.projectId = pa.projectId) as viewCount
+                   FROM ProjectAbility pa
+                   WHERE pa.abilityId IN (SELECT abilityId FROM UserAbility WHERE userId = ?)
+                   ${viewedCondition}
+                   ${memberCondition}
+                   GROUP BY pa.projectId
+                   ORDER BY abilityCount DESC, likeCount ${orderLikes}, viewCount ${orderViews}
+                   LIMIT ?`;
+            }
+
+            const params = viewed ? [userId, userId, limit] : [userId, userId, userId, limit];
+
+            db.all(sql, params, (err, rows: any[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const projectIds: number[] = rows.map(row => row.projectId);
+                    resolve(projectIds);
+                }
+            });
+        });
+    }
+
     static async getAmountOfProjectsByOwnerId(ownerId: string): Promise<number> {
         return new Promise((resolve, reject) => {
             db.get(`SELECT COUNT(*) FROM Project WHERE ownerId = ?`, [ownerId], (err, row) => {
