@@ -1,10 +1,9 @@
 import express from "express";
 import {ProjectUtility} from "../db/utility/project-utility";
 import {EndPoints} from "../db/validation";
+import {ProjectAlgo} from "../algorithm/project-recomendation";
 
 const projectRouter = express.Router();
-
-const userToViews = new Map<string, number[]>();
 
 export function createProjectEndpoints() {
 
@@ -53,22 +52,15 @@ export function createProjectEndpoints() {
                 res.sendStatus(400);
                 return;
             }
-            let showOld = req.params.showOld === "true";
-            const prevViews = userToViews.get(tokenUser.userId)??[];
-            const limit = 5;
+
+            const showOld = req.params.showOld === "true";
+            const limit: number = 5;
+            console.log("hi");
+            const prevViews = await ProjectAlgo.recommendProjects(tokenUser.userId, showOld, limit);
             const projects = await ProjectUtility.getProjects(tokenUser.userId, showOld, limit, prevViews);
             if (projects !== null && projects.length > 0) {
-                const views = projects.map(value => value.id);
-                if (projects.length < limit){
-                    showOld = true;
-                }
-                userToViews.set(tokenUser.userId, showOld? prevViews.concat(views) : views);
-                //TODO: algorithm
                 res.status(200).send(projects);
             } else {
-                if (showOld){
-                    userToViews.set(tokenUser.userId, []);
-                }
                 res.sendStatus(404);
             }
         } catch (e) {
