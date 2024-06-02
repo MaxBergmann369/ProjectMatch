@@ -55,9 +55,9 @@ export function createProjectEndpoints() {
 
             const showOld = req.params.showOld === "true";
             const limit: number = 5;
-            console.log("hi");
-            const prevViews = await ProjectAlgo.recommendProjects(tokenUser.userId, showOld, limit);
-            const projects = await ProjectUtility.getProjects(tokenUser.userId, showOld, limit, prevViews);
+
+            const projectIds = await ProjectAlgo.recommendProjects(tokenUser.userId, showOld, limit);
+            const projects = await ProjectUtility.getProjects(projectIds);
             if (projects !== null && projects.length > 0) {
                 res.status(200).send(projects);
             } else {
