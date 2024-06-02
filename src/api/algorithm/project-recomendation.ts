@@ -105,9 +105,10 @@ export class ProjectAlgo {
                 }
             }
 
-            this.data[userId][0] = [];
+            console.log(this.data[userId]);
 
             console.log(orderedProjects.length);
+            console.log(orderedProjects);
             return orderedProjects;
         }
         catch (e) {

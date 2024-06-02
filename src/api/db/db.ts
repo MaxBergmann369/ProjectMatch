@@ -504,42 +504,51 @@ export class Database {
 
     static async getProjectsAlgorithm(userId: string, viewed: boolean, limit: number, likes:boolean, views:boolean): Promise<number[]> {
         return new Promise((resolve, reject) => {
-            const orderLikes = likes ? 'DESC' : 'ASC';
-            const orderViews = views ? 'DESC' : 'ASC';
-            const viewedCondition = viewed ? '' : `AND pa.projectId NOT IN (SELECT projectId FROM View WHERE userId = ?)`;
-            const memberCondition = `AND pa.projectId NOT IN (SELECT projectId FROM ProjectMember WHERE userId = ?)`;
+            let sql = `SELECT p.id, COUNT(DISTINCT pa.abilityId) as matchingAbilities FROM Project p`;
 
-            let sql = '';
-            if (!likes && !views) {
-                sql = `SELECT pa.projectId
-                   FROM ProjectAbility pa
-                   INNER JOIN Project p ON pa.projectId = p.id
-                   WHERE pa.abilityId IN (SELECT abilityId FROM UserAbility WHERE userId = ?)
-                   ${viewedCondition}
-                   ${memberCondition}
-                   GROUP BY pa.projectId
-                   ORDER BY p.dateOfCreation DESC
-                   LIMIT ?`;
-            } else {
-                sql = `SELECT pa.projectId, COUNT(pa.abilityId) as abilityCount,
-                   (SELECT COUNT(*) FROM Like l WHERE l.projectId = pa.projectId) as likeCount,
-                   (SELECT COUNT(*) FROM View v WHERE v.projectId = pa.projectId) as viewCount
-                   FROM ProjectAbility pa
-                   WHERE pa.abilityId IN (SELECT abilityId FROM UserAbility WHERE userId = ?)
-                   ${viewedCondition}
-                   ${memberCondition}
-                   GROUP BY pa.projectId
-                   ORDER BY abilityCount DESC, likeCount ${orderLikes}, viewCount ${orderViews}
-                   LIMIT ?`;
+            if (!viewed) {
+                sql += ` LEFT JOIN View v ON p.id = v.projectId AND v.userId = ?`;
             }
 
-            const params = viewed ? [userId, userId, limit] : [userId, userId, userId, limit];
+            sql += ` LEFT JOIN ProjectMember pm ON p.id = pm.projectId AND pm.userId = ? AND pm.isAccepted = 1`;
 
-            db.all(sql, params, (err, rows: any[]) => {
+            if (views) {
+                sql += ` LEFT JOIN View v2 ON p.id = v2.projectId`;
+            }
+
+            if (likes) {
+                sql += ` LEFT JOIN Like l ON p.id = l.projectId`;
+            }
+
+            // Join with UserAbility and ProjectAbility to count matching abilities
+            sql += ` LEFT JOIN UserAbility ua ON ua.userId = ?`;
+            sql += ` LEFT JOIN ProjectAbility pa ON pa.projectId = p.id AND pa.abilityId = ua.abilityId`;
+
+            sql += ` WHERE 1=1`;
+
+            if (!viewed) {
+                sql += ` AND v.userId IS NULL`;
+            }
+
+            sql += ` AND pm.userId IS NULL`;
+
+            sql += ` GROUP BY p.id ORDER BY matchingAbilities DESC`;
+
+            if (views) {
+                sql += `, COUNT(v2.userId) DESC`;
+            } else if (likes) {
+                sql += `, COUNT(l.userId) DESC`;
+            } else {
+                sql += `, p.dateOfCreation DESC`;
+            }
+
+            sql += ` LIMIT ?`;
+
+            db.all(sql, [userId, userId, userId, limit], (err, rows: any) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const projectIds: number[] = rows.map(row => row.projectId);
+                    const projectIds = rows.map(row => row.id);
                     resolve(projectIds);
                 }
             });
