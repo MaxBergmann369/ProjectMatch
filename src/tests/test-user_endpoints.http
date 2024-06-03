@@ -1,0 +1,113 @@
+@token = eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ1OW1SYV85Q0NJWGtUNDdaUXQyNEplZGd1MWtsMTFNZ0ozb01NZ3k5V2UwIn0.eyJleHAiOjE3MTUzNTk3ODcsImlhdCI6MTcxNTM1ODg4NywiYXV0aF90aW1lIjoxNzE1MzU4ODg2LCJqdGkiOiIwZDA2NDFiYy0yMWY1LTQ3NzEtYTM5NS1iYjhjMzcyZDI3NjkiLCJpc3MiOiJodHRwczovL2F1dGguaHRsLWxlb25kaW5nLmFjLmF0L3JlYWxtcy9odGwtbGVvbmRpbmciLCJzdWIiOiJkODQ4NDU2MS1mNzJiLTQ1OWEtYjJkNS1kOWYzNmJjMTkzMDMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJodGxsZW9uZGluZy1zZXJ2aWNlIiwibm9uY2UiOiIzNmZjNmQ4YS1kZDU0LTQ3OTQtOWQyYS1iMDM2ZjlhNmZhMjIiLCJzZXNzaW9uX3N0YXRlIjoiNzQ4NDYzODktZmIxNi00NDA2LWExZjAtMWQxMDUzZjY5ZmZkIiwiYWNyIjoiMCIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgTERBUF9FTlRSWV9ETiBodGwtbGVvbmRpbmctZ3JvdXAtbWFwcGVyIGVtYWlsIGh0bC1sZW9uZGluZy1hY2NvdW50LW5hbWUiLCJzaWQiOiI3NDg0NjM4OS1mYjE2LTQ0MDYtYTFmMC0xZDEwNTNmNjlmZmQiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIkxEQVBfRU5UUllfRE4iOiJDTj1pZjIxMDAxMCxPVT0zQkhJRixPVT1JRixPVT1TdHVkZW50cyxPVT1IVEwsREM9RURVLERDPUhUTC1MRU9ORElORyxEQz1BQyxEQz1BVCIsIm5hbWUiOiJBZGFtIEjDtmxsZXJsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiaWYyMTAwMTAiLCJnaXZlbl9uYW1lIjoiQWRhbSIsImZhbWlseV9uYW1lIjoiSMO2bGxlcmwiLCJlbWFpbCI6ImEuaG9lbGxlcmxAc3R1ZGVudHMuaHRsLWxlb25kaW5nLmFjLmF0In0.wXLIfIkx78cro_ZvqV08scItwzYDG6JGj_-cSvaMU3zlAYbCX2cmQoimmI4zZdPy-MpJ91U7Hq9T4rQvqxr3HNrav9MlVMEDhY51bH3cpCFiZHUslh06B5ielyHPppe1tx4ixTEy2dZkgGMBnOojkrg3nqHTU3Qu4TMfi7AKByGIlKQdWq0hgYBIllLr9_7-4RElRhDQv0nLhGq4GsDgblJcyYXN24zOBooMCBloPdnaVHZMOrRDWa0kBSAnIRz1tuTVPhKCady-AvxQ9WLbAdSi1dL4GCYyJZpVf6NBRthO8WYzFXWfSDRl0wCzja1iSts-w6sQHpxLvc8rv7G6JA
+@url = http://localhost:3000/api
+
+###
+
+POST {{url}}/user
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "userId": "IF123456",
+    "username": "test",
+    "firstname": "test",
+    "lastname": "test",
+    "email": "test@test.at",
+    "clazz": "5BHITM",
+    "birthdate": "2002-05-08",
+    "biografie": "test",
+    "permissions": 1,
+    "department": "Informatik"
+}
+###
+POST {{url}}/user
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "userId": "IF123457",
+    "username": "test2",
+    "firstname": "test2",
+    "lastname": "tes2t",
+    "email": "test2@test.at",
+    "clazz": "5BHITM",
+    "birthdate": "2002-05-08",
+    "biografie": "test",
+    "permissions": 1,
+    "department": "Informatik"
+}
+
+###
+
+GET {{url}}/user/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+PUT {{url}}/user
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userId": "IF123456",
+  "username": "test12",
+  "firstname": "test",
+  "lastname": "test",
+  "email": "test@test.at",
+  "clazz": "5BHITM",
+  "birthdate": "2002-05-08",
+  "biografie": "test",
+  "permissions": 1,
+  "department": "Informatik"
+}
+
+###
+
+DELETE {{url}}/user/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/user/IF123456/ability
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "abilityId": 1
+}
+
+###
+
+GET {{url}}/user/IF123456/ability
+Authorization: Bearer {{token}}
+
+###
+
+DELETE {{url}}/user/IF123456/ability/1
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/user/IF123456/notification
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+      "title": "test",
+      "text": "test"
+}
+
+###
+
+GET {{url}}/user/IF123456/notification
+Authorization: Bearer {{token}}
+
+###
+
+DELETE {{url}}/user/IF123456/notification/2
+Authorization: Bearer {{token}}
+
+###
+
+GET {{url}}/user/abilities
+Authorization: Bearer {{token}}
