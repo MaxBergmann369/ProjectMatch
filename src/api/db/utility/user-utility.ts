@@ -218,6 +218,15 @@ export class UserUtility {
         }
     }
 
+    static async notificationsSeen(userId:string, id:number): Promise<boolean> {
+        try {
+            return await Database.notificationSeen(userId, id);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
     static async deleteNotification(userId: string, notificationId: number): Promise<boolean> {
         try {
             const id = userId.toLowerCase();

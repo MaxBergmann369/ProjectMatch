@@ -48,6 +48,7 @@ export interface Notification {
     title: string;
     text: string;
     dateTime: string;
+    seen: boolean;
 }
 
 export interface UserAbility {

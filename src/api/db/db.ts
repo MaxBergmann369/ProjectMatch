@@ -73,6 +73,7 @@ export class Database {
             title TEXT NOT NULL,
             text TEXT NOT NULL,
             dateTime TEXT NOT NULL,
+            seen BOOLEAN NOT NULL,
             FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
 
@@ -731,7 +732,8 @@ export class Database {
                         userId: row.userId,
                         title: row.title,
                         text: row.text,
-                        dateTime: row.dateTime
+                        dateTime: row.dateTime,
+                        seen: row.seen
                     }));
                     resolve(notifications);
                 }
@@ -1039,7 +1041,7 @@ export class Database {
 
     static async addNotification(userId: string, title: string, text: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Notification (userId, title, text, dateTime) VALUES (?, ?, ?, ?)`, [userId, title, text, date], (err) => {
+            db.run(`INSERT INTO Notification (userId, title, text, dateTime, seen) VALUES (?, ?, ?, ?, ?)`, [userId, title, text, date, false], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1173,6 +1175,18 @@ export class Database {
     static async acceptProjectMember(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`UPDATE ProjectMember SET isAccepted = ? WHERE userId = ? AND projectId = ?`, [true, userId, projectId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async notificationSeen(userId: string, notificationId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`UPDATE Notification SET seen = ? WHERE userId = ? AND id = ?`, [true, userId, notificationId], (err) => {
                 if (err) {
                     reject(err);
                 } else {

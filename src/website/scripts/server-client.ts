@@ -1,4 +1,4 @@
-import {User, Project, Message, DirectChat, ProjectMember, Ability} from "../../models";
+import {User, Project, Message, DirectChat, ProjectMember, Ability, Notification} from "../../models";
 import {keycloak} from "./keycloak";
 
 export class HttpClient {
@@ -123,6 +123,31 @@ export class HttpClient {
             }
         })
             .then(response => response.json());
+    }
+
+    async getNotifications(userId: string): Promise<Notification[]> {
+        return await fetch(`${this.baseUrl}/user/${userId}/notification/`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok ? response.json() : null);
+    }
+
+    async markNotificationAsSeen(userId: string, notId: number) {
+        return await fetch(`${this.baseUrl}/user/notification`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: this.bearer
+            },
+            body: JSON.stringify({
+                userId: userId,
+                notId: notId
+            })
+        })
+            .then(response => response.ok);
     }
 
     async deleteUserAbility(userId: string, abilityId: number) {

@@ -3,7 +3,8 @@ import {initKeycloak, keycloak} from "./keycloak";
 import {Project, User} from "../../models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
-import "./general"; // this tells webpack to include the general.ts file in the bundle
+import "./general";
+import {initNotifications} from "./notifications"; // this tells webpack to include the general.ts file in the bundle
 
 const authenticatedPromise = initKeycloak();
 let client : HttpClient = null;
@@ -44,6 +45,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     let cardCount = 0;
 
 // functions
+    await initNotifications(user);
 
     async function appendEndCard() {
         const card = new Card({

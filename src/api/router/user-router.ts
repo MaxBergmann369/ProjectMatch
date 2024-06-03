@@ -369,6 +369,29 @@ export function createUserEndpoints() {
         }
     });
 
+    userRouter.put('/user/notification', async (req, res) => {
+        try {
+            const {userId, notId} = req.body;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if(await UserUtility.notificationsSeen(userId, notId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
     userRouter.delete('/user/:userId/notification/:notId', async (req, res) => {
         try {
             const userId = req.params.userId;
