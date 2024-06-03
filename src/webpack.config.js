@@ -13,6 +13,7 @@ module.exports = {
         home: "./website/scripts/home.ts",
         register: "./website/scripts/register.ts",
         chat: "./website/scripts/chat.ts",
+        detailView: "./website/scripts/detailView.ts",
     },
     output: {
         path: path.resolve(__dirname,"website","scripts", "dist"),
