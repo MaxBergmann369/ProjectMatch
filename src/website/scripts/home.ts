@@ -182,7 +182,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 });
 
-//onunload
-document.addEventListener('unload', () => {
-    client.deleteData();
+window.addEventListener('beforeunload', async () => {
+    await client.deleteData();
 });
