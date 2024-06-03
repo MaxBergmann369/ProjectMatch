@@ -22,6 +22,19 @@
   font-style: italic;
 }
 
+@keyframes spin {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+.spin {
+  animation: spin 2s !important;
+}
+
 :root{
   --rounded: 2rem;
   font-family: 'Carlito', sans-serif;
@@ -127,7 +140,7 @@ body {
   position: absolute;
   border-radius: var(--rounded);
   overflow: hidden;
-  transform: translateZ(calc(-30px * var(--i)));
+  transform: translateZ(calc(-150px * var(--i)));
   filter: drop-shadow(2px 2px 20px rgba(0, 0, 0, 0.5));
   cursor: pointer;
   user-select: none;

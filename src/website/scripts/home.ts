@@ -100,6 +100,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (!project){
             return;
         }
+        const url = urls.includes(project.thumbnail) ? project.thumbnail : urls[cardCount % urls.length];
         const title = project.name;
         let desc = project.description;
         const ownerId = project.ownerId;
@@ -119,7 +120,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }
         const card = new Card({
-            imageUrl: urls[cardCount % urls.length],
+            imageUrl: url,
             onDismiss: () =>{
                 client.addView(project.id, user.userId);
                 appendNewCard();
