@@ -186,6 +186,16 @@ export class HttpClient {
 
     }
 
+    async deleteData() {
+        return await fetch(`${this.baseUrl}/deleteData`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok ? response.text() : null);
+    }
+
     async getProjectsWhereUserIsOwner(userId: string): Promise<Project[] | null> {
         return await fetch(`${this.baseUrl}/projects/${userId}`, {
             method: 'GET',

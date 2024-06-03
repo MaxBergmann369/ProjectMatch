@@ -68,6 +68,26 @@ export function createProjectEndpoints() {
         }
     });
 
+    projectRouter.delete('/deleteData', async (req, res) => {
+        try {
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+            if (!tokenUser){
+                res.sendStatus(400);
+                return;
+            }
+
+            if (ProjectAlgo.deleteUserData(tokenUser.userId)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
     projectRouter.get('/projects/owner/:userId', async (req, res) => {
         try {
             const userId = req.params.userId;

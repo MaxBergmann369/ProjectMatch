@@ -6,10 +6,11 @@ import {HttpClient} from "./server-client";
 import "./general"; // this tells webpack to include the general.ts file in the bundle
 
 const authenticatedPromise = initKeycloak();
+let client : HttpClient = null;
 
 document.addEventListener("DOMContentLoaded", async function () {
     const authenticated = await authenticatedPromise;
-    let client : HttpClient = null;
+
     if (!authenticated) {
         console.log("User is not authenticated");
         location.href = "index.html";
@@ -179,4 +180,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         topCard.dispatchEvent(event);
     });
+});
+
+//onunload
+document.addEventListener('unload', () => {
+    client.deleteData();
 });

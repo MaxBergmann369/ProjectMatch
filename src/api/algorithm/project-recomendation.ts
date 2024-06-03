@@ -28,11 +28,14 @@ export class ProjectAlgo {
         const userProjects = userData[1].splice(0, limit);
         userData[0].push(...userProjects);
 
+        console.log(userProjects);
+        
         return userProjects;
     }
 
-    static async deleteUserData(userId: string) {
-        this.data.delete(userId);
+    static deleteUserData(userId: string): boolean {
+        console.log("Deleting user data");
+        return this.data.delete(userId);
     }
 
     private static async initUserData(userId: string) {
@@ -47,9 +50,10 @@ export class ProjectAlgo {
 
     private static async findProjects(userId: string, viewed: boolean) {
         try {
-            const mostLiked = await Database.getProjectsAlgorithm(userId, viewed, 50, true, false);
-            const mostViewed = await Database.getProjectsAlgorithm(userId, viewed, 50, false, true);
-            const mostRecent = await Database.getProjectsAlgorithm(userId, viewed, 50, false, false);
+            const amount: number = 50;
+            const mostLiked = await Database.getProjectsAlgorithm(userId, viewed, amount, true, false);
+            const mostViewed = await Database.getProjectsAlgorithm(userId, viewed, amount, false, true);
+            const mostRecent = await Database.getProjectsAlgorithm(userId, viewed, amount, false, false);
 
             if (mostLiked === null || mostViewed === null || mostRecent === null ||
                 mostLiked.length === 0 || mostViewed.length === 0 || mostRecent.length === 0) {
@@ -61,26 +65,29 @@ export class ProjectAlgo {
             const sentToUser = this.data.get(userId)[0];
             const otherProjects = this.data.get(userId)[1];
 
-            for (let i = 0; i < mostLiked.length + mostViewed.length + mostRecent.length; i++) {
+            const len = mostLiked.length + mostRecent.length + mostViewed.length;
 
-                if (i%2 === 0) {
-                    const project = mostLiked.shift();
-
-                    if (!orderedProjects.includes(project) && !sentToUser.includes(project) && !otherProjects.includes(project)) {
-                        orderedProjects.push(project);
-                    }
-                } else if (i%3 === 0) {
-                    const project = mostViewed.shift();
-
-                    if (!orderedProjects.includes(project) && !sentToUser.includes(project) && !otherProjects.includes(project)) {
-                        orderedProjects.push(project);
-                    }
-                } else {
-                    const project = mostRecent.shift();
-
-                    if (!orderedProjects.includes(project) && !sentToUser.includes(project) && !otherProjects.includes(project)) {
-                        orderedProjects.push(project);
-                    }
+            let project: number = 0;
+            for (let i = 0; i < len; i++) {
+                switch (i % 3) {
+                    case 0: // First iteration
+                        project = mostLiked.shift();
+                        if (!orderedProjects.includes(project) && !sentToUser.includes(project) && !otherProjects.includes(project)) {
+                            orderedProjects.push(project);
+                        }
+                        break;
+                    case 1: // Second iteration
+                        project = mostViewed.shift();
+                        if (!orderedProjects.includes(project) && !sentToUser.includes(project) && !otherProjects.includes(project)) {
+                            orderedProjects.push(project);
+                        }
+                        break;
+                    case 2: // Third iteration
+                        project = mostRecent.shift();
+                        if (!orderedProjects.includes(project) && !sentToUser.includes(project) && !otherProjects.includes(project)) {
+                            orderedProjects.push(project);
+                        }
+                        break;
                 }
             }
 
