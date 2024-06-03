@@ -176,9 +176,9 @@ export class ProjectUtility {
         }
     }
 
-    static async getProjects(userId: string, showOld: boolean, limit: number, lastViews: number[]): Promise<Project[] | null> {
+    static async getProjects(projectIds: number[]): Promise<Project[] | null> {
         try {
-            return await Database.getProjects(userId,showOld, limit, lastViews);
+            return await Database.getProjects(projectIds);
         }
         catch (e) {
             // throw e;
@@ -197,7 +197,9 @@ export class ProjectUtility {
             }
 
             const members = await this.getProjectMembers(projectId);
-            if (members === null || members.some(member => member.userId === id)) {
+            const pendingMembers = await this.getPendingRequests(projectId);
+
+            if (members === null || members.map(value => value.userId).includes(id) || pendingMembers.map(value => value.userId).includes(id)) {
                 return false;
             }
 
