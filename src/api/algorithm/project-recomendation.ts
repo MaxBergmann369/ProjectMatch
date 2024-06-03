@@ -27,14 +27,11 @@ export class ProjectAlgo {
 
         const userProjects = userData[1].splice(0, limit);
         userData[0].push(...userProjects);
-
-        console.log(userProjects);
         
         return userProjects;
     }
 
     static deleteUserData(userId: string): boolean {
-        console.log("Deleting user data");
         return this.data.delete(userId);
     }
 

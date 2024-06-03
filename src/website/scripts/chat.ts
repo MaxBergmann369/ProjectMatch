@@ -407,6 +407,6 @@ async function searchForChat() {
     });
 }
 
-document.addEventListener("unload", async () => {
+window.addEventListener("beforeunload", async () => {
     await client.updateDirectChat(chatId, user.userId);
 });
