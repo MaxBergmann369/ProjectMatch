@@ -83,9 +83,9 @@ async function addEventListener() {
 async function loadChatProfileButtons() {
     const chatProfiles = document.getElementsByClassName("chat");
 
-    for (let i = 0; i < chatProfiles.length; i++) {
-        chatProfiles[i].addEventListener("click", async (event) => {
-            const id = parseInt((event.target as HTMLElement).id);
+    for (const profile of chatProfiles) {
+        profile.addEventListener("click", async () => {
+            const id = parseInt(profile.id);
 
             if(chatId !== id) {
                 chatMessages.clear();
@@ -97,9 +97,9 @@ async function loadChatProfileButtons() {
                 await client.updateDirectChat(chatId, user.userId);
             }
 
-            chatId = id;
-
             if(!isNaN(id)) {
+                chatId = id;
+
                 const layerUp = document.getElementById("layer-up");
 
                 if(messageAmount <= maxRenderAmount) {

@@ -105,6 +105,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         let desc = project.description;
         const ownerId = project.ownerId;
         const owner = await client.getUser(ownerId);
+
+        if(owner === null){
+            return;
+        }
+
         let tags = (await client.getProjectAbilities(project.id)).map(value => value.name);
         const favourite = await client.isLiked(project.id, user.userId);
         if (tags.length > 6){

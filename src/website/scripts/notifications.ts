@@ -35,13 +35,11 @@ async function renderNotifications(notificationElement: HTMLElement) {
         return;
     }
 
-    console.log(notifications);
-
     notificationElement.innerHTML = '';
 
     for (const notification of notifications) {
 
-        let html = '<div class="notification" id="${notification.id}">';
+        let html = `<div class="notification" id="${notification.id}">`;
 
         if (!notification.seen) {
             html += '<div class="notification-new"></div>';
@@ -59,18 +57,18 @@ async function renderNotifications(notificationElement: HTMLElement) {
 async function addButtonListeners() {
     const notifications = document.getElementsByClassName('notification');
 
-    for (let i = 0; i < notifications.length; i++) {
-        const notification = notifications[i];
-        await notification.addEventListener('click', async () => {
+    for (const notification of notifications) {
+        console.log(notification);
+        await notification.addEventListener("click", async () => {
             const notId = parseInt(notification.id);
 
+            console.log(notId);
             if (isNaN(notId)) {
                 return;
             }
 
             await client.markNotificationAsSeen(user.userId, notId);
-            notification.classList.remove('new');
+            notification.classList.remove('notification-new');
         });
     }
-
 }

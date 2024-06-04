@@ -1,14 +1,15 @@
 #notification-box {
-  width: 10rem;
-  height: 10rem;
+  margin-left: 5vw;
+  width: 10vw;
+  height: 20vh;
   background: orange;
   position: absolute;
   display: none;
 }
 
 .notification-new {
-  width: 1rem;
-  height: 1rem;
+  width: 0.5vw;
+  height: 0.5vh;
   border-radius: 100%;
   background: red;
   position: absolute;
