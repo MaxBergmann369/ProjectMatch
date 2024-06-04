@@ -1,6 +1,7 @@
 import express from "express";
 import {ChatUtility} from "../db/utility/chat-utility";
 import {EndPoints} from "../db/validation";
+import {SystemNotification} from "../db/system-notifications";
 
 const chatRouter = express.Router();
 
@@ -17,14 +18,14 @@ export function createChatEndpoints() {
             const tokenUser = EndPoints.getToken(authHeader);
 
             if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
-                console.log("User not authorized");
                 res.sendStatus(400);
                 return;
             }
 
-            console.log("here");
+            const chatId: number | null = await ChatUtility.addDirectChat(userId, otherUserId);
 
-            if(await ChatUtility.addDirectChat(userId, otherUserId)) {
+            if(chatId !== null) {
+                await SystemNotification.newChatNotification(userId, otherUserId, chatId);
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);

@@ -1123,13 +1123,14 @@ export class Database {
         });
     }
 
-    static async addDirectChat(userId: string, otherUserId: string, date: string, time: string): Promise<boolean> {
+    static async addDirectChat(userId: string, otherUserId: string, date: string, time: string): Promise<number | null> {
+        //add direct chat and return the chatId
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO DirectChat (userId, otherUserId, userLastOpenedDate, userLastOpenedTime) VALUES (?, ?, ?, ?)`, [userId, otherUserId, date, time], (err) => {
+            db.run(`INSERT INTO DirectChat (userId, otherUserId, userLastOpenedDate, userLastOpenedTime) VALUES (?, ?, ?, ?)`, [userId, otherUserId, date, time], function(err) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(true);
+                    resolve(this.lastID);
                 }
             });
         });

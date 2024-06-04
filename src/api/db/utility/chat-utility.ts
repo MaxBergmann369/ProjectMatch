@@ -5,19 +5,19 @@ import {DirectChat, Message} from "../../../models";
 export class ChatUtility {
     /* region Chat */
 
-    static async addDirectChat(userId: string, otherUserId: string): Promise<boolean> {
+    static async addDirectChat(userId: string, otherUserId: string): Promise<number | null> {
         try {
             const id = userId.toLowerCase();
             const otherId = otherUserId.toLowerCase();
 
             if(!(await ValUser.isUserValid(id)) || !(await ValUser.isUserValid(otherId)) || id === otherId) {
-                return false;
+                return null;
             }
 
             const chat = await Database.getDirectChatByUserIds(id, otherId);
 
             if(chat !== null) {
-                return false;
+                return null;
             }
 
             const data = new Date(Date.now());
@@ -28,8 +28,7 @@ export class ChatUtility {
             return await Database.addDirectChat(id, otherId, date, time);
         }
         catch (e) {
-            console.log(e);
-            return false;
+            return null;
         }
     }
 
