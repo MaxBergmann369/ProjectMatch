@@ -325,11 +325,14 @@ export class Database {
         });
     }
 
-    static async getUserIdByFullName(firstname: string, lastname: string): Promise<string> {
+    static async getUserIdByFullName(firstname: string, lastname: string): Promise<string | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT userId FROM User WHERE firstname = ? AND lastname = ?`, [firstname, lastname], (err, row: User) => {
+            db.get(`SELECT userId FROM User WHERE LOWER(firstname) = LOWER(?) AND LOWER(lastname) = LOWER(?)`, [firstname, lastname], (err, row: User) => {
                 if (err) {
                     reject(err);
+                }
+                else if(!row) {
+                    resolve(null);
                 } else {
                     resolve(row.userId);
                 }
@@ -1122,7 +1125,7 @@ export class Database {
 
     static async addDirectChat(userId: string, otherUserId: string, date: string, time: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO DirectChat (userId, otherUserId, userLastOpenedDate, userLastOpenedTime) VALUES (?, ?, ?, ?, ?, ?)`, [userId, otherUserId, date, time], (err) => {
+            db.run(`INSERT INTO DirectChat (userId, otherUserId, userLastOpenedDate, userLastOpenedTime) VALUES (?, ?, ?, ?)`, [userId, otherUserId, date, time], (err) => {
                 if (err) {
                     reject(err);
                 } else {

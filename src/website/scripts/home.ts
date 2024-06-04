@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function appendEndCard() {
         const card = new Card({
+            id: 0,
             imageUrl: urls[cardCount % urls.length],
             onDismiss: () => {
                 appendNewCard();
@@ -125,6 +126,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }
         const card = new Card({
+            id: project.id,
             imageUrl: url,
             onDismiss: () =>{
                 client.addView(project.id, user.userId);

@@ -31,6 +31,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         await renderChatProfiles();
         manageMessages();
         await addEventListener();
+
+        // Get the chat parameter from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const chat = urlParams.get("chat");
+
+        // Check if the chat parameter exists and is a valid number
+        if (chat && !isNaN(Number(chat))) {
+            // Set chatId to the value of the chat parameter and render the chat messages
+            chatId = Number(chat);
+            await renderChatMessages(chatId);
+        }
     }
     else {
         location.href = "index.html";

@@ -1,6 +1,7 @@
 import {User} from "../../models";
 
 export class Card {
+    id: number;
     imageUrl: string;
     onDismiss: () => void;
     onLike: () => void;
@@ -14,6 +15,7 @@ export class Card {
     tags: string[];
 
     constructor({
+                    id,
                     imageUrl,
                     onDismiss,
                     onLike,
@@ -25,6 +27,7 @@ export class Card {
                     owner,
                     tags
                 }) {
+        this.id = id;
         this.imageUrl = imageUrl;
         this.onDismiss = onDismiss;
         this.onLike = onLike;
@@ -72,7 +75,10 @@ export class Card {
         setTimeout(() => {
             this.element.classList.remove('spin');
         }, 2000);
-        setTimeout(() => window.location.href = 'detailView.html', 1800);
+
+        if(this.id > 0) {
+            setTimeout(() => window.location.href = `detailView.html?project=${this.id}`, 1800);
+        }
     };
 
     private listenToTouchEvents = () => {

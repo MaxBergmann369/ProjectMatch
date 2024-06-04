@@ -76,13 +76,9 @@ export class UserUtility {
                 return null;
             }
 
-            //first letter uppercase and the rest lowercase
-            const firstname = names[0].charAt(0).toUpperCase() + names[0].slice(1).toLowerCase();
+            const userId = await Database.getUserIdByFullName(names[0], names[1]);
 
-            //first letter uppercase and the rest lowercase
-            const lastname = names[1].charAt(0).toUpperCase() + names[1].slice(1).toLowerCase();
-
-            return await Database.getUserIdByFullName(firstname, lastname);
+            return userId === null ? null : userId;
         }
         catch (e) {
             return null;

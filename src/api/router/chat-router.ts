@@ -17,9 +17,12 @@ export function createChatEndpoints() {
             const tokenUser = EndPoints.getToken(authHeader);
 
             if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                console.log("User not authorized");
                 res.sendStatus(400);
                 return;
             }
+
+            console.log("here");
 
             if(await ChatUtility.addDirectChat(userId, otherUserId)) {
                 res.sendStatus(200);
