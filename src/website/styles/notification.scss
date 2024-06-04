@@ -1,10 +1,12 @@
 #notification-box {
   margin-left: 5vw;
-  width: 10vw;
+  width: 30vw;
   height: 20vh;
   background: orange;
   position: absolute;
   display: none;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .notification-new {
@@ -15,4 +17,8 @@
   position: absolute;
   top: 0;
   right: 0;
+}
+
+.notification {
+  border: 1px solid black;
 }

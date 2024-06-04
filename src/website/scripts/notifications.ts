@@ -58,17 +58,15 @@ async function addButtonListeners() {
     const notifications = document.getElementsByClassName('notification');
 
     for (const notification of notifications) {
-        console.log(notification);
         await notification.addEventListener("click", async () => {
             const notId = parseInt(notification.id);
 
-            console.log(notId);
             if (isNaN(notId)) {
                 return;
             }
 
             await client.markNotificationAsSeen(user.userId, notId);
-            notification.classList.remove('notification-new');
+            notification.getElementsByClassName('notification-new')[0].remove();
         });
     }
 }
