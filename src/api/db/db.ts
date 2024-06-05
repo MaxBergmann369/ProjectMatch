@@ -373,19 +373,10 @@ export class Database {
         });
     }
 
-    static async getProjects(userId: string, showOld: boolean, limit: number, lastViews: number[]): Promise<Project[]> {
-        if (showOld === undefined){
-            showOld = true;
-        }
-        if (!limit){
-            limit = 100;
-        }
-        if (!lastViews){
-            lastViews = [];
-        }
-
+    static async getProjects(projectIds: number[]): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            const callback = (err:never, rows: Project[]) => {
+            const placeholder = projectIds.map(() => "?").join(", ");
+            db.all(`SELECT * FROM Project WHERE id IN (${placeholder})`, projectIds, (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -399,34 +390,19 @@ export class Database {
                         links: row.links,
                         maxMembers: row.maxMembers
                     }));
-                    resolve(projects);
-                }
-            };
-            const placeholders: string = lastViews.map(() => "?").join(", ");
-            const arr : string[] = lastViews.map((value) => value.toString());
-            if (!userId){
-                db.all("SELECT * FROM Project LIMIT ?",arr,callback);
-            }
-            else if (showOld){
-                arr.push(limit.toString());
-                if (arr.length === 1){
-                    db.all("SELECT * FROM Project LIMIT ?",arr,callback);
-                }
-                else{
-                    db.all(`SELECT * FROM Project WHERE id not in (${placeholders}) LIMIT ?`,arr,callback);
-                }
-            }
-            else{
-                if (arr.length === 0){
-                    db.all(`SELECT * FROM Project WHERE id NOT IN (SELECT projectId FROM View WHERE userId = ?) LIMIT ?`, [userId,limit], callback);
-                }
-                else{
-                    arr.push(userId);
-                    arr.push(limit.toString());
-                    db.all(`SELECT * FROM Project WHERE id not in (${placeholders}) and id NOT IN (SELECT projectId FROM View WHERE userId = ?) LIMIT ?`,arr,callback);
-                }
-            }
 
+                    const orderedProjects: Project[] = [];
+
+                    for (const projectId of projectIds) {
+                        const project = projects.find(project => project.id === projectId);
+                        if (project) {
+                            orderedProjects.push(project);
+                        }
+                    }
+
+                    resolve(orderedProjects);
+                }
+            });
         });
     }
 
@@ -497,6 +473,57 @@ export class Database {
                         maxMembers: row.maxMembers
                     }));
                     resolve(projects);
+                }
+            });
+        });
+    }
+
+    static async getProjectsAlgorithm(userId: string, viewed: boolean, limit: number, likes:boolean, views:boolean): Promise<number[]> {
+        return new Promise((resolve, reject) => {
+            let sql = `SELECT p.id, COUNT(DISTINCT pa.abilityId) as matchingAbilities FROM Project p`;
+
+            sql += ` LEFT JOIN View v ON p.id = v.projectId AND v.userId = ?`;
+
+            sql += ` LEFT JOIN ProjectMember pm ON p.id = pm.projectId AND pm.userId = ? AND pm.isAccepted = 1`;
+
+            if (views) {
+                sql += ` LEFT JOIN View v2 ON p.id = v2.projectId`;
+            }
+
+            if (likes) {
+                sql += ` LEFT JOIN Like l ON p.id = l.projectId`;
+            }
+
+            // Join with UserAbility and ProjectAbility to count matching abilities
+            sql += ` LEFT JOIN UserAbility ua ON ua.userId = ?`;
+            sql += ` LEFT JOIN ProjectAbility pa ON pa.projectId = p.id AND pa.abilityId = ua.abilityId`;
+
+            sql += ` WHERE 1=1`;
+
+            if (!viewed) {
+                sql += ` AND v.userId IS NULL`;
+            }
+
+            sql += ` AND pm.userId IS NULL`;
+
+            sql += ` GROUP BY p.id ORDER BY matchingAbilities DESC`;
+
+            if (views) {
+                sql += `, COUNT(v2.userId) DESC`;
+            } else if (likes) {
+                sql += `, COUNT(l.userId) DESC`;
+            } else {
+                sql += `, p.dateOfCreation DESC`;
+            }
+
+            sql += ` LIMIT ?`;
+
+            db.all(sql, [userId, userId, userId, limit], (err, rows: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const projectIds = rows.map(row => row.id);
+                    resolve(projectIds);
                 }
             });
         });

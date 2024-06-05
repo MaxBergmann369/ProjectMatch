@@ -53,6 +53,8 @@ export class Card {
         // add keypress event listener for a and d for like and dislike without it triggering periodically
 
         this.element = this.createCardElement();
+        this.element.addEventListener('dblclick', this.handleDoubleClick);
+
         if (this.isTouchDevice()) {
             this.listenToTouchEvents();
         } else {
@@ -63,6 +65,14 @@ export class Card {
             this.dismiss(e.detail.direction, false);
         });
 
+    };
+
+    private handleDoubleClick = () => {
+        this.element.classList.add('spin');
+        setTimeout(() => {
+            this.element.classList.remove('spin');
+        }, 2000);
+        setTimeout(() => window.location.href = 'detailView.html', 1800);
     };
 
     private listenToTouchEvents = () => {
