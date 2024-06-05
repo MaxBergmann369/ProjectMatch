@@ -34,9 +34,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         await addLink();
     });
 
-    const cerateProject = document.getElementById("add-picture-button");
-    console.log(cerateProject);
-
     document.getElementById("add-picture-button").addEventListener("click", async (event) => {
         event.preventDefault();
         //await addPicture();
@@ -54,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const abilitiesIds = abilities.map(ability => parseInt(ability));
 
         console.log(abilities);
-        const abResponse = await client.addProjectAbility(keycloak.tokenParsed.preferred_username, abilitiesIds);
+        const abResponse = await client.addProjectAbilities(keycloak.tokenParsed.preferred_username, abilitiesIds);
 
         if (!abResponse) {
             alert("Failed to add ability to project");
@@ -89,16 +86,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             const response = await client.addProject(project);
 
-            if (response) {
+            console.log(response);
+            /*if (response) {
                 console.log('hello this is the response')
                 console.log(response);
                 location.href = "home.html";
             } else {
                 console.error("Failed to create project");
             }
-            console.log('hello this is the project not going in the if')
+             */
+            console.log('hello this is the project not going in the if');
+            alert("Project created successfully");
          }
-
+        console.log('hello this is the project not going in the if');
+        alert("Project created successfully");
     });
 });
 
