@@ -1,9 +1,91 @@
-body{
+body {
+  font-family: Arial, sans-serif;
   height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-#abilities{
+.create-project {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  gap: 1rem;
+  padding: 2rem;
+  border: 1px solid #000;
+  width: 800px;
+}
+
+.label {
+  grid-column: 1 / 2;
+  margin-top: 1rem;
+}
+
+.input-field {
+  grid-column: 1 / 2;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #000;
+}
+
+.abilities {
+  grid-column: 1 / 2;
   border: 1px solid black;
+  padding: 1rem;
+  height: 100px;
   overflow-y: scroll;
-  height: 50vh;
+}
+
+.ability-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.add-btn, .remove-btn {
+  background-color: #f0f0f0;
+  border: 1px solid #000;
+  cursor: pointer;
+}
+
+.thumbnail {
+  grid-column: 2 / 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #000;
+  height: 200px;
+  width: 200px;
+  padding: 1rem;
+}
+
+.thumbnail img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.link-container {
+  grid-column: 1 / 2;
+  display: flex;
+  align-items: center;
+}
+
+.submit-btn {
+  grid-column: 2 / 3;
+  justify-self: end;
+  padding: 0.5rem 1rem;
+  border: 1px solid #000;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+a{
+    text-decoration:none;
+    color:black;
+}
+
+
+a:hover{
+  color:blue;
 }

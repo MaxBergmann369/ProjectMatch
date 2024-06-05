@@ -1,11 +1,21 @@
 import {HttpClient} from "./server-client";
 import {Ability, User} from "../../models";
 import {initKeycloak, keycloak} from "./keycloak";
-import {ValProject} from "../../api/db/validation";
 import * as path from 'path';
-
+import http from "http";
+import {ValProject} from "./validation";
 
 const auth = initKeycloak();
+let client;
+let links = [];
+const pictures :string[] = [];
+
+for (let i = 1; i <= 33; i++) {
+    pictures.push(`./resources/project/backgrounds/bg${i}.webp`);
+}
+
+let firstTimePicture = Math.floor(Math.random() * ((pictures.length - 1) + 1));
+
 document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await auth;
 
@@ -13,29 +23,38 @@ document.addEventListener("DOMContentLoaded", async () => {
         location.href = "index.html";
     }
 
-    const client = new HttpClient();
+    client = new HttpClient();
 
     await renderAbilities();
 
     await renderPicture();
 
-    document.getElementById("add-link-button").addEventListener("submit", async (event) => {
+    document.getElementById("add-link-button").addEventListener("click", async (event) => {
+        event.preventDefault();
         await addLink();
     });
 
-    document.getElementById("add-pic-button").addEventListener("submit", async (event) => {
-        await addPicture();
+    const cerateProject = document.getElementById("add-picture-button");
+    console.log(cerateProject);
+
+    document.getElementById("add-picture-button").addEventListener("click", async (event) => {
+        event.preventDefault();
+        //await addPicture();
     });
 
-    document.getElementById("create-project").addEventListener("submit", async (event) => {
-        event.preventDefault();
+    //console.log(document.getElementById("add-pic-button"));
+
+    document.getElementById('create-project').addEventListener("submit", async (event) => {
+        //event.preventDefault();
+        console.log('enterd create project');
         const form = event.target as HTMLFormElement;
         const data = new FormData(form);
 
         const abilities = data.getAll("abilities") as string[];
         const abilitiesIds = abilities.map(ability => parseInt(ability));
 
-        const abResponse = await client.addUserAbilities(keycloak.tokenParsed.preferred_username, abilitiesIds);
+        console.log(abilities);
+        const abResponse = await client.addProjectAbility(keycloak.tokenParsed.preferred_username, abilitiesIds);
 
         if (!abResponse) {
             alert("Failed to add ability to project");
@@ -44,15 +63,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         const projectTitle = data.get("project-title") as string;
         const description = data.get("description") as string;
         const maxMembers = data.get("max-members") as string;
-        const link = data.get("add-link") as string;
+        //links
+        const link = links.join(";\n");
+        const picture = `./resources/project/backgrounds/bg${firstTimePicture}.webp`;
+
+        console.log(projectTitle);
+        console.log(keycloak.tokenParsed.preferred_username);
+        console.log(picture);
+        console.log(description);
+        console.log(new Date());
+        console.log(link);
+        console.log(parseInt(maxMembers));
 
 
-        /*if(ValProject.isValid(projectTitle, keycloak.tokenParsed.preferred_username, "hereWillBeAThumbnail", description, new Date(), link, parseInt(maxMembers))) {
+        if(ValProject.isValid(projectTitle, keycloak.tokenParsed.preferred_username, picture, description, new Date(), link, parseInt(maxMembers))) {
             const project = {
                 id: 1,
                 name: projectTitle,
                 ownerId: keycloak.tokenParsed.preferred_username,
-                thumbnail: "hereWillBeAThumbnail",
+                thumbnail: picture,
                 description: description,
                 dateOfCreation: new Date(),
                 links: link,
@@ -61,17 +90,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             const response = await client.addProject(project);
 
             if (response) {
+                console.log('hello this is the response')
+                console.log(response);
                 location.href = "home.html";
             } else {
                 console.error("Failed to create project");
             }
+            console.log('hello this is the project not going in the if')
          }
-         */
+
     });
 });
 
 async function renderAbilities() {
-    const client = new HttpClient();
     const abilities: Ability[] = await client.getAbilities();
     const abilitiesElement = document.getElementById("abilities");
 
@@ -145,66 +176,58 @@ async function renderAbilities() {
 
 }
 
-let counter = 0;
-
 async function addLink() {
-    const client = new HttpClient();
+    const link = document.getElementById("link") as HTMLInputElement;
     const linkElement = document.getElementById("add-link");
-
-    if (linkElement !== null) {
-        let html = "";
-
-        const renderLink = (link: String) => {
-            counter++;
-
-            html += `
-            <div class="add-link">
-                <input type="checkbox" id="link_${counter}" name="abilities" value="${counter}">
-                <label for="link_${counter}"><a href="${link}">${link}</a></label>
-            </div>
-            
-            `;
-        };
+    if(link.value === ""){
+        alert("There is no link to add");
+        return;
     }
 
+    let html = "";
+
+    for(const loadLink of links) {
+        console.log(loadLink);
+        html += `
+                   <li>
+                        <a href="${loadLink}">${loadLink}</a>
+                    </li>       
+        `;
+    }
+
+    if (linkElement !== null) {
+        html += `
+                   <li>
+                        <a href="${link.value}">${link.value}</a>
+                    </li>       
+        `;
+
+        links.push(link.value);
+        link.value = "";
+    }
+    linkElement.innerHTML = html;
 }
 
-
+let count = 0;
 async function addPicture() {
-    const client = new HttpClient();
-    const linkElement = document.getElementById("add-link");
-
-    if (linkElement !== null) {
+    const pictureElement = document.getElementById("add-pic-button");
+    if (pictureElement !== null) {
         let html = "";
 
-        const renderLink = (link: String) => {
-            counter++;
-
-            html += `
-            <div class="add-link">
-                <input type="checkbox" id="link_${counter}" name="abilities" value="${counter}">
-                <label for="link_${counter}"><a href="${link}">${link}</a></label>
+        html += `
+            <div class="add-pic">
+                <input type="checkbox" id="pic_${count}" name="abilities" value="${count}">
+                <label for="ability_${count}"><img src=${pictures[0]} alt="BackroundPicture"></label>
             </div>
-            
             `;
-        };
+        count++;
+        pictureElement.innerHTML = html;
+
     }
 
 }
 
-async function renderPicture() {
-    const client = new HttpClient();
-
-    const folderPath = './resources/project/backgrounds'; // src/website
-    const pictures :string[] = [];
-
-    addImagesFromBgFolder();
-    function addImagesFromBgFolder() {
-        for (let i = 1; i <= 33; i++) {
-            pictures.push(`./resources/project/backgrounds/bg${i}.webp`);
-        }
-    }
-
+async function renderPictures() {
     let randomNumber = Math.floor(Math.random() * ((pictures.length - 1) + 1));
 
     const pictureElement = document.getElementById("add-pic");
@@ -220,6 +243,7 @@ async function renderPicture() {
                 <label for="ability_${count}"><img src=${picture} alt="BackroundPicture"></label>
             </div>
             `;
+
         }
 
 
@@ -256,6 +280,18 @@ async function renderPicture() {
             }
         );
     }
+}
 
+async function renderPicture() {
 
+    const pictureElement = document.getElementById("picture");
+
+    if (pictureElement !== null) {
+        let html = "";
+
+            html += `
+                <img src="./resources/project/backgrounds/bg${firstTimePicture}.webp" alt="BackroundPicture">
+            `;
+        pictureElement.innerHTML += html;
+    }
 }
