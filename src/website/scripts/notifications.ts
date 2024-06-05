@@ -6,6 +6,8 @@ let client: HttpClient = null;
 let user: TokenUser = null;
 let clicked = false;
 
+let notificationsLoaded: Notification[] = [];
+
 const notificationTexts: Map<number, string> = new Map<number, string>();
 const separator: string = ';';
 
@@ -13,12 +15,14 @@ export async function initNotifications(tokenUser: TokenUser) {
     user = tokenUser;
     client = new HttpClient();
 
+    await loadNotifications();
+    await renderNotificationIcons();
+
     const notifications = document.getElementById('notifications');
     const notificationBox = document.getElementById('notification-box');
 
-    await renderNotificationIcons();
-
     notifications.addEventListener('click', async () => {
+        console.log("clicked");
         if(clicked) {
             notificationBox.style.display = 'none';
             clicked = false;
@@ -32,9 +36,18 @@ export async function initNotifications(tokenUser: TokenUser) {
     });
 }
 
-async function renderNotifications(notificationElement: HTMLElement) {
+async function loadNotifications(): Promise<void> {
+    const notificationsDb: Notification[] | null = await client.getNotifications(user.userId);
 
-    const notifications: Notification[] = await client.getNotifications(user.userId);
+    if (notificationsDb === null) {
+        return null;
+    }
+
+    notificationsLoaded = notificationsDb;
+}
+
+async function renderNotifications(notificationElement: HTMLElement) {
+    const notifications: Notification[] = notificationsLoaded;
 
     if (notifications === null || notifications.length === 0) {
         return;
@@ -42,7 +55,7 @@ async function renderNotifications(notificationElement: HTMLElement) {
 
     notificationElement.innerHTML = '';
 
-    const orderedNotifications = notifications.sort((a, b) => {
+    const orderedNotifications: Notification[] = notifications.sort((a, b) => {
         const dateA = a.dateTime.split(separator)[0];
         const dateB = b.dateTime.split(separator)[0];
 
@@ -73,7 +86,10 @@ async function renderNotifications(notificationElement: HTMLElement) {
         notificationTexts.set(notification.id, notification.text);
 
         notificationElement.innerHTML += html;
+        console.log(notificationElement);
     }
+
+    console.log(notificationElement);
 }
 
 function notificationTypes(text: string): string {
@@ -92,16 +108,54 @@ function notificationTypes(text: string): string {
 async function renderNotificationIcons() {
     const chat = document.getElementById('chat');
 
-    if (chat === null) {
-        return;
-    }
+    const notificationBtn = document.getElementById('notification-btn');
 
     const unread = await client.hasUnreadMessages(user.userId);
 
-    console.log(unread);
+    if (unread && chat !== null) {
+        chat.innerHTML += '<img src="../resources/icons/badge-11.ico" class="chat-notification-icon" alt="new Notifaction">';
+    }
 
-    if (unread) {
-        chat.innerHTML += '<img src="../resources/icons/badge-11.ico" class="notification-icon" alt="new Notifaction">';
+    if(notificationsLoaded === undefined) {
+        return;
+    }
+
+    const unreadNotifications = notificationsLoaded.map(notification => notification.seen).filter(seen => !seen).length;
+
+    if(unreadNotifications !== null && notificationBtn !== null) {
+        switch (unreadNotifications) {
+            case 0:
+                break;
+            case 1:
+                notificationBtn.innerHTML += '<img src="../resources/icons/badge-1.ico" class="notification-icon" alt="new Notifaction">';
+                break;
+            case 2:
+                notificationBtn.innerHTML += '<img src="../resources/icons/badge-2.ico" class="notification-icon" alt="new Notifaction">';
+                break;
+            case 3:
+                notificationBtn.innerHTML += '<img src="../resources/icons/badge-3.ico" class="notification-icon" alt="new Notifaction">';
+                break;
+            case 4:
+                notificationBtn.innerHTML += '<img src="../resources/icons/badge-4.ico" class="notification-icon" alt="new Notifaction">';
+                break;
+            case 5:
+                notificationBtn.innerHTML += '<img src="../resources/icons/badge-5.ico" class="notification-icon" alt="new Notifaction">';
+                break;
+            case 6:
+                notificationBtn.innerHTML += '<img src="../resources/icons/badge-6.ico" class="notification-icon" alt="new Notifaction">';
+                break;
+            case 7:
+                notificationBtn.innerHTML += '<img src="../resources/icons/badge-7.ico" class="notification-icon" alt="new Notifaction">';
+                break;
+            case 8:
+                notificationBtn.innerHTML += '<img src="../resources/icons/badge-8.ico" class="notification-icon" alt="new Notifaction">';
+                break;
+            case 9:
+                notificationBtn.innerHTML += '<img src="../resources/icons/badge-9.ico" class="notification-icon" alt="new Notifaction">';
+                break;
+            default:
+                notificationBtn.innerHTML += '<img src="../resources/icons/badge-10.ico" class="notification-icon" alt="new Notifaction">';
+        }
     }
 }
 

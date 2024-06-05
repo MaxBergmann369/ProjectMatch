@@ -29,10 +29,18 @@
   position: relative;
 }
 
-.notification-icon {
-  width: 1vw;
-  height: 1.5vh;
+.notification-icon, .chat-notification-icon {
   position: absolute;
-  top: 1vh;
-  right: 0.5vw;
+  width: 1vw;
+  height: 1.7vh;
+}
+
+.notification-icon {
+  top: 1.3vh;
+  right: 2.5vw;
+}
+
+.chat-notification-icon {
+  top: 0.3vh;
+  right: 0.3vw;
 }
