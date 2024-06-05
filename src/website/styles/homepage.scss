@@ -132,6 +132,14 @@ body {
   position: relative;
 }
 
+.card-distance-spin {
+  transform: translateZ(calc(-150px * var(--i)));
+}
+
+.card-distance {
+  transform: translateZ(calc(-50px * var(--i)));
+}
+
 .card {
   padding: 2rem 3rem;
   text-align: center;
@@ -140,7 +148,6 @@ body {
   position: absolute;
   border-radius: var(--rounded);
   overflow: hidden;
-  transform: translateZ(calc(-150px * var(--i)));
   filter: drop-shadow(2px 2px 20px rgba(0, 0, 0, 0.5));
   cursor: pointer;
   user-select: none;

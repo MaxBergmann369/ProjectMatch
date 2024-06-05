@@ -921,25 +921,41 @@ export class Database {
 
     static async getUnreadMessagesByChatId(chatId: number, userId: string): Promise<number> {
         return new Promise((resolve, reject) => {
-            // Get the DirectChat record
-            db.get(`SELECT * FROM DirectChat WHERE id = ? AND (userId = ? OR otherUserId = ?)`, [chatId, userId, userId], (err, row: DirectChat) => {
+            const sql: string = `
+            SELECT COUNT(m.id) as count
+            FROM Message m
+            JOIN DirectChat d ON m.chatId = d.id
+            WHERE m.chatId = ? AND m.userId != ? AND (
+                (d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime))) OR
+                (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime)))
+            )
+        `;
+            db.get(sql, [chatId, userId, userId, userId], (err, row: any) => {
                 if (err) {
                     reject(err);
-                } else if (!row) {
-                    resolve(0);
                 } else {
-                    // Determine the last opened date and time for the user
-                    const lastOpenedDate = row.userId === userId ? row.userLastOpenedDate : row.otherLastOpenedDate;
-                    const lastOpenedTime = row.userId === userId ? row.userLastOpenedTime : row.otherLastOpenedTime;
+                    resolve(row.count || 0);
+                }
+            });
+        });
+    }
 
-                    // Get the count of messages that were sent after the last opened date and time
-                    db.get(`SELECT COUNT(*) FROM Message WHERE chatId = ? AND userId != ? AND date > ? OR (date = ? AND time > ?)`, [chatId, userId, lastOpenedDate, lastOpenedDate, lastOpenedTime], (err, row) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(row['COUNT(*)'] || 0);
-                        }
-                    });
+    static async hasUnreadMessages(userId: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            const sql: string = `
+            SELECT COUNT(*) 
+            FROM DirectChat d
+            JOIN Message m ON d.id = m.chatId
+            WHERE (d.userId = ? OR d.otherUserId = ?)
+            AND m.userId != ?
+            AND ((d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime)))
+            OR (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime))))
+        `;
+            db.get(sql, [userId, userId, userId, userId, userId], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row['COUNT(*)'] > 0);
                 }
             });
         });

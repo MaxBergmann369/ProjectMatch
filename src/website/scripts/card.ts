@@ -56,6 +56,9 @@ export class Card {
         // add keypress event listener for a and d for like and dislike without it triggering periodically
 
         this.element = this.createCardElement();
+
+        this.element.classList.add('card-distance');
+
         this.element.addEventListener('dblclick', this.handleDoubleClick);
 
         if (this.isTouchDevice()) {
@@ -63,21 +66,38 @@ export class Card {
         } else {
             this.listenToMouseEvents();
         }
-        this.element.addEventListener('dismiss', (e:CustomEvent) => {
 
+        this.element.addEventListener('dismiss', (e:CustomEvent) => {
             this.dismiss(e.detail.direction, false);
         });
 
     };
 
     private handleDoubleClick = () => {
+        const cards = document.getElementsByClassName('card');
+
+        for(const card of cards) {
+            card.classList.remove('card-distance');
+            card.classList.add('card-distance-spin');
+        }
+
         this.element.classList.add('spin');
+
+        setTimeout(() => {
+            for(const card of cards) {
+                card.classList.remove('card-distance-spin');
+                card.classList.add('card-distance');
+            }
+        }, 1200);
+
         setTimeout(() => {
             this.element.classList.remove('spin');
         }, 2000);
 
         if(this.id > 0) {
-            setTimeout(() => window.location.href = `detailView.html?project=${this.id}`, 1800);
+            setTimeout(() => {
+                window.location.href = `detailView.html?project=${this.id}`;
+            }, 1800);
         }
     };
 

@@ -138,7 +138,6 @@ async function addUserButtons() {
             }
         });
     }
-
 }
 
 async function renderChatProfiles(load: boolean = true) {
@@ -245,10 +244,23 @@ async function loadChatMessages(id: number) {
     let lastDate = "";
     let date = "";
 
+    const orderedMessages: Message[] = messages.sort((a, b) => {
+        const dateA = a.date;
+        const dateB = b.date;
+
+        const timeA = a.time;
+        const timeB = b.time;
+
+        if (dateA === dateB) {
+            return timeA.localeCompare(timeB);
+        }
+
+        return dateA.localeCompare(dateB);
+    });
+
     let recentMessages: string[] = [];
 
-    for(let i = 0; i < messages.length; i++) {
-        const message = messages[i];
+    for(const message of orderedMessages) {
 
         let username = user.username;
 

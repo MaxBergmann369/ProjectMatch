@@ -16,6 +16,8 @@ export async function initNotifications(tokenUser: TokenUser) {
     const notifications = document.getElementById('notifications');
     const notificationBox = document.getElementById('notification-box');
 
+    await renderNotificationIcons();
+
     notifications.addEventListener('click', async () => {
         if(clicked) {
             notificationBox.style.display = 'none';
@@ -80,8 +82,26 @@ function notificationTypes(text: string): string {
     switch (data[1]) {
         case 'chat':
             return `chat.html?chat=${data[2]}`;
+        case 'project':
+            return `project.html?project=${data[2]}`;
         default:
-            return 'chat';
+            return '';
+    }
+}
+
+async function renderNotificationIcons() {
+    const chat = document.getElementById('chat');
+
+    if (chat === null) {
+        return;
+    }
+
+    const unread = await client.hasUnreadMessages(user.userId);
+
+    console.log(unread);
+
+    if (unread) {
+        chat.innerHTML += '<img src="../resources/icons/badge-11.ico" class="notification-icon" alt="new Notifaction">';
     }
 }
 
@@ -98,7 +118,9 @@ async function addButtonListeners() {
                 return;
             }
 
-            location.href = url;
+            if(url === '') {
+                location.href = url;
+            }
 
             await client.markNotificationAsSeen(user.userId, notId);
             notification.getElementsByClassName('notification-new')[0].remove();

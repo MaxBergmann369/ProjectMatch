@@ -206,6 +206,21 @@ export class ChatUtility {
         }
     }
 
+    static async hasUnreadMessages(userId: string): Promise<boolean> {
+        try {
+            const id = userId.toLowerCase();
+
+            if(!ValUser.isUserIdValid(id)) {
+                return false;
+            }
+
+            return await Database.hasUnreadMessages(id);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
     static async updateMessage(messageId: number, chatId: number, userId: string, message: string): Promise<boolean> {
         try {
             const id = userId.toLowerCase();

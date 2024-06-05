@@ -507,6 +507,16 @@ export class HttpClient {
             .then(response => response.ok? response.json() : 0);
     }
 
+    async hasUnreadMessages(userId: string): Promise<boolean> {
+        return await fetch(`${this.baseUrl}/messages/unread/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok);
+    }
+
     async editMessage(messageId: number, chatId: number, userId: string, message: string) {
         return await fetch(`${this.baseUrl}/messages/${chatId}/${messageId}`, {
             method: 'PUT',
