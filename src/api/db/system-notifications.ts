@@ -11,11 +11,11 @@ export class SystemNotification {
         } catch (e) { /* empty */ }
     }
 
-    static async projectMemberRequest(userId:string, otherUserId: string, projectId: number) {
+    static async projectMemberRequest(userId:string, projectId: number) {
         try {
             const user = await UserUtility.getUser(userId);
             const project = await ProjectUtility.getProject(projectId);
-            await UserUtility.addNotification(otherUserId, `${user.firstname} ${user.lastname} wants to be a member in your project!`, `${user.firstname} ${user.lastname} wants to be a member in your project ${project.name}.${separator}project${separator}${projectId}`);
+            await UserUtility.addNotification(project.ownerId, `${user.firstname} ${user.lastname} wants to be a member in your project!`, `${user.firstname} ${user.lastname} wants to be a member in your project ${project.name}.${separator}project${separator}${projectId}`);
         } catch (e) { /* empty */ }
     }
 

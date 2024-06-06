@@ -1,6 +1,7 @@
 import {Database} from "../db";
 import {ValProject, ValUser} from "../validation";
 import {Ability, Like, Project, ProjectMember, View} from "../../../models";
+import {SystemNotification} from "../system-notifications";
 
 export class ProjectUtility {
     /* region Base */
@@ -203,6 +204,8 @@ export class ProjectUtility {
                 return false;
             }
 
+            await SystemNotification.projectMemberRequest(userId, projectId);
+
             return await Database.addProjectMember(id, projectId);
         }
         catch (e) {
@@ -233,6 +236,8 @@ export class ProjectUtility {
             if(members >= project.maxMembers) {
                 return false;
             }
+
+            await SystemNotification.projectAccepted(userId, projectId);
 
             return Database.acceptProjectMember(id, projectId);
         }
