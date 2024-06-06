@@ -203,10 +203,9 @@ export class ProjectUtility {
                 return false;
             }
 
-            const members = await this.getProjectMembers(projectId);
-            const pendingMembers = await this.getPendingRequests(projectId);
-
-            if (members === null || members.map(value => value.userId).includes(id) || pendingMembers.map(value => value.userId).includes(id)) {
+            if(await Database.isProjectMember(id, projectId, false) ||
+                await Database.isProjectMember(id, projectId, true) ||
+            await Database.isUserOwnerOfProject(id, projectId)) {
                 return false;
             }
 
@@ -243,7 +242,7 @@ export class ProjectUtility {
                 return false;
             }
 
-            if(await Database.isProjectMember(id, projectId)) {
+            if(await Database.isProjectMember(id, projectId, true)) {
                 return false;
             }
 

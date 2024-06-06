@@ -1204,9 +1204,9 @@ export class Database {
         });
     }
 
-    static async isProjectMember(userId: string, projectId: number): Promise<boolean> {
+    static async isProjectMember(userId: string, projectId: number, accepted: boolean): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM ProjectMember WHERE userId = ? AND projectId = ?`, [userId, projectId], (err, row: ProjectMember) => {
+            db.get(`SELECT * FROM ProjectMember WHERE userId = ? AND projectId = ? AND isAccepted`, [userId, projectId, accepted], (err, row: ProjectMember) => {
                 if (err) {
                     reject(err);
                 } else {
