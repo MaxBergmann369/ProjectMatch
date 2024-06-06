@@ -23,7 +23,13 @@ export class ProjectUtility {
                 return false;
             }
 
-            return await Database.addProject(name, owId, thumbnail, description, date.toDateString(), links, maxMembers);
+            const projectId:number = await Database.addProject(name, owId, thumbnail, description, date.toDateString(), links, maxMembers);
+
+            if (projectId === null) {
+                return false;
+            }
+
+            return await Database.addProjectMember(owId, projectId, true);
         }
         catch (e) {
             return false;
@@ -227,13 +233,17 @@ export class ProjectUtility {
                 return false;
             }
 
-            if(!await this.isUserOwnerOfProject(id, projectId)) {
+            if(await this.isUserOwnerOfProject(id, projectId)) {
                 return false;
             }
 
             const members = await Database.getAmountOfProjectMembersByProjectId(projectId);
 
             if(members >= project.maxMembers) {
+                return false;
+            }
+
+            if(await Database.isProjectMember(id, projectId)) {
                 return false;
             }
 

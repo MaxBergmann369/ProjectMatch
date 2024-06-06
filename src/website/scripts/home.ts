@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     client = new HttpClient();
+
+    await client.acceptProjectMember(1,'if210062');
     console.log("User is authenticated");
     const user = new TokenUser(keycloak.tokenParsed);
 

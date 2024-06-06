@@ -1009,22 +1009,22 @@ export class Database {
         });
     }
 
-    static async addProject(name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: string, links: string, maxMembers: number): Promise<boolean> {
+    static async addProject(name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: string, links: string, maxMembers: number): Promise<number> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Project (name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers) VALUES (?, ?, ?, ?, ?, ?, ?)`, [name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers], (err) => {
+            db.run(`INSERT INTO Project (name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers) VALUES (?, ?, ?, ?, ?, ?, ?)`, [name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers], function(err) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(true);
+                    resolve(this.lastID);
                 }
             });
         });
     }
 
-    static async addProjectMember(userId: string, projectId: number): Promise<boolean> {
+    static async addProjectMember(userId: string, projectId: number, owner:boolean=false): Promise<boolean> {
         //set isAccepted true
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO ProjectMember (userId, projectId, isAccepted) VALUES (?, ?, ?)`, [userId, projectId, false], (err) => {
+            db.run(`INSERT INTO ProjectMember (userId, projectId, isAccepted) VALUES (?, ?, ?)`, [userId, projectId, owner], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1199,6 +1199,18 @@ export class Database {
                     reject(err);
                 } else {
                     resolve(true);
+                }
+            });
+        });
+    }
+
+    static async isProjectMember(userId: string, projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM ProjectMember WHERE userId = ? AND projectId = ?`, [userId, projectId], (err, row: ProjectMember) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row !== undefined);
                 }
             });
         });
