@@ -15,14 +15,12 @@ export async function initNotifications(tokenUser: TokenUser) {
     user = tokenUser;
     client = new HttpClient();
 
-    await loadNotifications();
     await renderNotificationIcons();
 
     const notifications = document.getElementById('notifications');
     const notificationBox = document.getElementById('notification-box');
 
     notifications.addEventListener('click', async () => {
-        console.log("clicked");
         if(clicked) {
             notificationBox.style.display = 'none';
             clicked = false;
@@ -86,10 +84,7 @@ async function renderNotifications(notificationElement: HTMLElement) {
         notificationTexts.set(notification.id, notification.text);
 
         notificationElement.innerHTML += html;
-        console.log(notificationElement);
     }
-
-    console.log(notificationElement);
 }
 
 function notificationTypes(text: string): string {
@@ -106,6 +101,8 @@ function notificationTypes(text: string): string {
 }
 
 async function renderNotificationIcons() {
+    await loadNotifications();
+
     const chat = document.getElementById('chat');
 
     const notificationBtn = document.getElementById('notification-btn');
@@ -113,6 +110,7 @@ async function renderNotificationIcons() {
     const unread = await client.hasUnreadMessages(user.userId);
 
     if (unread && chat !== null) {
+        chat.classList.remove('chat-notification-icon');
         chat.innerHTML += '<img src="../resources/icons/badge-11.ico" class="chat-notification-icon" alt="new Notifaction">';
     }
 
@@ -123,6 +121,7 @@ async function renderNotificationIcons() {
     const unreadNotifications = notificationsLoaded.map(notification => notification.seen).filter(seen => !seen).length;
 
     if(unreadNotifications !== null && notificationBtn !== null) {
+        notificationBtn.classList.remove('notification-icon');
         switch (unreadNotifications) {
             case 0:
                 break;
@@ -165,6 +164,8 @@ async function addButtonListeners() {
     for (const notification of notifications) {
         await notification.addEventListener("click", async () => {
             const notId = parseInt(notification.id);
+
+            await renderNotificationIcons();
 
             const url = notificationTypes(notificationTexts.get(notId));
 
