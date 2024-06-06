@@ -766,18 +766,6 @@ export class Database {
         });
     }
 
-    static async userAbilityAlreadyExists(userId: string, abilityId: number): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM UserAbility WHERE userId = ? AND abilityId = ?`, [userId, abilityId], (err, row: UserAbility) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row !== undefined);
-                }
-            });
-        });
-    }
-
     static getProjectAbilitiesByProjectId(projectId: number): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT abilityId FROM ProjectAbility WHERE projectId = ?`, [projectId], (err, rows: ProjectAbility[]) => {
@@ -1070,9 +1058,10 @@ export class Database {
         });
     }
 
-    static async addUserAbility(userId: string, abilityId: number): Promise<boolean> {
+    static async addUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO UserAbility (userId, abilityId) VALUES (?, ?)`, [userId, abilityId], (err) => {
+            const values = abilityIds.map(() => "(?, ?)").join(", ");
+            db.run(`INSERT INTO UserAbility (userId, abilityId) VALUES ${values}`, abilityIds.flatMap(abilityId => [userId, abilityId]), (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1082,42 +1071,10 @@ export class Database {
         });
     }
 
-    static async addUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
+    static async addProjectAbilities(projectId: number, abilityIds: number[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run("BEGIN TRANSACTION", async (beginErr) => {
-                if (beginErr) {
-                    reject(beginErr);
-                    return;
-                }
-
-                try {
-                    for (const abilityId of abilityIds) {
-                        await this.addUserAbility(userId, abilityId);
-                    }
-
-                    db.run("COMMIT", commitErr => {
-                        if (commitErr) {
-                            reject(commitErr);
-                        } else {
-                            resolve(true);
-                        }
-                    });
-                } catch (err) {
-                    db.run("ROLLBACK", rollbackErr => {
-                        if (rollbackErr) {
-                            reject(rollbackErr);
-                        } else {
-                            resolve(false);
-                        }
-                    });
-                }
-            });
-        });
-    }
-
-    static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO ProjectAbility (projectId, abilityId) VALUES (?, ?)`, [projectId, abilityId], (err) => {
+            const values = abilityIds.map(() => "(?, ?)").join(", ");
+            db.run(`INSERT INTO ProjectAbility (projectId, abilityId) VALUES ${values}`, abilityIds.flatMap(abilityId => [projectId, abilityId]), (err) => {
                 if (err) {
                     reject(err);
                 } else {

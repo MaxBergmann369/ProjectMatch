@@ -121,19 +121,23 @@ export class UserUtility {
     /* endregion */
 
     /* region UserAbility */
-    static async addUserAbility(userId: string, abilityId: number): Promise<boolean> {
+    static async addUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
         try {
             const id = userId.toLowerCase();
 
-            if(!(await ValUser.isUserValid(id)) || abilityId < 1) {
+            if(!(await ValUser.isUserValid(id)) || abilityIds.length < 1) {
                 return false;
             }
 
-            if(await Database.userAbilityAlreadyExists(id, abilityId)) {
+            const abilities = await Database.getUserAbilitiesByUserId(id);
+
+            const newAbilities = abilityIds.filter(abilityId => !abilities.some(ability => ability.id === abilityId));
+
+            if(newAbilities.length < 1) {
                 return false;
             }
 
-            return await Database.addUserAbility(id, abilityId);
+            return await Database.addUserAbilities(id, newAbilities);
         }
         catch (e) {
             return false;
