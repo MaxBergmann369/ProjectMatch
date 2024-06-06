@@ -133,7 +133,8 @@ body {
 }
 
 .card-distance-spin {
-  transform: translateZ(calc(-150px * var(--i)));
+  transform: translateZ(calc(-180px * var(--i)));
+  pointer-events: none;
 }
 
 .card-distance {
