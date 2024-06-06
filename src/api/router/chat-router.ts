@@ -1,6 +1,7 @@
 import express from "express";
 import {ChatUtility} from "../db/utility/chat-utility";
 import {EndPoints} from "../db/validation";
+import {SystemNotification} from "../db/system-notifications";
 
 const chatRouter = express.Router();
 
@@ -21,7 +22,10 @@ export function createChatEndpoints() {
                 return;
             }
 
-            if(await ChatUtility.addDirectChat(userId, otherUserId)) {
+            const chatId: number | null = await ChatUtility.addDirectChat(userId, otherUserId);
+
+            if(chatId !== null) {
+                await SystemNotification.newChat(userId, otherUserId, chatId);
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -154,6 +158,31 @@ export function createChatEndpoints() {
 
             if (await ChatUtility.addMessage(chatId, userId, message)) {
                 res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
+    chatRouter.get('/messages/unread/:userId', async (req, res) => {
+        try {
+            const userId = req.params.userId;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const unread = await ChatUtility.hasUnreadMessages(userId);
+
+            if (unread) {
+                res.status(200).send(unread.toString());
             } else {
                 res.sendStatus(400);
             }
