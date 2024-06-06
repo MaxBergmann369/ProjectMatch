@@ -412,7 +412,7 @@ export function createProjectEndpoints() {
 
     projectRouter.post('/projects/:projId/abilities', async (req, res) => {
         try {
-            const {abilityId} = req.body;
+            const {abilityIds} = req.body;
             const projectId = parseInt(req.params.projId);
 
             const authHeader = req.headers.authorization;
@@ -424,7 +424,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if (await ProjectUtility.addProjectAbility(projectId, abilityId)) {
+            if (await ProjectUtility.addProjectAbilities(projectId, abilityIds)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);

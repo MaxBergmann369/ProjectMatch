@@ -440,17 +440,17 @@ export class ProjectUtility {
     /* endregion */
 
     /* region ProjectAbility */
-    static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
+    static async addProjectAbilities(projectId: number, abilityIds: number[]): Promise<boolean> {
         try {
-            if(abilityId < 1 || projectId < 1 || await Database.getProject(projectId) === null || await Database.getAbilityById(abilityId) === null){
+            if(abilityIds.length === 0 || projectId < 1 || await Database.getProject(projectId) === null){
                 return false;
             }
 
-            if(await Database.projectAbilityAlreadyExists(projectId, abilityId)) {
-                return false;
-            }
+            const projectAbilities: Ability[] = await this.getAbilitiesByProjectId(projectId);
 
-            return await Database.addProjectAbility(projectId, abilityId);
+            const newAbilities = abilityIds.filter(abilityId => !projectAbilities.some(ability => ability.id === abilityId));
+
+            return await Database.addProjectAbilities(projectId, newAbilities);
         }
         catch (e) {
             return false;

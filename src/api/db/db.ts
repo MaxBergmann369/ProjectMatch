@@ -1071,9 +1071,10 @@ export class Database {
         });
     }
 
-    static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
+    static async addProjectAbilities(projectId: number, abilityIds: number[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO ProjectAbility (projectId, abilityId) VALUES (?, ?)`, [projectId, abilityId], (err) => {
+            const values = abilityIds.map(() => "(?, ?)").join(", ");
+            db.run(`INSERT INTO ProjectAbility (projectId, abilityId) VALUES ${values}`, abilityIds.flatMap(abilityId => [projectId, abilityId]), (err) => {
                 if (err) {
                     reject(err);
                 } else {
