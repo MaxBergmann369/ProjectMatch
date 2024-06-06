@@ -120,6 +120,9 @@ body {
   //display: flex;
   //justify-content: space-evenly;
   //align-items: center;
+  margin: 0 !important;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 #swiper {
@@ -269,6 +272,7 @@ body {
     width: 50%;
     height: 50%;
     -webkit-user-drag: none;
+    user-select: none;
   }
 
 }

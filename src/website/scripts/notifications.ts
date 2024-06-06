@@ -172,7 +172,7 @@ async function addButtonListeners() {
                 return;
             }
 
-            if(url === '') {
+            if(url !== '') {
                 location.href = url;
             }
 

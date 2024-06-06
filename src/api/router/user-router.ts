@@ -1,5 +1,5 @@
 import express from "express";
-import {UserUtility} from "../db/utility/user-utility";;
+import {UserUtility} from "../db/utility/user-utility";
 import {EndPoints} from "../db/validation";
 
 const userRouter = express.Router();

@@ -61,6 +61,7 @@ async function addEventListener() {
         userFullName = userFullName.replace(" ", "-");
         if(userFullName !== "" ) {
             const userId = await client.getUserId(userFullName);
+            console.log(userId);
 
             await client.addDirectChat(user.userId, userId);
             await renderChatProfiles();

@@ -16,4 +16,8 @@ export class SystemNotification {
             await UserUtility.addNotification(otherUserId, `${user.firstname} ${user.lastname} wants to chat with you!`, `You have a new chat, click to enter the chat.${separator}chat${separator}${chatId}`);
         } catch (e) { /* empty */ }
     }
+
+    static async projectAccepted() {
+
+    }
 }

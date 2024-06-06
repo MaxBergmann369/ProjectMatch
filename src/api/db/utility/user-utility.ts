@@ -59,13 +59,7 @@ export class UserUtility {
             return null;
         }
 
-        //first letter uppercase and the rest lowercase
-        const firstname = names[0].charAt(0).toUpperCase() + names[0].slice(1).toLowerCase();
-
-        //first letter uppercase and the rest lowercase
-        const lastname = names[1].charAt(0).toUpperCase() + names[1].slice(1).toLowerCase();
-
-        return await Database.getTop10UserMatching(firstname, lastname);
+        return await Database.getTop10UserMatching(names[0], names[1]);
     }
 
     static async getUserIdByFullName(fullName: string): Promise<string | null> {
@@ -214,9 +208,9 @@ export class UserUtility {
         }
     }
 
-    static async notificationsSeen(userId:string, id:number): Promise<boolean> {
+    static async notificationsSeen(userId:string, notificationId:number): Promise<boolean> {
         try {
-            return await Database.notificationSeen(userId, id);
+            return await Database.notificationSeen(userId, notificationId);
         }
         catch (e) {
             return false;
