@@ -247,13 +247,11 @@ export function createUserEndpoints() {
                 return;
             }
 
-            for(const abilityId of abilityIds) {
-                const abId: number = parseInt(abilityId);
-                if (!isNaN(abId) && await UserUtility.addUserAbility(userId, abId)) {
-                    res.sendStatus(200);
-                } else {
-                    res.sendStatus(400);
-                }
+            if(await UserUtility.addUserAbilities(userId, abilityIds)) {
+                res.sendStatus(200);
+            }
+            else {
+                res.sendStatus(400);
             }
         } catch (e) {
             res.status(400);
