@@ -609,7 +609,6 @@ export class Database {
                         links: row.links,
                         maxMembers: row.maxMembers
                     }));
-                    console.log(projects);
                     resolve(projects);
                 }
             });
