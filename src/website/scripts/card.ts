@@ -90,31 +90,42 @@ export class Card {
 
         let rotation = 0;
         const rotationIncrement = 360 / (seconds * 60); // 2 seconds * 60 frames per second
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+            card.animate([
+                { transform: 'rotateY(0deg)' },
+                { transform: 'rotateY(360deg)' }
+            ], {
+                duration: seconds * 1000,
+                iterations: 1
+            });
+        }
+        else{
+            const animationId = setInterval(() => {
+                rotation += rotationIncrement;
 
-        const animationId = setInterval(() => {
-            rotation += rotationIncrement;
-
-            if (rotation >= 360) {
-                rotation = 360;
-                clearInterval(animationId);
-            }
-
-            if (rotation >= 90 && rotation < 270) {
-                backImage.style.display = 'block';
-            }
-
-            if(rotation >= 270) {
-                backImage.style.display = 'none';
-            }
-
-            if(rotation >= 290) {
-                for(const card of cards) {
-                    card.classList.remove('card-distance-spin');
-                    card.classList.add('card-distance');
+                if (rotation >= 360) {
+                    rotation = 360;
+                    clearInterval(animationId);
                 }
-            }
-            card.style.transform = `rotateY(${rotation}deg)`;
-        }, 1000 / 60);
+
+                if (rotation >= 90 && rotation < 270) {
+                    backImage.style.display = 'block';
+                }
+
+                if(rotation >= 270) {
+                    backImage.style.display = 'none';
+                }
+
+                if(rotation >= 290) {
+                    for(const card of cards) {
+                        card.classList.remove('card-distance-spin');
+                        card.classList.add('card-distance');
+                    }
+                }
+                card.style.transform = `rotateY(${rotation}deg)`;
+            }, 1000 / 60);
+
+        }
 
         if(this.id > 0) {
             setTimeout(() => {
