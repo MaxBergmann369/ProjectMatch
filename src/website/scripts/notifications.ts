@@ -19,7 +19,12 @@ export async function initNotifications(tokenUser: TokenUser) {
 
     const notifications = document.getElementById('notifications');
     const notificationBox = document.getElementById('notification-box');
-
+    window.addEventListener('click', async (event) => {
+        if (event.target !== notifications && event.target !== notificationBox) {
+            notificationBox.style.display = 'none';
+            clicked = false;
+        }
+    });
     notifications.addEventListener('click', async () => {
         if(clicked) {
             notificationBox.style.display = 'none';
@@ -103,7 +108,7 @@ function notificationTypes(text: string): string {
 async function renderNotificationIcons() {
     await loadNotifications();
 
-    const chat = document.getElementById('chat');
+    const chat = document.getElementById('chatNavButton');
 
     const notificationBtn = document.getElementById('notification-btn');
 
@@ -162,7 +167,7 @@ async function addButtonListeners() {
     const notifications = document.getElementsByClassName('notification');
 
     for (const notification of notifications) {
-        await notification.addEventListener("click", async () => {
+        notification.addEventListener("click", async () => {
             const notId = parseInt(notification.id);
 
             await renderNotificationIcons();

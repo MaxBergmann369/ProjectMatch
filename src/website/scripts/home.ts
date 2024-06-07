@@ -49,8 +49,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     let cardCount = 0;
 
 // functions
-    await initNotifications(user);
-
     async function appendEndCard() {
         const card = new Card({
             id: 0,
