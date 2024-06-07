@@ -1,4 +1,4 @@
-import {User, Project, View, Like, Message, DirectChat, Notification, ProjectMember, UserAbility, Ability, ProjectAbility} from "../../models";
+import {User, Project, Message, DirectChat, ProjectMember, Ability, Notification} from "../../models";
 import {keycloak} from "./keycloak";
 
 export class HttpClient {
@@ -7,6 +7,16 @@ export class HttpClient {
     bearer = `Bearer ${keycloak.token}`;
 
     /* region User */
+
+    async logout() {
+        return await fetch(`${this.baseUrl}/logout`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.text());
+    }
 
     async addUser(username: string, birthdate: string) {
         return await fetch(`${this.baseUrl}/user`, {
@@ -34,7 +44,37 @@ export class HttpClient {
 
     }
 
-    async updateUser(username: string, birthdate: string) {
+    async getFullNameByUserId(userId: string): Promise<string | null> {
+        return await fetch(`${this.baseUrl}/user/fullName/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.text() : null);
+    }
+
+    async getTop10UserMatching(fullName: string) {
+        return await fetch(`${this.baseUrl}/user/top10/${fullName}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.json() : null);
+    }
+
+    async getUserId(fullName: string): Promise<string | null> {
+        return await fetch(`${this.baseUrl}/userId/${fullName}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.text() : null);
+    }
+
+    async updateUser(userId: string, username:string, birthdate: string, pfp: string) {
         return await fetch(`${this.baseUrl}/user`, {
             method: 'PUT',
             headers: {
@@ -42,8 +82,10 @@ export class HttpClient {
                 Authorization: this.bearer
             },
             body: JSON.stringify({
+                userId: userId,
                 username: username,
-                birthdate: birthdate
+                birthdate: birthdate,
+                pfp: pfp
             })
         })
             .then(response => response.text());
@@ -73,7 +115,7 @@ export class HttpClient {
             .then(response => response.ok);
     }
 
-    async getUserAbilities(userId: string) {
+    async getUserAbilities(userId: string) : Promise<Ability[] | null> {
         return await fetch(`${this.baseUrl}/user/${userId}/abilities`, {
             method: 'GET',
             headers: {
@@ -81,6 +123,31 @@ export class HttpClient {
             }
         })
             .then(response => response.json());
+    }
+
+    async getNotifications(userId: string): Promise<Notification[]> {
+        return await fetch(`${this.baseUrl}/user/${userId}/notification/`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok ? response.json() : null);
+    }
+
+    async markNotificationAsSeen(userId: string, notId: number) {
+        return await fetch(`${this.baseUrl}/user/notification`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: this.bearer
+            },
+            body: JSON.stringify({
+                userId: userId,
+                notId: notId
+            })
+        })
+            .then(response => response.ok);
     }
 
     async deleteUserAbility(userId: string, abilityId: number) {
@@ -93,7 +160,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getAbilities() {
+    async getAbilities() : Promise<Ability[] | null> {
         return await fetch(`${this.baseUrl}/user/abilities`, {
             method: 'GET',
             headers: {
@@ -120,7 +187,7 @@ export class HttpClient {
     }
 
     async getProject(projectId: number): Promise<Project | null> {
-        return await fetch(`${this.baseUrl}/projects/${projectId}`, {
+        return await fetch(`${this.baseUrl}/id/projects/${projectId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -130,8 +197,11 @@ export class HttpClient {
 
     }
 
-    async getProjects(): Promise<Project[] | null> {
-        return await fetch(`${this.baseUrl}/projects`, {
+    async getProjects(showOldProjects?:boolean): Promise<Project[] | null> {
+        if (showOldProjects === undefined) {
+            showOldProjects = false;
+        }
+        return await fetch(`${this.baseUrl}/projects/${showOldProjects}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -139,6 +209,16 @@ export class HttpClient {
         })
             .then(response => response.ok? response.json() : null);
 
+    }
+
+    async deleteData() {
+        return await fetch(`${this.baseUrl}/deleteData`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok ? response.text() : null);
     }
 
     async getProjectsWhereUserIsOwner(userId: string): Promise<Project[] | null> {
@@ -187,7 +267,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getProjectMembers(projectId: number) {
+    async getProjectMembers(projectId: number) : Promise<ProjectMember[] | null> {
         return await fetch(`${this.baseUrl}/projects/${projectId}`, {
             method: 'GET',
             headers: {
@@ -197,7 +277,7 @@ export class HttpClient {
             .then(response => response.json());
     }
 
-    async getProjectsWhereUserIsMember(userId: string) {
+    async getProjectsWhereUserIsMember(userId: string):Promise<Project[] | null> {
         return await fetch(`${this.baseUrl}/projects/members/${userId}`, {
             method: 'GET',
             headers: {
@@ -240,7 +320,7 @@ export class HttpClient {
                 userId: userId
             })
         })
-            .then(response => response.text());
+            .then(response => response.ok);
     }
 
     async getViews(projectId: number) {
@@ -265,7 +345,7 @@ export class HttpClient {
                 userId: userId
             })
         })
-            .then(response => response.text());
+            .then(response => response.ok);
     }
 
     async getLikes(projectId: number) {
@@ -276,6 +356,16 @@ export class HttpClient {
             }
         })
             .then(response => response.text());
+    }
+
+    async isLiked(projectId: number, userId: string): Promise<boolean> {
+        return await fetch(`${this.baseUrl}/isLiked/${projectId}/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok);
     }
 
     async deleteLike(projectId: number, userId: string) {
@@ -302,7 +392,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getProjectAbilities(projectId: number) {
+    async getProjectAbilities(projectId: number):Promise<Ability[]> {
         return await fetch(`${this.baseUrl}/projects/${projectId}/abilities`, {
             method: 'GET',
             headers: {
@@ -341,7 +431,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getDirectChat(userId: string, otherUserId: string) {
+    async getDirectChat(userId: string, otherUserId: string) : Promise<DirectChat> {
         return await fetch(`${this.baseUrl}/chats/${userId}/${otherUserId}`, {
             method: 'GET',
             headers: {
@@ -351,7 +441,7 @@ export class HttpClient {
             .then(response => response.json());
     }
 
-    async getDirectChats(userId: string) {
+    async getDirectChats(userId: string):Promise<DirectChat[]> {
         return await fetch(`${this.baseUrl}/chats/${userId}`, {
             method: 'GET',
             headers: {
@@ -359,6 +449,16 @@ export class HttpClient {
             }
         })
             .then(response => response.json());
+    }
+
+    async updateDirectChat(chatId: number, userId: string) {
+        return await fetch(`${this.baseUrl}/chats/${chatId}/${userId}`, {
+            method: 'PUT',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.text());
     }
 
     async deleteDirectChat(userId: string, otherUserId: string) {
@@ -371,7 +471,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async addMessage(userId: string, otherUserId: string, message: string) {
+    async addMessage(chatId: number, userId: string, message: string) {
         return await fetch(`${this.baseUrl}/messages`, {
             method: 'POST',
             headers: {
@@ -379,22 +479,42 @@ export class HttpClient {
                 Authorization: this.bearer
             },
             body: JSON.stringify({
+                chatId: chatId,
                 userId: userId,
-                otherUserId: otherUserId,
                 message: message
             })
         })
             .then(response => response.text());
     }
 
-    async getMessages(chatId: number) {
-        return await fetch(`${this.baseUrl}/messages/${chatId}`, {
+    async getMessages(chatId: number, min: number, max: number) :Promise<[number, Message[]]>  {
+        return await fetch(`${this.baseUrl}/messages/${chatId}/${min}/${max}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
             }
         })
-            .then(response => response.json());
+            .then(response => response.ok ? response.json() : null);
+    }
+
+    async getUnreadMessages(chatId: number, userId: string): Promise<number> {
+        return await fetch(`${this.baseUrl}/messages/unread/${chatId}/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.json() : 0);
+    }
+
+    async hasUnreadMessages(userId: string): Promise<boolean> {
+        return await fetch(`${this.baseUrl}/messages/unread/${userId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok);
     }
 
     async editMessage(messageId: number, chatId: number, userId: string, message: string) {

@@ -6,8 +6,8 @@
   "scripts": {
     "start": "npx ts-node ./app.ts",
     "run": "npx ts-node ./app.ts",
-    "build": "npx webpack --mode=production  && npx sass website/styles/",
-    "dev": "npx webpack --mode=development && npx sass website/styles/",
+    "build": "npx webpack --mode=production  && npx sass ./styles/*.scss ./dist/styles/",
+    "dev": "npx webpack --mode=development && npx sass ./styles/*.scss ./dist/styles/",
     "watch": "npx webpack --watch --mode=development",
     "test": "jest"
   },
@@ -24,8 +24,7 @@
     "express-session": "^1.17.2",
     "keycloak-connect": "^10.0.2",
     "jsonwebtoken": "^8.5.1",
-    "cors": "^2.8.5",
-    "path": "^0.12.7"
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

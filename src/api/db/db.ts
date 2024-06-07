@@ -21,6 +21,7 @@ export class Database {
             username TEXT NOT NULL,
             firstname TEXT NOT NULL,
             lastname TEXT NOT NULL,
+            pfp TEXT,
             email TEXT NOT NULL,
             clazz TEXT NOT NULL,
             birthdate TEXT NOT NULL,
@@ -71,7 +72,8 @@ export class Database {
             userId TEXT NOT NULL,
             title TEXT NOT NULL,
             text TEXT NOT NULL,
-            date TEXT NOT NULL,
+            dateTime TEXT NOT NULL,
+            seen BOOLEAN NOT NULL,
             FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
 
@@ -102,6 +104,10 @@ export class Database {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userId TEXT NOT NULL,
             otherUserId TEXT NOT NULL,
+            userLastOpenedDate TEXT,
+            userLastOpenedTime TEXT,
+            otherLastOpenedDate TEXT,
+            otherLastOpenedTime TEXT,
             FOREIGN KEY(userId) REFERENCES User(userId),
             FOREIGN KEY(otherUserId) REFERENCES User(userId)
         )`);
@@ -112,6 +118,7 @@ export class Database {
             userId TEXT NOT NULL,
             message TEXT NOT NULL,
             date TEXT NOT NULL,
+            time TEXT NOT NULL,
             FOREIGN KEY(chatId) REFERENCES DirectChat(id),
             FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
@@ -277,6 +284,7 @@ export class Database {
                         username: row.username,
                         firstname: row.firstname,
                         lastname: row.lastname,
+                        pfp: row.pfp,
                         email: row.email,
                         clazz: row.clazz,
                         birthdate: new Date(row.birthdate),
@@ -303,6 +311,7 @@ export class Database {
                         username: row.username,
                         firstname: row.firstname,
                         lastname: row.lastname,
+                        pfp: row.pfp,
                         email: row.email,
                         clazz: row.clazz,
                         birthdate: new Date(row.birthdate),
@@ -311,6 +320,46 @@ export class Database {
                         department: row.department
                     };
                     resolve(user);
+                }
+            });
+        });
+    }
+
+    static async getUserIdByFullName(firstname: string, lastname: string): Promise<string | null> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT userId FROM User WHERE LOWER(firstname) = LOWER(?) AND LOWER(lastname) = LOWER(?)`, [firstname, lastname], (err, row: User) => {
+                if (err) {
+                    reject(err);
+                }
+                else if(!row) {
+                    resolve(null);
+                } else {
+                    resolve(row.userId);
+                }
+            });
+        });
+    }
+
+    static async getFullNameByUserId(userId: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT firstname, lastname FROM User WHERE userId = ?`, [userId], (err, row: User) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row.firstname + " " + row.lastname);
+                }
+            });
+        });
+    }
+
+    static async getTop10UserMatching(firstname: string, lastname: string): Promise<[string, string][]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT userId, firstname, lastname FROM User WHERE firstname LIKE ? AND lastname LIKE ? ORDER BY LENGTH(firstname), LENGTH(lastname), firstname, lastname LIMIT 10`, [firstname + '%', lastname + '%'], (err, rows: User[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const users: [string, string][] = rows.map(row => [row.userId, row.firstname + " " + row.lastname]);
+                    resolve(users);
                 }
             });
         });
@@ -328,9 +377,10 @@ export class Database {
         });
     }
 
-    static async getProjects(): Promise<Project[]> {
+    static async getProjects(projectIds: number[]): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project`, (err, rows: Project[]) => {
+            const placeholder = projectIds.map(() => "?").join(", ");
+            db.all(`SELECT * FROM Project WHERE id IN (${placeholder})`, projectIds, (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -344,7 +394,17 @@ export class Database {
                         links: row.links,
                         maxMembers: row.maxMembers
                     }));
-                    resolve(projects);
+
+                    const orderedProjects: Project[] = [];
+
+                    for (const projectId of projectIds) {
+                        const project = projects.find(project => project.id === projectId);
+                        if (project) {
+                            orderedProjects.push(project);
+                        }
+                    }
+
+                    resolve(orderedProjects);
                 }
             });
         });
@@ -417,6 +477,57 @@ export class Database {
                         maxMembers: row.maxMembers
                     }));
                     resolve(projects);
+                }
+            });
+        });
+    }
+
+    static async getProjectsAlgorithm(userId: string, viewed: boolean, limit: number, likes:boolean, views:boolean): Promise<number[]> {
+        return new Promise((resolve, reject) => {
+            let sql = `SELECT p.id, COUNT(DISTINCT pa.abilityId) as matchingAbilities FROM Project p`;
+
+            sql += ` LEFT JOIN View v ON p.id = v.projectId AND v.userId = ?`;
+
+            sql += ` LEFT JOIN ProjectMember pm ON p.id = pm.projectId AND pm.userId = ? AND pm.isAccepted = 1`;
+
+            if (views) {
+                sql += ` LEFT JOIN View v2 ON p.id = v2.projectId`;
+            }
+
+            if (likes) {
+                sql += ` LEFT JOIN Like l ON p.id = l.projectId`;
+            }
+
+            // Join with UserAbility and ProjectAbility to count matching abilities
+            sql += ` LEFT JOIN UserAbility ua ON ua.userId = ?`;
+            sql += ` LEFT JOIN ProjectAbility pa ON pa.projectId = p.id AND pa.abilityId = ua.abilityId`;
+
+            sql += ` WHERE 1=1`;
+
+            if (!viewed) {
+                sql += ` AND v.userId IS NULL`;
+            }
+
+            sql += ` AND pm.userId IS NULL`;
+
+            sql += ` GROUP BY p.id ORDER BY matchingAbilities DESC`;
+
+            if (views) {
+                sql += `, COUNT(v2.userId) DESC`;
+            } else if (likes) {
+                sql += `, COUNT(l.userId) DESC`;
+            } else {
+                sql += `, p.dateOfCreation DESC`;
+            }
+
+            sql += ` LIMIT ?`;
+
+            db.all(sql, [userId, userId, userId, limit], (err, rows: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const projectIds = rows.map(row => row.id);
+                    resolve(projectIds);
                 }
             });
         });
@@ -526,6 +637,18 @@ export class Database {
         });
     }
 
+    static async isProjectLikedByUser(userId: string, projectId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM Like WHERE userId = ? AND projectId = ?`, [userId, projectId], (err, row: Like) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row !== undefined);
+                }
+            });
+        });
+    }
+
     static async getViewsByProjectId(projectId: number): Promise<View[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT * FROM View WHERE projectId = ?`, [projectId], (err, rows: View[]) => {
@@ -612,7 +735,8 @@ export class Database {
                         userId: row.userId,
                         title: row.title,
                         text: row.text,
-                        dateTime: row.dateTime
+                        dateTime: row.dateTime,
+                        seen: row.seen
                     }));
                     resolve(notifications);
                 }
@@ -642,18 +766,6 @@ export class Database {
         });
     }
 
-    static async userAbilityAlreadyExists(userId: string, abilityId: number): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM UserAbility WHERE userId = ? AND abilityId = ?`, [userId, abilityId], (err, row: UserAbility) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row !== undefined);
-                }
-            });
-        });
-    }
-
     static getProjectAbilitiesByProjectId(projectId: number): Promise<Ability[]> {
         return new Promise((resolve, reject) => {
             db.all(`SELECT abilityId FROM ProjectAbility WHERE projectId = ?`, [projectId], (err, rows: ProjectAbility[]) => {
@@ -661,7 +773,9 @@ export class Database {
                     reject(err);
                 } else {
                     const abilityIds: number[] = rows.map(row => row.abilityId);
-                    db.all(`SELECT * FROM Ability WHERE id IN (?)`, [abilityIds], (err, rows: Ability[]) => {
+                    const placeholder = abilityIds.map(() => "?").join(", ");
+
+                    db.all(`SELECT * FROM Ability WHERE id IN (${placeholder})`, abilityIds, (err, rows: Ability[]) => {
                         if (err) {
                             reject(err);
                         } else {
@@ -735,7 +849,11 @@ export class Database {
                     const directChats: DirectChat[] = rows.map(row => ({
                         id: row.id,
                         userId: row.userId,
-                        otherUserId: row.otherUserId
+                        otherUserId: row.otherUserId,
+                        userLastOpenedDate: row.userLastOpenedDate,
+                        userLastOpenedTime: row.userLastOpenedTime,
+                        otherLastOpenedDate: row.otherLastOpenedDate,
+                        otherLastOpenedTime: row.otherLastOpenedTime
                     }));
                     resolve(directChats);
                 }
@@ -745,7 +863,7 @@ export class Database {
 
     static async getDirectChatByUserIds(userId: string, otherUserId: string): Promise<DirectChat | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM DirectChat WHERE userId = ? AND otherUserId = ?`, [userId, otherUserId], (err, row: DirectChat) => {
+            db.get(`SELECT * FROM DirectChat WHERE (userId = ? AND otherUserId = ?) OR (userId = ? AND otherUserId = ?)`, [userId, otherUserId, otherUserId, userId], (err, row: DirectChat) => {
                 if (err) {
                     reject(err);
                 } else if (!row) {
@@ -754,7 +872,11 @@ export class Database {
                     const directChat: DirectChat = {
                         id: row.id,
                         userId: row.userId,
-                        otherUserId: row.otherUserId
+                        otherUserId: row.otherUserId,
+                        userLastOpenedDate: row.userLastOpenedDate,
+                        userLastOpenedTime: row.userLastOpenedTime,
+                        otherLastOpenedDate: row.otherLastOpenedDate,
+                        otherLastOpenedTime: row.otherLastOpenedTime
                     };
                     resolve(directChat);
                 }
@@ -773,7 +895,11 @@ export class Database {
                     const directChat: DirectChat = {
                         id: row.id,
                         userId: row.userId,
-                        otherUserId: row.otherUserId
+                        otherUserId: row.otherUserId,
+                        userLastOpenedDate: row.userLastOpenedDate,
+                        userLastOpenedTime: row.userLastOpenedTime,
+                        otherLastOpenedDate: row.otherLastOpenedDate,
+                        otherLastOpenedTime: row.otherLastOpenedTime
                     };
                     resolve(directChat);
                 }
@@ -781,9 +907,51 @@ export class Database {
         });
     }
 
-    static async getMessagesByChatId(chatId: number): Promise<Message[]> {
+    static async getUnreadMessagesByChatId(chatId: number, userId: string): Promise<number> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Message WHERE chatId = ?`, [chatId], (err, rows: Message[]) => {
+            const sql: string = `
+            SELECT COUNT(m.id) as count
+            FROM Message m
+            JOIN DirectChat d ON m.chatId = d.id
+            WHERE m.chatId = ? AND m.userId != ? AND (
+                (d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime))) OR
+                (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime)))
+            )
+        `;
+            db.get(sql, [chatId, userId, userId, userId], (err, row: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row.count || 0);
+                }
+            });
+        });
+    }
+
+    static async hasUnreadMessages(userId: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            const sql: string = `
+            SELECT COUNT(*) 
+            FROM DirectChat d
+            JOIN Message m ON d.id = m.chatId
+            WHERE (d.userId = ? OR d.otherUserId = ?)
+            AND m.userId != ?
+            AND ((d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime)))
+            OR (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime))))
+        `;
+            db.get(sql, [userId, userId, userId, userId, userId], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row['COUNT(*)'] > 0);
+                }
+            });
+        });
+    }
+
+    static async getMessagesByChatId(chatId: number, min: number, max:number): Promise<Message[]> {
+        return new Promise((resolve, reject) => {
+            db.all(`SELECT * FROM Message WHERE chatId = ? ORDER BY id DESC LIMIT ? OFFSET ?`, [chatId, max - min, min], (err, rows: Message[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -792,9 +960,22 @@ export class Database {
                         chatId: row.chatId,
                         userId: row.userId,
                         message: row.message,
-                        dateTime: row.dateTime
+                        date: row.date,
+                        time: row.time
                     }));
                     resolve(messages);
+                }
+            });
+        });
+    }
+
+    static async getAmountOfMessages(chatId: number): Promise<number> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT COUNT(*) FROM Message WHERE chatId = ?`, [chatId], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row['COUNT(*)'] || 0);
                 }
             });
         });
@@ -804,7 +985,7 @@ export class Database {
 
     //#region InsertDataToDB
 
-    static async addUser(userId: string, username: string, firstname: string, lastname: string, email: string, clazz: string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
+    static async addUser(userId: string, username: string, firstname: string, lastname: string, pfp:string, email: string, clazz: string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`INSERT INTO User (userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [userId, username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department], (err) => {
                 if (err) {
@@ -816,22 +997,22 @@ export class Database {
         });
     }
 
-    static async addProject(name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: string, links: string, maxMembers: number): Promise<boolean> {
+    static async addProject(name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: string, links: string, maxMembers: number): Promise<number> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Project (name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers) VALUES (?, ?, ?, ?, ?, ?, ?)`, [name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers], (err) => {
+            db.run(`INSERT INTO Project (name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers) VALUES (?, ?, ?, ?, ?, ?, ?)`, [name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers], function(err) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(true);
+                    resolve(this.lastID);
                 }
             });
         });
     }
 
-    static async addProjectMember(userId: string, projectId: number): Promise<boolean> {
+    static async addProjectMember(userId: string, projectId: number, owner:boolean=false): Promise<boolean> {
         //set isAccepted true
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO ProjectMember (userId, projectId, isAccepted) VALUES (?, ?, ?)`, [userId, projectId, false], (err) => {
+            db.run(`INSERT INTO ProjectMember (userId, projectId, isAccepted) VALUES (?, ?, ?)`, [userId, projectId, owner], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -867,7 +1048,7 @@ export class Database {
 
     static async addNotification(userId: string, title: string, text: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Notification (userId, title, text, date) VALUES (?, ?, ?, ?)`, [userId, title, text, date], (err) => {
+            db.run(`INSERT INTO Notification (userId, title, text, dateTime, seen) VALUES (?, ?, ?, ?, ?)`, [userId, title, text, date, false], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -877,9 +1058,10 @@ export class Database {
         });
     }
 
-    static async addUserAbility(userId: string, abilityId: number): Promise<boolean> {
+    static async addUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO UserAbility (userId, abilityId) VALUES (?, ?)`, [userId, abilityId], (err) => {
+            const values = abilityIds.map(() => "(?, ?)").join(", ");
+            db.run(`INSERT INTO UserAbility (userId, abilityId) VALUES ${values}`, abilityIds.flatMap(abilityId => [userId, abilityId]), (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -889,9 +1071,10 @@ export class Database {
         });
     }
 
-    static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
+    static async addProjectAbilities(projectId: number, abilityIds: number[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO ProjectAbility (projectId, abilityId) VALUES (?, ?)`, [projectId, abilityId], (err) => {
+            const values = abilityIds.map(() => "(?, ?)").join(", ");
+            db.run(`INSERT INTO ProjectAbility (projectId, abilityId) VALUES ${values}`, abilityIds.flatMap(abilityId => [projectId, abilityId]), (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -913,21 +1096,22 @@ export class Database {
         });
     }
 
-    static async addDirectChat(userId: string, otherUserId: string): Promise<boolean> {
+    static async addDirectChat(userId: string, otherUserId: string, date: string, time: string): Promise<number | null> {
+        //add direct chat and return the chatId
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO DirectChat (userId, otherUserId) VALUES (?, ?)`, [userId, otherUserId], (err) => {
+            db.run(`INSERT INTO DirectChat (userId, otherUserId, userLastOpenedDate, userLastOpenedTime) VALUES (?, ?, ?, ?)`, [userId, otherUserId, date, time], function(err) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(true);
+                    resolve(this.lastID);
                 }
             });
         });
     }
 
-    static async addMessage(chatId: number, userId: string, message: string, date: string): Promise<boolean> {
+    static async addMessage(chatId: number, userId: string, message: string, date: string, time: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Message (chatId, userId, message, date) VALUES (?, ?, ?, ?)`, [chatId, userId, message, date], (err) => {
+            db.run(`INSERT INTO Message (chatId, userId, message, date, time) VALUES (?, ?, ?, ?, ?)`, [chatId, userId, message, date, time], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -941,7 +1125,7 @@ export class Database {
 
     //#region UpdateDataInDB
 
-    static async updateUser(userId: string, username: string, firstname: string, lastname: string, email:string, clazz:string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
+    static async updateUser(userId: string, username: string, firstname: string, lastname: string, pfp:string, email:string, clazz:string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, email = ?, clazz = ?, birthdate = ?, biografie = ?, permissions = ?, department = ? WHERE userId = ?`, [username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department, userId], (err) => {
                 if (err) {
@@ -972,6 +1156,53 @@ export class Database {
                     reject(err);
                 } else {
                     resolve(true);
+                }
+            });
+        });
+    }
+
+    static async isProjectMember(userId: string, projectId: number, accepted: boolean): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM ProjectMember WHERE userId = ? AND projectId = ? AND isAccepted`, [userId, projectId, accepted], (err, row: ProjectMember) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row !== undefined);
+                }
+            });
+        });
+    }
+
+    static async notificationSeen(userId: string, notificationId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`UPDATE Notification SET seen = ? WHERE userId = ? AND id = ?`, [true, userId, notificationId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async updateDirectChatLastOpened(chatId: number, userId: string, date: string, time: string): Promise<boolean> {
+        //you have to look if userId === userId than userLastOpenedDate else userId === otherUserId otherLastOpenedDate
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM DirectChat WHERE id = ?`, [chatId], (err, row: DirectChat) => {
+                if (err) {
+                    reject(err);
+                } else if (!row) {
+                    reject(new Error("Chat not found"));
+                } else {
+                    const lastOpenedDate = row.userId === userId ? 'userLastOpenedDate' : 'otherLastOpenedDate';
+                    const lastOpenedTime = row.userId === userId ? 'userLastOpenedTime' : 'otherLastOpenedTime';
+                    db.run(`UPDATE DirectChat SET ${lastOpenedDate} = ?, ${lastOpenedTime} = ? WHERE id = ?`, [date, time, chatId], (err) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(true);
+                        }
+                    });
                 }
             });
         });
