@@ -86,7 +86,7 @@ export class Card {
 
         const card = this.element;
         const backImage = card.getElementsByTagName('div')[1];
-        const seconds: number = 2;
+        const seconds: number = 1.5;
 
         let rotation = 0;
         const rotationIncrement = 360 / (seconds * 60); // 2 seconds * 60 frames per second
