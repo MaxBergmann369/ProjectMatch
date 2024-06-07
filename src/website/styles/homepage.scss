@@ -153,7 +153,6 @@ body {
 }
 
 .card {
-  background-size: cover;
   padding: 2rem 3rem;
   text-align: center;
   width: 100%;
@@ -165,7 +164,6 @@ body {
   cursor: pointer;
   user-select: none;
   transition: transform 0.5s;
-  background-color: white;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
