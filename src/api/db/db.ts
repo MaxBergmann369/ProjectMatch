@@ -73,6 +73,7 @@ export class Database {
             title TEXT NOT NULL,
             text TEXT NOT NULL,
             dateTime TEXT NOT NULL,
+            seen BOOLEAN NOT NULL,
             FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
 
@@ -324,11 +325,14 @@ export class Database {
         });
     }
 
-    static async getUserIdByFullName(firstname: string, lastname: string): Promise<string> {
+    static async getUserIdByFullName(firstname: string, lastname: string): Promise<string | null> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT userId FROM User WHERE firstname = ? AND lastname = ?`, [firstname, lastname], (err, row: User) => {
+            db.get(`SELECT userId FROM User WHERE LOWER(firstname) = LOWER(?) AND LOWER(lastname) = LOWER(?)`, [firstname, lastname], (err, row: User) => {
                 if (err) {
                     reject(err);
+                }
+                else if(!row) {
+                    resolve(null);
                 } else {
                     resolve(row.userId);
                 }
@@ -732,7 +736,8 @@ export class Database {
                         userId: row.userId,
                         title: row.title,
                         text: row.text,
-                        dateTime: row.dateTime
+                        dateTime: row.dateTime,
+                        seen: row.seen
                     }));
                     resolve(notifications);
                 }
@@ -757,18 +762,6 @@ export class Database {
                     }
 
                     resolve(abilities);
-                }
-            });
-        });
-    }
-
-    static async userAbilityAlreadyExists(userId: string, abilityId: number): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM UserAbility WHERE userId = ? AND abilityId = ?`, [userId, abilityId], (err, row: UserAbility) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row !== undefined);
                 }
             });
         });
@@ -917,25 +910,41 @@ export class Database {
 
     static async getUnreadMessagesByChatId(chatId: number, userId: string): Promise<number> {
         return new Promise((resolve, reject) => {
-            // Get the DirectChat record
-            db.get(`SELECT * FROM DirectChat WHERE id = ? AND (userId = ? OR otherUserId = ?)`, [chatId, userId, userId], (err, row: DirectChat) => {
+            const sql: string = `
+            SELECT COUNT(m.id) as count
+            FROM Message m
+            JOIN DirectChat d ON m.chatId = d.id
+            WHERE m.chatId = ? AND m.userId != ? AND (
+                (d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime))) OR
+                (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime)))
+            )
+        `;
+            db.get(sql, [chatId, userId, userId, userId], (err, row: any) => {
                 if (err) {
                     reject(err);
-                } else if (!row) {
-                    resolve(0);
                 } else {
-                    // Determine the last opened date and time for the user
-                    const lastOpenedDate = row.userId === userId ? row.userLastOpenedDate : row.otherLastOpenedDate;
-                    const lastOpenedTime = row.userId === userId ? row.userLastOpenedTime : row.otherLastOpenedTime;
+                    resolve(row.count || 0);
+                }
+            });
+        });
+    }
 
-                    // Get the count of messages that were sent after the last opened date and time
-                    db.get(`SELECT COUNT(*) FROM Message WHERE chatId = ? AND userId != ? AND date > ? OR (date = ? AND time > ?)`, [chatId, userId, lastOpenedDate, lastOpenedDate, lastOpenedTime], (err, row) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(row['COUNT(*)'] || 0);
-                        }
-                    });
+    static async hasUnreadMessages(userId: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            const sql: string = `
+            SELECT COUNT(*) 
+            FROM DirectChat d
+            JOIN Message m ON d.id = m.chatId
+            WHERE (d.userId = ? OR d.otherUserId = ?)
+            AND m.userId != ?
+            AND ((d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime)))
+            OR (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime))))
+        `;
+            db.get(sql, [userId, userId, userId, userId, userId], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row['COUNT(*)'] > 0);
                 }
             });
         });
@@ -989,22 +998,22 @@ export class Database {
         });
     }
 
-    static async addProject(name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: string, links: string, maxMembers: number): Promise<boolean> {
+    static async addProject(name: string, ownerId: string, thumbnail: string, description: string, dateOfCreation: string, links: string, maxMembers: number): Promise<number> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Project (name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers) VALUES (?, ?, ?, ?, ?, ?, ?)`, [name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers], (err) => {
+            db.run(`INSERT INTO Project (name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers) VALUES (?, ?, ?, ?, ?, ?, ?)`, [name, ownerId, thumbnail, description, dateOfCreation, links, maxMembers], function(err) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(true);
+                    resolve(this.lastID);
                 }
             });
         });
     }
 
-    static async addProjectMember(userId: string, projectId: number): Promise<boolean> {
+    static async addProjectMember(userId: string, projectId: number, owner:boolean=false): Promise<boolean> {
         //set isAccepted true
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO ProjectMember (userId, projectId, isAccepted) VALUES (?, ?, ?)`, [userId, projectId, false], (err) => {
+            db.run(`INSERT INTO ProjectMember (userId, projectId, isAccepted) VALUES (?, ?, ?)`, [userId, projectId, owner], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1040,19 +1049,7 @@ export class Database {
 
     static async addNotification(userId: string, title: string, text: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Notification (userId, title, text, dateTime) VALUES (?, ?, ?, ?)`, [userId, title, text, date], (err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(true);
-                }
-            });
-        });
-    }
-
-    static async addUserAbility(userId: string, abilityId: number): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO UserAbility (userId, abilityId) VALUES (?, ?)`, [userId, abilityId], (err) => {
+            db.run(`INSERT INTO Notification (userId, title, text, dateTime, seen) VALUES (?, ?, ?, ?, ?)`, [userId, title, text, date, false], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1064,40 +1061,21 @@ export class Database {
 
     static async addUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run("BEGIN TRANSACTION", async (beginErr) => {
-                if (beginErr) {
-                    reject(beginErr);
-                    return;
-                }
-
-                try {
-                    for (const abilityId of abilityIds) {
-                        await this.addUserAbility(userId, abilityId);
-                    }
-
-                    db.run("COMMIT", commitErr => {
-                        if (commitErr) {
-                            reject(commitErr);
-                        } else {
-                            resolve(true);
-                        }
-                    });
-                } catch (err) {
-                    db.run("ROLLBACK", rollbackErr => {
-                        if (rollbackErr) {
-                            reject(rollbackErr);
-                        } else {
-                            resolve(false);
-                        }
-                    });
+            const values = abilityIds.map(() => "(?, ?)").join(", ");
+            db.run(`INSERT INTO UserAbility (userId, abilityId) VALUES ${values}`, abilityIds.flatMap(abilityId => [userId, abilityId]), (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
                 }
             });
         });
     }
 
-    static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
+    static async addProjectAbilities(projectId: number, abilityIds: number[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO ProjectAbility (projectId, abilityId) VALUES (?, ?)`, [projectId, abilityId], (err) => {
+            const values = abilityIds.map(() => "(?, ?)").join(", ");
+            db.run(`INSERT INTO ProjectAbility (projectId, abilityId) VALUES ${values}`, abilityIds.flatMap(abilityId => [projectId, abilityId]), (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1119,13 +1097,14 @@ export class Database {
         });
     }
 
-    static async addDirectChat(userId: string, otherUserId: string, date: string, time: string): Promise<boolean> {
+    static async addDirectChat(userId: string, otherUserId: string, date: string, time: string): Promise<number | null> {
+        //add direct chat and return the chatId
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO DirectChat (userId, otherUserId, userLastOpenedDate, userLastOpenedTime) VALUES (?, ?, ?, ?, ?, ?)`, [userId, otherUserId, date, time], (err) => {
+            db.run(`INSERT INTO DirectChat (userId, otherUserId, userLastOpenedDate, userLastOpenedTime) VALUES (?, ?, ?, ?)`, [userId, otherUserId, date, time], function(err) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(true);
+                    resolve(this.lastID);
                 }
             });
         });
@@ -1174,6 +1153,30 @@ export class Database {
     static async acceptProjectMember(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.run(`UPDATE ProjectMember SET isAccepted = ? WHERE userId = ? AND projectId = ?`, [true, userId, projectId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    static async isProjectMember(userId: string, projectId: number, accepted: boolean): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM ProjectMember WHERE userId = ? AND projectId = ? AND isAccepted`, [userId, projectId, accepted], (err, row: ProjectMember) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row !== undefined);
+                }
+            });
+        });
+    }
+
+    static async notificationSeen(userId: string, notificationId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`UPDATE Notification SET seen = ? WHERE userId = ? AND id = ?`, [true, userId, notificationId], (err) => {
                 if (err) {
                     reject(err);
                 } else {

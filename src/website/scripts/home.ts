@@ -3,7 +3,8 @@ import {initKeycloak, keycloak} from "./keycloak";
 import {Project, User} from "../../models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
-import "./general"; // this tells webpack to include the general.ts file in the bundle
+import "./general";
+import {initNotifications} from "./notifications"; // this tells webpack to include the general.ts file in the bundle
 
 const authenticatedPromise = initKeycloak();
 
@@ -21,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
     client = new HttpClient();
+
     console.log("User is authenticated");
     const user = new TokenUser(keycloak.tokenParsed);
 
@@ -47,9 +49,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     let cardCount = 0;
 
 // functions
+    await initNotifications(user);
 
     async function appendEndCard() {
         const card = new Card({
+            id: 0,
             imageUrl: urls[cardCount % urls.length],
             onDismiss: () => {
                 appendNewCard();
@@ -106,6 +110,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         let desc = project.description;
         const ownerId = project.ownerId;
         const owner = await client.getUser(ownerId);
+
+        if(owner === null){
+            return;
+        }
+
         let tags = (await client.getProjectAbilities(project.id)).map(value => value.name);
         const favourite = await client.isLiked(project.id, user.userId);
         if (tags.length > 6){
@@ -121,6 +130,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }
         const card = new Card({
+            id: project.id,
             imageUrl: url,
             onDismiss: () =>{
                 client.addView(project.id, user.userId);

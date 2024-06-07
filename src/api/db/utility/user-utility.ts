@@ -59,13 +59,7 @@ export class UserUtility {
             return null;
         }
 
-        //first letter uppercase and the rest lowercase
-        const firstname = names[0].charAt(0).toUpperCase() + names[0].slice(1).toLowerCase();
-
-        //first letter uppercase and the rest lowercase
-        const lastname = names[1].charAt(0).toUpperCase() + names[1].slice(1).toLowerCase();
-
-        return await Database.getTop10UserMatching(firstname, lastname);
+        return await Database.getTop10UserMatching(names[0], names[1]);
     }
 
     static async getUserIdByFullName(fullName: string): Promise<string | null> {
@@ -76,13 +70,9 @@ export class UserUtility {
                 return null;
             }
 
-            //first letter uppercase and the rest lowercase
-            const firstname = names[0].charAt(0).toUpperCase() + names[0].slice(1).toLowerCase();
+            const userId = await Database.getUserIdByFullName(names[0], names[1]);
 
-            //first letter uppercase and the rest lowercase
-            const lastname = names[1].charAt(0).toUpperCase() + names[1].slice(1).toLowerCase();
-
-            return await Database.getUserIdByFullName(firstname, lastname);
+            return userId === null ? null : userId;
         }
         catch (e) {
             return null;
@@ -131,19 +121,23 @@ export class UserUtility {
     /* endregion */
 
     /* region UserAbility */
-    static async addUserAbility(userId: string, abilityId: number): Promise<boolean> {
+    static async addUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
         try {
             const id = userId.toLowerCase();
 
-            if(!(await ValUser.isUserValid(id)) || abilityId < 1) {
+            if(!(await ValUser.isUserValid(id)) || abilityIds.length < 1) {
                 return false;
             }
 
-            if(await Database.userAbilityAlreadyExists(id, abilityId)) {
+            const abilities = await Database.getUserAbilitiesByUserId(id);
+
+            const newAbilities = abilityIds.filter(abilityId => !abilities.some(ability => ability.id === abilityId));
+
+            if(newAbilities.length < 1) {
                 return false;
             }
 
-            return await Database.addUserAbility(id, abilityId);
+            return await Database.addUserAbilities(id, newAbilities);
         }
         catch (e) {
             return false;
@@ -215,6 +209,15 @@ export class UserUtility {
         }
         catch (e) {
             return null;
+        }
+    }
+
+    static async notificationsSeen(userId:string, notificationId:number): Promise<boolean> {
+        try {
+            return await Database.notificationSeen(userId, notificationId);
+        }
+        catch (e) {
+            return false;
         }
     }
 

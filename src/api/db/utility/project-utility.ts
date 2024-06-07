@@ -1,6 +1,7 @@
 import {Database} from "../db";
 import {ValProject, ValUser} from "../validation";
 import {Ability, Like, Project, ProjectMember, View} from "../../../models";
+import {SystemNotification} from "../system-notifications";
 
 export class ProjectUtility {
     /* region Base */
@@ -22,7 +23,13 @@ export class ProjectUtility {
                 return false;
             }
 
-            return await Database.addProject(name, owId, thumbnail, description, date.toDateString(), links, maxMembers);
+            const projectId:number = await Database.addProject(name, owId, thumbnail, description, date.toDateString(), links, maxMembers);
+
+            if (projectId === null) {
+                return false;
+            }
+
+            return await Database.addProjectMember(owId, projectId, true);
         }
         catch (e) {
             return false;
@@ -196,12 +203,13 @@ export class ProjectUtility {
                 return false;
             }
 
-            const members = await this.getProjectMembers(projectId);
-            const pendingMembers = await this.getPendingRequestsByProjectId(projectId);
-
-            if (members === null || members.map(value => value.userId).includes(id) || pendingMembers.map(value => value.userId).includes(id)) {
+            if(await Database.isProjectMember(id, projectId, false) ||
+                await Database.isProjectMember(id, projectId, true) ||
+            await Database.isUserOwnerOfProject(id, projectId)) {
                 return false;
             }
+
+            await SystemNotification.projectMemberRequest(userId, projectId);
 
             return await Database.addProjectMember(id, projectId);
         }
@@ -224,7 +232,7 @@ export class ProjectUtility {
                 return false;
             }
 
-            if(!await this.isUserOwnerOfProject(id, projectId)) {
+            if(await this.isUserOwnerOfProject(id, projectId)) {
                 return false;
             }
 
@@ -233,6 +241,12 @@ export class ProjectUtility {
             if(members >= project.maxMembers) {
                 return false;
             }
+
+            if(await Database.isProjectMember(id, projectId, true)) {
+                return false;
+            }
+
+            await SystemNotification.projectAccepted(userId, projectId);
 
             return Database.acceptProjectMember(id, projectId);
         }
@@ -441,17 +455,17 @@ export class ProjectUtility {
     /* endregion */
 
     /* region ProjectAbility */
-    static async addProjectAbility(projectId: number, abilityId: number): Promise<boolean> {
+    static async addProjectAbilities(projectId: number, abilityIds: number[]): Promise<boolean> {
         try {
-            if(abilityId < 1 || projectId < 1 || await Database.getProject(projectId) === null || await Database.getAbilityById(abilityId) === null){
+            if(abilityIds.length === 0 || projectId < 1 || await Database.getProject(projectId) === null){
                 return false;
             }
 
-            if(await Database.projectAbilityAlreadyExists(projectId, abilityId)) {
-                return false;
-            }
+            const projectAbilities: Ability[] = await this.getAbilitiesByProjectId(projectId);
 
-            return await Database.addProjectAbility(projectId, abilityId);
+            const newAbilities = abilityIds.filter(abilityId => !projectAbilities.some(ability => ability.id === abilityId));
+
+            return await Database.addProjectAbilities(projectId, newAbilities);
         }
         catch (e) {
             return false;

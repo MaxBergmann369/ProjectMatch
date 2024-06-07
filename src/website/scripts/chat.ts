@@ -32,6 +32,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         await renderChatProfiles();
         manageMessages();
         await addEventListener();
+
+        // Get the chat parameter from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const chat = urlParams.get("chat");
+
+        // Check if the chat parameter exists and is a valid number
+        if (chat && !isNaN(Number(chat))) {
+            // Set chatId to the value of the chat parameter and render the chat messages
+            chatId = Number(chat);
+            await renderChatMessages(chatId);
+        }
     }
     else {
         location.href = "index.html";
@@ -51,6 +62,7 @@ async function addEventListener() {
         userFullName = userFullName.replace(" ", "-");
         if(userFullName !== "" ) {
             const userId = await client.getUserId(userFullName);
+            console.log(userId);
 
             await client.addDirectChat(user.userId, userId);
             await renderChatProfiles();
@@ -84,9 +96,9 @@ async function addEventListener() {
 async function loadChatProfileButtons() {
     const chatProfiles = document.getElementsByClassName("chat");
 
-    for (let i = 0; i < chatProfiles.length; i++) {
-        chatProfiles[i].addEventListener("click", async (event) => {
-            const id = parseInt((event.target as HTMLElement).id);
+    for (const profile of chatProfiles) {
+        profile.addEventListener("click", async () => {
+            const id = parseInt(profile.id);
 
             if(chatId !== id) {
                 chatMessages.clear();
@@ -98,9 +110,9 @@ async function loadChatProfileButtons() {
                 await client.updateDirectChat(chatId, user.userId);
             }
 
-            chatId = id;
-
             if(!isNaN(id)) {
+                chatId = id;
+
                 const layerUp = document.getElementById("layer-up");
 
                 if(messageAmount <= maxRenderAmount) {
@@ -128,7 +140,6 @@ async function addUserButtons() {
             }
         });
     }
-
 }
 
 async function renderChatProfiles(load: boolean = true) {
@@ -235,10 +246,23 @@ async function loadChatMessages(id: number) {
     let lastDate = "";
     let date = "";
 
+    const orderedMessages: Message[] = messages.sort((a, b) => {
+        const dateA = a.date;
+        const dateB = b.date;
+
+        const timeA = a.time;
+        const timeB = b.time;
+
+        if (dateA === dateB) {
+            return timeA.localeCompare(timeB);
+        }
+
+        return dateA.localeCompare(dateB);
+    });
+
     let recentMessages: string[] = [];
 
-    for(let i = 0; i < messages.length; i++) {
-        const message = messages[i];
+    for(const message of orderedMessages) {
 
         let username = user.username;
 

@@ -1,5 +1,5 @@
 import express from "express";
-import {UserUtility} from "../db/utility/user-utility";;
+import {UserUtility} from "../db/utility/user-utility";
 import {EndPoints} from "../db/validation";
 
 const userRouter = express.Router();
@@ -247,13 +247,11 @@ export function createUserEndpoints() {
                 return;
             }
 
-            for(const abilityId of abilityIds) {
-                const abId: number = parseInt(abilityId);
-                if (!isNaN(abId) && await UserUtility.addUserAbility(userId, abId)) {
-                    res.sendStatus(200);
-                } else {
-                    res.sendStatus(400);
-                }
+            if(await UserUtility.addUserAbilities(userId, abilityIds)) {
+                res.sendStatus(200);
+            }
+            else {
+                res.sendStatus(400);
             }
         } catch (e) {
             res.status(400);
@@ -361,6 +359,29 @@ export function createUserEndpoints() {
 
             if(notification !== null) {
                 res.status(200).send(notification);
+            } else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
+    userRouter.put('/user/notification', async (req, res) => {
+        try {
+            const {userId, notId} = req.body;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if(await UserUtility.notificationsSeen(userId, notId)) {
+                res.sendStatus(200);
             } else {
                 res.sendStatus(400);
             }
