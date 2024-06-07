@@ -86,9 +86,10 @@ export class Card {
 
         const card = this.element;
         const backImage = card.getElementsByTagName('div')[1];
+        const seconds: number = 2;
 
         let rotation = 0;
-        const rotationIncrement = 360 / (2 * 60); // 2 seconds * 60 frames per second
+        const rotationIncrement = 360 / (seconds * 60); // 2 seconds * 60 frames per second
 
         const animationId = setInterval(() => {
             rotation += rotationIncrement;
@@ -106,24 +107,19 @@ export class Card {
                 backImage.style.display = 'none';
             }
 
+            if(rotation >= 290) {
+                for(const card of cards) {
+                    card.classList.remove('card-distance-spin');
+                    card.classList.add('card-distance');
+                }
+            }
             card.style.transform = `rotateY(${rotation}deg)`;
         }, 1000 / 60);
-
-        setTimeout(() => {
-            for(const card of cards) {
-                card.classList.remove('card-distance-spin');
-                card.classList.add('card-distance');
-            }
-        }, 1600);
-
-        setTimeout(() => {
-            this.element.classList.remove('spin');
-        }, 2000);
 
         if(this.id > 0) {
             setTimeout(() => {
                 window.location.href = `detailView.html?project=${this.id}`;
-            }, 1900);
+            }, (seconds * 1000) - 100);
         }
     };
 
