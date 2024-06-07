@@ -252,8 +252,18 @@ export class HttpClient {
             .then(response => response.json());
     }
 
-    async getProjectsWhereUserIsMember(userId: string):Promise<Project[] | null> {
-        return await fetch(`${this.baseUrl}/projects/members/${userId}`, {
+    async getProjectsWhereUserIsMember(userId: string, isAccepted:boolean=true):Promise<Project[] | null> {
+        return await fetch(`${this.baseUrl}/projects/members/${userId}/${isAccepted}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.json());
+    }
+
+    async getProjectsLikedByUser(userId: string):Promise<Project[] | null> {
+        return await fetch(`${this.baseUrl}/projects/liked/${userId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
