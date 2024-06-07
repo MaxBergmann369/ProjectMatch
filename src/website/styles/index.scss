@@ -17,14 +17,7 @@ body {
 
 }
 
-.bottomRow {
-  margin-top: 10rem;
-}
-
 .topRow {
-  h1{
-    animation: rotate 3s infinite linear;
-  }
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -65,17 +58,6 @@ body {
 
 
 
-@keyframes rotate {
-  0% {
-    transform: rotateY(0deg) rotateX(0deg) rotateZ(0deg)
-  }
-  30% {
-    transform: rotateY(21deg) rotateX(66deg) rotateZ(32deg)
-  }
-  100% {
-    transform: rotateY(360deg) rotateX(360deg) rotateZ(360deg)
-  }
-}
 
 .center-idx  {
   display: flex;
