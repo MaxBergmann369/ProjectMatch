@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const dislike = document.querySelector('#dislike') as HTMLElement;
     // constants
     const urls = [];
-    const backImage: string = "./resources/project/test.jpg";
+    const backImage: string = "./resources/project/cardback/test.jpg";
     let allowRepeats = false;
     const projects: Project[] = [];
     for (let i = 1; i <= 33; i++) {
