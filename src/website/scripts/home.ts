@@ -19,7 +19,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     client = new HttpClient();
-
+    window.addEventListener('beforeunload', async () => {
+        await client.deleteData();
+    });
     console.log("User is authenticated");
     const user = new TokenUser(keycloak.tokenParsed);
 
@@ -194,8 +196,4 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         topCard.dispatchEvent(event);
     });
-});
-
-window.addEventListener('beforeunload', async () => {
-    await client.deleteData();
 });
