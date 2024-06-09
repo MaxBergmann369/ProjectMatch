@@ -1,0 +1,151 @@
+@token = s%3AANc9Cj4S6hnBXnb2PjPnSbZ2ALiQDok7.LhYD882KrSc7Y4TO8xyV2RjKeJ7VdTOg2uV453U9%2F74
+@url = http://localhost:3000/api
+
+###
+
+POST {{url}}/projects
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "test",
+  "ownerId": "IF123456",
+  "thumbnail": "image.png",
+  "description": "some description",
+  "links": "https://www.google.com;https://www.youtube.com",
+  "maxMembers": 5
+}
+
+###
+
+PUT http://localhost:3000/api/projects/1/members/if210010
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+
+GET {{url}}/projects/1
+Authorization: Bearer {{token}}
+
+###
+
+GET {{url}}/projects
+Authorization: Bearer {{token}}
+
+###
+
+GET {{url}}/projects/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+PUT {{url}}/projects
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "name": "test updated",
+  "ownerId": "IF123456",
+  "thumbnail": "image.png",
+  "description": "some updated description",
+  "links": "https://www.google.com;https://www.youtube.com",
+  "maxMembers": 5
+}
+
+###
+
+DELETE {{url}}/projects/IF123456/1
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/projects/1/members
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userId": "IF123456"
+}
+
+###
+
+GET {{url}}/projects/1
+Authorization: Bearer {{token}}
+
+###
+
+GET {{url}}/projects/members/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+PUT {{url}}/projects/1/members
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userId": "IF123456"
+}
+
+###
+
+DELETE {{url}}/projects/1/members/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/views
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "projectId": 1,
+  "userId": "IF123456"
+}
+
+###
+
+GET {{url}}/views/1
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/likes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "projectId": 1,
+  "userId": "IF123456"
+}
+
+###
+
+GET {{url}}/likes/1
+Authorization: Bearer {{token}}
+
+###
+
+DELETE {{url}}/likes/1/IF123456
+Authorization: Bearer {{token}}
+
+###
+
+POST {{url}}/projects/1/abilities
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "abilityId": 1
+}
+
+###
+
+GET {{url}}/projects/1/abilities
+Authorization: Bearer {{token}}
+
+###
+
+DELETE {{url}}/projects/1/abilities/1
+Authorization: Bearer {{token}}

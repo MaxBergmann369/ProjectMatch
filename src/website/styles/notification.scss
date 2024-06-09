@@ -1,0 +1,72 @@
+#notification-box {
+  padding: 0.5rem;
+  margin-left: 5vw;
+  width: 30rem;
+  height: 15rem;
+  background: rgba(182, 175, 175, 0.75);
+  border-radius: 8px;
+  position: absolute;
+  display: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid black;
+}
+
+.notification-new {
+  width: 0.5vw;
+  height: 0.8vh;
+  border-radius: 100%;
+  background: red;
+  position: absolute;
+  top: 0.5rem;
+  right: 0;
+}
+
+.notification {
+  position: relative;
+  border-bottom: 1px solid black;
+  cursor: pointer;
+}
+
+#chat {
+  position: relative;
+}
+
+.notification-icon, .chat-notification-icon {
+  position: absolute;
+  width: 1vw;
+  height: 1.7vh;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.notification-icon {
+  top: 1.3vh;
+  right: 2.5vw;
+}
+
+.chat-notification-icon {
+  top: 0.3vh;
+  right: 0.3vw;
+}
+
+.nav-notification{
+  span {
+    font-family: 'Carlito', sans-serif;
+    margin: 0 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.3s;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  span:hover{
+    color: var(--nav-accent);
+  }
+  &.active{
+    color: var(--nav-accent);
+    font-weight: bold;
+  }
+
+}

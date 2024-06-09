@@ -128,3 +128,13 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# SCSS output
+/src/website/styles/*.css
+/src/website/styles/*.css.map
+
+# tsc output (we are using typescript only)
+/src/website/dist/*.js
+/src/website/dist/*.js.map
+/src/api/**/*.js
+/src/api/**/*.js.map
