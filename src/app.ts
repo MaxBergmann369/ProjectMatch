@@ -7,6 +7,7 @@ import Keycloak from 'keycloak-connect';
 import {createUserEndpoints} from "./api/router/user-router";
 import {createProjectEndpoints} from "./api/router/project-router";
 import {createChatEndpoints} from "./api/router/chat-router";
+import helmet from "helmet";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(session({
     saveUninitialized: true,
     store: memoryStore
 }));
+app.use(helmet.frameguard({ action: "sameorigin" }));
 const keycloak = new Keycloak({ store: memoryStore });
 
 app.use(keycloak.middleware({
