@@ -3,6 +3,7 @@ import {User} from "../../models";
 export class Card {
     id: number;
     imageUrl: string;
+    backImageUrl: string;
     onDismiss: () => void;
     onLike: () => void;
     onDislike: () => void;
@@ -17,6 +18,7 @@ export class Card {
     constructor({
                     id,
                     imageUrl,
+                    backImageUrl,
                     onDismiss,
                     onLike,
                     onDislike,
@@ -29,6 +31,7 @@ export class Card {
                 }) {
         this.id = id;
         this.imageUrl = imageUrl;
+        this.backImageUrl = backImageUrl;
         this.onDismiss = onDismiss;
         this.onLike = onLike;
         this.onDislike = onDislike;
@@ -81,23 +84,53 @@ export class Card {
             card.classList.add('card-distance-spin');
         }
 
-        this.element.classList.add('spin');
+        const card = this.element;
+        const backImage = card.getElementsByTagName('div')[1];
+        const seconds: number = 1.5;
 
-        setTimeout(() => {
-            for(const card of cards) {
-                card.classList.remove('card-distance-spin');
-                card.classList.add('card-distance');
-            }
-        }, 1200);
+        let rotation = 0;
+        const rotationIncrement = 360 / (seconds * 60); // 2 seconds * 60 frames per second
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+            card.animate([
+                { transform: 'rotateY(0deg)' },
+                { transform: 'rotateY(360deg)' }
+            ], {
+                duration: seconds * 1000,
+                iterations: 1
+            });
+        }
+        else{
+            const animationId = setInterval(() => {
+                rotation += rotationIncrement;
 
-        setTimeout(() => {
-            this.element.classList.remove('spin');
-        }, 2000);
+                if (rotation >= 360) {
+                    rotation = 360;
+                    clearInterval(animationId);
+                }
+
+                if (rotation >= 90 && rotation < 270) {
+                    backImage.style.display = 'block';
+                }
+
+                if(rotation >= 270) {
+                    backImage.style.display = 'none';
+                }
+
+                if(rotation >= 290) {
+                    for(const card of cards) {
+                        card.classList.remove('card-distance-spin');
+                        card.classList.add('card-distance');
+                    }
+                }
+                card.style.transform = `rotateY(${rotation}deg)`;
+            }, 1000 / 60);
+
+        }
 
         if(this.id > 0) {
             setTimeout(() => {
                 window.location.href = `detailView.html?project=${this.id}`;
-            }, 1800);
+            }, (seconds * 1000) - 100);
         }
     };
 
@@ -206,7 +239,17 @@ export class Card {
         const card = document.createElement('div');
         const fullname = `${this.owner.firstname} ${this.owner.lastname}`;
         card.classList.add('card');
-        card.style.backgroundImage = `url(${this.imageUrl})`;
+
+        const image = document.createElement('div');
+        image.classList.add('image');
+        image.style.backgroundImage = `url(${this.imageUrl})`;
+        card.append(image);
+
+        const backImage = document.createElement('div');
+        backImage.classList.add('back-image');
+        backImage.style.backgroundImage = `url(${this.backImageUrl})`;
+        card.append(backImage);
+
         const title = document.createElement('div');
         title.classList.add('title');
         const h2 = document.createElement('h2');

@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const dislike = document.querySelector('#dislike') as HTMLElement;
     // constants
     const urls = [];
+    const backImage: string = "./resources/project/cardback/test.jpg";
     let allowRepeats = false;
     const projects: Project[] = [];
     for (let i = 1; i <= 33; i++) {
@@ -52,6 +53,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const card = new Card({
             id: 0,
             imageUrl: urls[cardCount % urls.length],
+            backImageUrl: backImage,
             onDismiss: () => {
                 appendNewCard();
             },
@@ -129,6 +131,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const card = new Card({
             id: project.id,
             imageUrl: url,
+            backImageUrl: backImage,
             onDismiss: () =>{
                 client.addView(project.id, user.userId);
                 appendNewCard();
