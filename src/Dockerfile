@@ -11,7 +11,7 @@ RUN npm install
 
 RUN npm run build
 
-EXPOSE 5000
+EXPOSE 3000
 
 # Start the app using serve command
 CMD [ "npm", "start" ]
