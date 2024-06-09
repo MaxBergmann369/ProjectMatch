@@ -10,15 +10,18 @@
 <body>
 <form id="create-project" class="create-project" onsubmit="false">
 
+    <label for="picture" class="label">Add Project Thumbnail:</label>
+
+    <div id="picture" class="thumbnail">
+        <button id="add-picture-button" class="add-btn" type="button">+</button>
+    </div>
+
     <label for="project-name" class="label">Projectname:</label>
     <input type="text" id="project-name" name="project-name" placeholder="Project Title" class="input-field">
 
     <label for="abilities" class="label">Needed Abilities:</label>
     <div id="abilities" class="input abilities">
         <!-- the script inserts abilities here -->
-        <div class="ability-item">C# <button class="remove-btn">X</button></div>
-        <input type="text" placeholder="Add Ability" class="input-field">
-        <button class="add-btn">+</button>
     </div>
 
     <label for="description" class="label">Description (max 500 words):</label>
@@ -36,12 +39,6 @@
             </ul>
         </div>
         <button type="button" class="add-btn" id="add-link-button">+</button>
-    </div>
-
-    <label for="picture" class="label">Add Project Thumbnail:</label>
-
-    <div id="picture" class="thumbnail">
-        <button id="add-picture-button" class="add-btn" type="button">+</button>
     </div>
 
     <button type="submit" class="submit-btn">Create Project</button>

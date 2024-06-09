@@ -150,13 +150,12 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            for (const abilityId of abilityIds) {
-                const id = parseInt(abilityId);
-                if (isNaN(id) || !await Utility.addProjectAbility(projectId, id)) {
-                    res.sendStatus(400);
-                    return;
-                }
+            if (await ProjectUtility.addProjectAbilities(projectId, abilityIds)) {
+                res.sendStatus(200);
+            } else {
+                res.sendStatus(400);
             }
+            
         } catch (e) {
             res.sendStatus(400);
         }

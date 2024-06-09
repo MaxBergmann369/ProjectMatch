@@ -118,7 +118,7 @@ export class ValProject {
         }
 
 
-        if(thumbnail === undefined || thumbnail === "" || thumbnail.length > 20 || thumbnail.length < 1) {
+        if(thumbnail === undefined || thumbnail === "" || thumbnail.length > 150 || thumbnail.length < 1) {
             return false;
         }
 

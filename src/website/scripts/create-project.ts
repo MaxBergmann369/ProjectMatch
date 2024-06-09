@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     client = new HttpClient();
-
+    
     await renderAbilities();
 
     await renderPicture();
@@ -39,41 +39,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         //await addPicture();
     });
 
-    //console.log(document.getElementById("add-pic-button"));
-
     document.getElementById('create-project').addEventListener("submit", async (event) => {
-        //event.preventDefault();
-        console.log('enterd create project');
+        event.preventDefault();
         const form = event.target as HTMLFormElement;
         const data = new FormData(form);
 
         const abilities = data.getAll("abilities") as string[];
         const abilitiesIds = abilities.map(ability => parseInt(ability));
 
-        console.log(abilities);
         const abResponse = await client.addProjectAbilities(keycloak.tokenParsed.preferred_username, abilitiesIds);
 
         if (!abResponse) {
             alert("Failed to add ability to project");
         }
 
-        const projectTitle = data.get("project-title") as string;
+        const projectTitle = data.get("project-name") as string;
         const description = data.get("description") as string;
-        const maxMembers = data.get("max-members") as string;
-        //links
+        const maxMembers = data.get("max-member") as string;
         const link = links.join(";\n");
         const picture = `./resources/project/backgrounds/bg${firstTimePicture}.webp`;
 
-        console.log(projectTitle);
-        console.log(keycloak.tokenParsed.preferred_username);
-        console.log(picture);
-        console.log(description);
-        console.log(new Date());
-        console.log(link);
-        console.log(parseInt(maxMembers));
-
-
         if(ValProject.isValid(projectTitle, keycloak.tokenParsed.preferred_username, picture, description, new Date(), link, parseInt(maxMembers))) {
+
             const project = {
                 id: 1,
                 name: projectTitle,
@@ -84,22 +71,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 links: link,
                 maxMembers: parseInt(maxMembers)
             }
+
             const response = await client.addProject(project);
 
-            console.log(response);
-            /*if (response) {
-                console.log('hello this is the response')
-                console.log(response);
-                location.href = "home.html";
+            if (response) {
+                //location.href = "home.html";
             } else {
                 console.error("Failed to create project");
             }
-             */
-            console.log('hello this is the project not going in the if');
-            alert("Project created successfully");
          }
-        console.log('hello this is the project not going in the if');
-        alert("Project created successfully");
     });
 });
 
@@ -161,7 +141,6 @@ async function renderAbilities() {
                         for (let i = 0; i < childrenChildren.length; i++) {
                             const child = childrenChildren.item(i);
                             if (child instanceof HTMLElement) {
-                                console.log("Entered child if")
                                 const childInput = child.querySelector("input");
                                 if (childInput) {
                                     (childInput as HTMLInputElement).checked = false;
@@ -188,7 +167,6 @@ async function addLink() {
     let html = "";
 
     for(const loadLink of links) {
-        console.log(loadLink);
         html += `
                    <li>
                         <a href="${loadLink}">${loadLink}</a>
@@ -268,7 +246,6 @@ async function renderPictures() {
                         for (let i = 0; i < childrenChildren.length; i++) {
                             const child = childrenChildren.item(i);
                             if (child instanceof HTMLElement) {
-                                console.log("Entered child if")
                                 const childInput = child.querySelector("input");
                                 if (childInput) {
                                     (childInput as HTMLInputElement).checked = false;
