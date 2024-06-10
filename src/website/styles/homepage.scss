@@ -125,6 +125,7 @@ body {
 .card-distance-spin {
   transform: translateZ(calc(-180px * var(--i)));
   pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 .card-distance {
