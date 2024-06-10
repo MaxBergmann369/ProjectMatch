@@ -6,14 +6,14 @@ function insertGlobalHtmlElements() {
     document.head.insertAdjacentHTML('beforeend', `<link rel="icon" href="./resources/favicon.ico" />`);
     document.body.insertAdjacentHTML('afterbegin', `<nav>
     <div class="center">
-        <a href="home.html" class="navButton"><img src="resources/nav/home.svg" alt="Home"></a>
-        <a href="profile.html" class="navButton"><img src="resources/nav/user.svg" alt="Profiles"></a>
-        <a href="chat.html"  id="chatNavButton" class="navButton"><img src="resources/nav/message-circle.svg" alt="Chats"></a>
-        <div id="notification-btn" class="nav-notification navButton">
+        <a href="home.html" title="Home" class="navButton"><img src="resources/nav/home.svg" alt="Home"></a>
+        <a href="profile.html" title="Profiles" class="navButton"><img src="resources/nav/user.svg" alt="Profiles"></a>
+        <a href="chat.html" title="Chats" id="chatNavButton" class="navButton"><img src="resources/nav/message-circle.svg" alt="Chats"></a>
+        <div id="notification-btn" title="Notifications" class="nav-notification navButton">
             <img id="notifications" src="resources/nav/bell.svg" alt="Home">
             <div id="notification-box"></div>
         </div>
-        <a href="javascript:void(0)" id="logout" class="navButton"><img src="resources/nav/log-out.svg" alt="Logout"></a>
+        <a href="javascript:void(0)" title="Logout" id="logout" class="navButton"><img src="resources/nav/log-out.svg" alt="Logout"></a>
         
     </div>
 </nav>`);
