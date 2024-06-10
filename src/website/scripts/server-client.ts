@@ -235,16 +235,6 @@ export class HttpClient {
             .then(response => response.ok ? response.text() : null);
     }
 
-    async getProjectsWhereUserIsOwner(userId: string): Promise<Project[] | null> {
-        return await fetch(`${this.baseUrl}/projects/${userId}`, {
-            method: 'GET',
-            headers: {
-                Authorization: this.bearer
-            }
-        })
-            .then(response => response.ok? response.json() : null);
-    }
-
     async updateProject(project: Project) {
         return await fetch(`${this.baseUrl}/projects`, {
             method: 'PUT',

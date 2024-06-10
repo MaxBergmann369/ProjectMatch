@@ -88,22 +88,6 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/projects/owner/:userId', async (req, res) => {
-        try {
-            const userId = req.params.userId;
-
-            const projects = await ProjectUtility.getProjectsWhereUserIsOwner(userId);
-
-            if (projects !== null) {
-                res.status(200).send(projects);
-            } else {
-                res.sendStatus(400);
-            }
-        } catch (e) {
-            res.sendStatus(400);
-        }
-    });
-
     projectRouter.put('/projects', async (req, res) => {
         try {
             const {id, name, ownerId, thumbnail, description, links, maxMembers} = req.body;

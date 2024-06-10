@@ -153,21 +153,6 @@ export class ProjectUtility {
         }
     }
 
-    static async getProjectsWhereUserIsOwner(userId: string): Promise<Project[] | null> {
-        try {
-            const owId = userId.toLowerCase();
-
-            if(!await ValUser.isUserValid(owId)) {
-                return null;
-            }
-
-            return await Database.getProjectsByOwnerId(owId);
-        }
-        catch (e) {
-            return null;
-        }
-    }
-
     static async getProjectId(projectName: string, ownerId: string): Promise<number | null> {
         try {
             const owId = ownerId.toLowerCase();
