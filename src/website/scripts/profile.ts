@@ -38,12 +38,11 @@ async function loadProjectUI(client: HttpClient, id: string) {
     function addProjectsToList(projects: Project[]) {
         projectList.innerHTML = "";
         for (const project of projects) {
-            const li = document.createElement("li");
             const a = document.createElement("a");
+            a.classList.add("project");
             a.href = `project.html?id=${project.id}`;
             a.textContent = project.name;
-            li.appendChild(a);
-            projectList.appendChild(li);
+            projectList.appendChild(a);
         }
     }
     addProjectsToList(projects);
@@ -91,9 +90,6 @@ async function loadUserUI(client: HttpClient, abilities: Ability[], id: string) 
         const path = `./resources/profile/pfp/${user.pfp}`;
 
         pfp.src = path;
-    }
-    else {
-        pfp.src = `./website/resources/profile/pfp/${defaultImage}`;
     }
 
     const pfpInput = document.getElementById('pfpInput') as HTMLInputElement;
