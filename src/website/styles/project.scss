@@ -1,0 +1,44 @@
+:root{
+  --rounded: 2rem;
+}
+
+.center{
+    display: flex;
+  flex-wrap: wrap;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 100%;
+  gap: 1rem;
+  .container{
+    //border: 2px solid black;
+    border-radius: var(--rounded);
+    background: #ededed;
+    padding: 2rem;
+    width: 100%;
+  }
+}
+
+#project-details{
+  flex: 3;
+}
+
+#project-members{
+    flex: 2;
+
+}
+
+.member{
+  display: flex;
+  flex-direction: row;
+  height: 5rem;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid black;
+  .pfp{
+    border-radius: 50%;
+    object-fit: cover;
+    height: 100%;
+    aspect-ratio: 1;
+  }
+}
+
