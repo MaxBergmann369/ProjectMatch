@@ -20,6 +20,13 @@
 
 #project-details{
   flex: 3;
+  #minor-details{
+    img{
+      vertical-align: middle;
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+  }
 }
 
 #project-members{
