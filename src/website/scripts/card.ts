@@ -87,9 +87,10 @@ export class Card {
         const card = this.element;
         const backImage = card.getElementsByTagName('div')[1];
         const seconds: number = 1.5;
+        const fps: number = 50;
 
         let rotation = 0;
-        const rotationIncrement = 360 / (seconds * 60); // 2 seconds * 60 frames per second
+        const rotationIncrement = 360 / (seconds * fps); // 2 seconds * 60 frames per second
         if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
             card.animate([
                 { transform: 'rotateY(0deg)' },
@@ -122,15 +123,13 @@ export class Card {
                         card.classList.add('card-distance');
                     }
                 }
+
+                if(rotation >= 360 && this.id > 0) {
+                    window.location.href = `detailView.html?project=${this.id}`;
+                }
+
                 card.style.transform = `rotateY(${rotation}deg)`;
-            }, 1000 / 60);
-
-        }
-
-        if(this.id > 0) {
-            setTimeout(() => {
-                window.location.href = `detailView.html?project=${this.id}`;
-            }, (seconds * 1000) - 100);
+            }, 1000 / fps);
         }
     };
 
