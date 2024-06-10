@@ -593,9 +593,9 @@ export class Database {
         });
     }
 
-    static async getProjectsWhereUserIsMember(userId: string): Promise<Project[]> {
+    static async getProjectsWhereUserIsMember(userId: string, isAccepted:boolean): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM ProjectMember WHERE userId = ?)`, [userId], (err, rows: Project[]) => {
+            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM ProjectMember WHERE userId = ? and isAccepted = ?)`, [userId, isAccepted], (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -617,7 +617,7 @@ export class Database {
 
     static async getLikedProjectsByUserId(userId: string): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM Like WHERE userId = ?)`, [userId], (err, rows: Project[]) => {
+            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM Like WHERE userId = ? LIMIT 100)`, [userId], (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1127,7 +1127,7 @@ export class Database {
 
     static async updateUser(userId: string, username: string, firstname: string, lastname: string, pfp:string, email:string, clazz:string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, email = ?, clazz = ?, birthdate = ?, biografie = ?, permissions = ?, department = ? WHERE userId = ?`, [username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department, userId], (err) => {
+            db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, pfp = ?, email = ?, clazz = ?, birthdate = ?, biografie = ?, permissions = ?, department = ? WHERE userId = ?`, [username, firstname, lastname, pfp, email, clazz, birthdate, biografie, permissions, department, userId], (err) => {
                 if (err) {
                     reject(err);
                 } else {

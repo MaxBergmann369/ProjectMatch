@@ -9,7 +9,7 @@
 </head>
 <body>
 <a target="_blank" id="credits" href="https://www.vecteezy.com/free-vector/pattern">Pattern Vectors by Vecteezy</a>
-    <div class="nav-bar"></div>
+<div id="chat" class="main">
     <div class="side-bar">
         <input type="text" id="input-chat" placeholder="Search" maxlength="40">
         <div id="chat-list">
@@ -20,15 +20,19 @@
             <button id="addChat">+</button>
         </div>
     </div>
-    <div id="chat-window">
+<div id="chatandinput">
+    <div id="chat-window" >
         <div id="layer-up">Load Messages</div>
         <div id="messageWindow">
         </div>
         <div id="layer-down">Load Messages</div>
-        <div class="input-bar">
-            <input type="text" id="messageInput" placeholder="Type a message">
-            <button id="sendMessage">Send</button>
-        </div>
+
     </div>
+<form id="input-bar" onsubmit="false">
+    <input type="text" id="messageInput" placeholder="Type a message">
+    <button id="sendMessage"><img src="resources/chat/send-horizontal.svg" alt="Send"></button>
+</form>
+</div>
+</div>
 </body>
 </html>

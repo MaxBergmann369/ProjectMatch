@@ -18,6 +18,20 @@ export class HttpClient {
             .then(response => response.text());
     }
 
+    async uploadImage(userId: string, image: Blob): Promise<string> {
+        const formData = new FormData();
+        formData.append('image', image);
+
+        return await fetch(`${this.baseUrl}/user/${userId}/image`, {
+            method: 'POST',
+            headers: {
+                Authorization: this.bearer
+            },
+            body: formData
+        })
+            .then(response => response.ok ? response.text() : null);
+    }
+
     async addUser(username: string, birthdate: string) {
         return await fetch(`${this.baseUrl}/user`, {
             method: 'POST',
@@ -221,16 +235,6 @@ export class HttpClient {
             .then(response => response.ok ? response.text() : null);
     }
 
-    async getProjectsWhereUserIsOwner(userId: string): Promise<Project[] | null> {
-        return await fetch(`${this.baseUrl}/projects/${userId}`, {
-            method: 'GET',
-            headers: {
-                Authorization: this.bearer
-            }
-        })
-            .then(response => response.ok? response.json() : null);
-    }
-
     async updateProject(project: Project) {
         return await fetch(`${this.baseUrl}/projects`, {
             method: 'PUT',
@@ -277,8 +281,18 @@ export class HttpClient {
             .then(response => response.json());
     }
 
-    async getProjectsWhereUserIsMember(userId: string):Promise<Project[] | null> {
-        return await fetch(`${this.baseUrl}/projects/members/${userId}`, {
+    async getProjectsWhereUserIsMember(userId: string, isAccepted:boolean=true):Promise<Project[] | null> {
+        return await fetch(`${this.baseUrl}/projects/members/${userId}/${isAccepted}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.json());
+    }
+
+    async getProjectsLikedByUser(userId: string):Promise<Project[] | null> {
+        return await fetch(`${this.baseUrl}/projects/liked/${userId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer

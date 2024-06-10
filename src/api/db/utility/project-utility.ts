@@ -153,21 +153,6 @@ export class ProjectUtility {
         }
     }
 
-    static async getProjectsWhereUserIsOwner(userId: string): Promise<Project[] | null> {
-        try {
-            const owId = userId.toLowerCase();
-
-            if(!await ValUser.isUserValid(owId)) {
-                return null;
-            }
-
-            return await Database.getProjectsByOwnerId(owId);
-        }
-        catch (e) {
-            return null;
-        }
-    }
-
     static async getProjectId(projectName: string, ownerId: string): Promise<number | null> {
         try {
             const owId = ownerId.toLowerCase();
@@ -268,7 +253,7 @@ export class ProjectUtility {
         }
     }
 
-    static async getPendingRequests(projectId: number): Promise<ProjectMember[] | null> {
+    static async getPendingRequestsByProjectId(projectId: number): Promise<ProjectMember[] | null> {
         try {
             if(projectId < 1) {
                 return null;
@@ -281,7 +266,22 @@ export class ProjectUtility {
         }
     }
 
-    static async getProjectsWhereUserIsMember(userId: string): Promise<Project[] | null> {
+    static async getPendingRequestsByUserId(userId: string): Promise<Project[] | null> {
+        try {
+            const id = userId.toLowerCase();
+
+            if(!(await ValUser.isUserValid(id))) {
+                return null;
+            }
+
+            return await Database.getProjectsWhereUserIsMember(id, true);
+        }
+        catch (e) {
+            return null;
+        }
+    }
+
+    static async getProjectsWhereUserIsMember(userId: string, isAccepted:boolean): Promise<Project[] | null> {
         try {
             const id = userId.toLowerCase();
 
@@ -289,7 +289,7 @@ export class ProjectUtility {
                 return null;
             }
 
-            return await Database.getProjectsWhereUserIsMember(id);
+            return await Database.getProjectsWhereUserIsMember(id, isAccepted);
         }
         catch (e) {
             return null;

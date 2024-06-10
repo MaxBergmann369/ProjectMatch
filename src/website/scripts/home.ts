@@ -197,3 +197,4 @@ document.addEventListener("DOMContentLoaded", async function () {
         topCard.dispatchEvent(event);
     });
 });
+
