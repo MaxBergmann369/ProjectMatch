@@ -1,5 +1,4 @@
 body {
-  font-family: Arial, sans-serif;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -9,14 +8,10 @@ body {
 .create-project {
   position: relative;
   display: grid;
-  gap: 1rem;
+  gap: 0.7rem;
   padding: 2rem;
   border: 1px solid #000;
-  width: 800px;
-}
-
-.label {
-  margin-top: 1rem;
+  width: 50vw;
 }
 
 .input-field {
@@ -62,24 +57,54 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid #000;
-  height: 200px;
-  width: 200px;
-  padding: 1rem;
-}
+  height: 20rem;
+    width: 12rem;
+  #picture-preview {
+    border-radius: 2rem;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    aspect-ratio: 1;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    padding: 0.2rem;
+  }
 
-.thumbnail img {
-  max-width: 100%;
-  max-height: 100%;
 }
 
 .link-container {
   display: flex;
   align-items: center;
+  li{
+    list-style-type: none;
+
+  }
+  li button {
+    vertical-align: middle;
+    background-color: #f0f0f0;
+    border: 1px solid #000;
+    cursor: pointer;
+    padding: 0;
+    width: 1rem;
+    height: 1rem;
+    img{
+      width: 1rem;
+      height: 1rem;
+
+    }
+  }
 }
 
 .submit-btn {
-  justify-self: end;
+  position: absolute;
+    right: 2rem;
+    bottom: 2rem;
   padding: 0.5rem 1rem;
   border: 1px solid #000;
   background-color: #fff;
@@ -94,4 +119,32 @@ a{
 
 a:hover{
   color:blue;
+}
+
+#popup-pictures{
+  display: none;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 2rem;
+  position: absolute;
+  width: 100%;
+  max-height: 50vh;
+  overflow-y: scroll;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 1rem;
+  border: 1px solid black;
+  z-index: 100;
+  #close{
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+  }
+  img:not(#close){
+    height: 12rem;
+    cursor: pointer;
+  }
 }

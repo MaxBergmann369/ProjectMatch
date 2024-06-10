@@ -1,21 +1,41 @@
 import {HttpClient} from "./server-client";
-import {Ability, User} from "../../models";
+import {Ability} from "../../models";
 import {initKeycloak, keycloak} from "./keycloak";
-import * as path from 'path';
-import http from "http";
 import {ValProject} from "./validation";
 
 const auth = initKeycloak();
-let client;
-let links = [];
+let client: HttpClient;
+const links = [];
 const pictures :string[] = [];
 
 for (let i = 1; i <= 33; i++) {
     pictures.push(`./resources/project/backgrounds/bg${i}.webp`);
 }
+let selection= Math.floor(Math.random() * (pictures.length - 1));
 
-let firstTimePicture = Math.floor(Math.random() * ((pictures.length - 1) + 1));
 
+
+async function showPictureSelectionPopup() {
+    const popup = document.getElementById("popup-pictures");
+
+    if (popup) {
+        popup.style.display = "flex";
+        document.getElementById("close").addEventListener("click", () => {
+            popup.style.display = "none";
+        });
+        for (let i = 0; i < pictures.length; i++) {
+            const img = document.createElement("img");
+            img.src = pictures[i];
+            img.classList.add("popup-picture");
+            img.addEventListener("click", () => {
+                selection = i;
+                renderPicture(selection);
+                popup.style.display = "none";
+            });
+            popup.appendChild(img);
+        }
+    }
+}
 document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await auth;
 
@@ -27,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     await renderAbilities();
 
-    await renderPicture();
+    renderPicture(selection);
 
     document.getElementById("add-link-button").addEventListener("click", async (event) => {
         event.preventDefault();
@@ -36,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById("add-picture-button").addEventListener("click", async (event) => {
         event.preventDefault();
-        //await addPicture();
+        await showPictureSelectionPopup();
     });
 
     document.getElementById('create-project').addEventListener("submit", async (event) => {
@@ -48,11 +68,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const description = data.get("description") as string;
         const maxMembers = data.get("max-member") as string;
         const link = links.join(";\n");
-        const picture = `./resources/project/backgrounds/bg${firstTimePicture}.webp`;
+        const picture = `./resources/project/backgrounds/bg${selection}.webp`;
 
         if(ValProject.isValid(projectTitle, keycloak.tokenParsed.preferred_username, picture, description, new Date(), link, parseInt(maxMembers))) {
 
             const project = {
+                id: 0,
                 name: projectTitle,
                 ownerId: keycloak.tokenParsed.preferred_username,
                 thumbnail: picture,
@@ -60,11 +81,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 dateOfCreation: new Date(),
                 links: link,
                 maxMembers: parseInt(maxMembers)
-            }
+            };
 
-            const projectId = await client.addProject(project);
-            console.log('Project id before parseing: ',projectId);
-            parseInt(projectId);
+            const projectId = parseInt(await client.addProject(project));
             console.log('Project id: ',projectId);
 
             if (projectId < 0) {
@@ -156,6 +175,12 @@ async function renderAbilities() {
                 });
             }
         );
+        topLevelAbilities.forEach(ability => {
+            const input = document.getElementById(`ability_${ability.id}`) as HTMLInputElement;
+            if (input) {
+                input.dispatchEvent(new Event("change"));
+            }
+        });
     }
 
 }
@@ -167,13 +192,20 @@ async function addLink() {
         alert("There is no link to add");
         return;
     }
+    const regex = /^(?:http|https):\/\/[^!@#$%^&*()-_=+[\]{}\\|;:'"<>,.?/ ]+\.[a-zA-Z]+$/;
 
+    if (!regex.test(link.value)) {
+        alert("Invalid link");
+        return;
+    }
     let html = "";
 
     for(const loadLink of links) {
         html += `
                    <li>
+                        <button class="remove-link"><img src="./resources/x.svg" alt="remove link"></button>
                         <a href="${loadLink}">${loadLink}</a>
+                       
                     </li>       
         `;
     }
@@ -181,7 +213,9 @@ async function addLink() {
     if (linkElement !== null) {
         html += `
                    <li>
+                        <button class="remove-link"><img src="./resources/x.svg" alt="remove link"></button>
                         <a href="${link.value}">${link.value}</a>
+                        
                     </li>       
         `;
 
@@ -189,91 +223,21 @@ async function addLink() {
         link.value = "";
     }
     linkElement.innerHTML = html;
-}
-
-let count = 0;
-async function addPicture() {
-    const pictureElement = document.getElementById("add-pic-button");
-    if (pictureElement !== null) {
-        let html = "";
-
-        html += `
-            <div class="add-pic">
-                <input type="checkbox" id="pic_${count}" name="abilities" value="${count}">
-                <label for="ability_${count}"><img src=${pictures[0]} alt="BackroundPicture"></label>
-            </div>
-            `;
-        count++;
-        pictureElement.innerHTML = html;
-
-    }
-
-}
-
-async function renderPictures() {
-    let randomNumber = Math.floor(Math.random() * ((pictures.length - 1) + 1));
-
-    const pictureElement = document.getElementById("add-pic");
-
-    if (pictureElement !== null) {
-        let html = "";
-
-        let count = 0;
-        for(const picture of pictures) {
-            html += `
-            <div class="add-pic">
-                <input type="checkbox" id="pic_${count}" name="abilities" value="${count}">
-                <label for="ability_${count}"><img src=${picture} alt="BackroundPicture"></label>
-            </div>
-            `;
-
-        }
-
-
-        pictureElement.innerHTML = html;
-
-        document.querySelectorAll(".picture input").forEach((input) => {
-                input.addEventListener("change", (event) => {
-
-                    const id = parseInt((event.target as HTMLInputElement).id.split("_")[1]);
-                    const checked = (event.target as HTMLInputElement).checked;
-                    const children = document.getElementById(`children_${id}`);
-                    if (!children) {
-                        return;
-                    }
-                    (children as HTMLElement).style.display = checked ? "block" : "none";
-                    const childrenChildren = children.children;
-                    if (!childrenChildren || childrenChildren.length === 0) {
-                        return;
-                    }
-                    if (checked) {
-                        for (let i = 0; i < childrenChildren.length; i++) {
-                            const child = childrenChildren.item(i);
-                            if (child instanceof HTMLElement) {
-                                const childInput = child.querySelector("input");
-                                if (childInput) {
-                                    (childInput as HTMLInputElement).checked = false;
-                                    childInput.dispatchEvent(new Event("change"));
-                                }
-                            }
-                        }
-                    }
-                });
+    linkElement.querySelectorAll("li .remove-link").forEach((element) => {
+        element.addEventListener("click", async (event: Event) => {
+            event.preventDefault();
+            const link = (element as HTMLElement).nextElementSibling as HTMLAnchorElement;
+            const linkIndex = links.indexOf(link.textContent);
+            if (linkIndex !== -1) {
+                links.splice(linkIndex, 1);
             }
-        );
-    }
+            link.parentElement.remove();
+        });
+    });
 }
 
-async function renderPicture() {
+function renderPicture(index: number) {
 
-    const pictureElement = document.getElementById("picture");
-
-    if (pictureElement !== null) {
-        let html = "";
-
-            html += `
-                <img src="./resources/project/backgrounds/bg${firstTimePicture}.webp" alt="BackroundPicture">
-            `;
-        pictureElement.innerHTML += html;
-    }
+    const pictureElement = document.getElementById("picture-preview") as HTMLImageElement;
+    pictureElement.src = pictures[index];
 }

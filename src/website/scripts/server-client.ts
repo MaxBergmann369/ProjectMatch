@@ -183,7 +183,7 @@ export class HttpClient {
             },
             body: JSON.stringify(project)
         })
-            .then(response => response.text());
+            .then(response => response.ok? response.text(): "-1");
     }
 
     async getProject(projectId: number): Promise<Project | null> {
