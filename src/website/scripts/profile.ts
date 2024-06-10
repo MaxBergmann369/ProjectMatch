@@ -122,9 +122,12 @@ async function loadUserUI(client: HttpClient, abilities: Ability[], id: string) 
     document.title = `${user.firstname} ${user.lastname}'s Profile - ProjectMatch`;
 }
 
-
 function addPopupEventListener(abilities: Ability[]) {
     document.getElementById("showmore").addEventListener("click", function () {
+        if (document.getElementById("ability-popup")) {
+            return; // If it's open, don't open it again
+        }
+
         const el = document.createElement("div"); // popup
         el.id = "ability-popup";
         el.innerHTML = `
