@@ -6,6 +6,7 @@ import {Ability, Project} from "../../models";
 
 const authenticatedPromise = initKeycloak();
 
+const defaultImage = "default.jpg";
 
 document.addEventListener("DOMContentLoaded", async function () {
     const authenticated = await authenticatedPromise;
@@ -58,7 +59,6 @@ async function loadProjectUI(client: HttpClient, id: string) {
     });
     const favProjectsButton = document.getElementById("favProjects");
     favProjectsButton.addEventListener("click", async function () {
-        console.log("clicked");
         const favProjects = await client.getProjectsLikedByUser(id);
         addProjectsToList(favProjects);
     });
@@ -86,9 +86,34 @@ async function loadUserUI(client: HttpClient, abilities: Ability[], id: string) 
     const department = document.getElementById("department").querySelector("span");
     // get short form
     department.textContent = user.department;
+
     if (user.pfp) {
-        pfp.src = user.pfp;
+        const path = `./resources/profile/pfp/${user.pfp}`;
+
+        pfp.src = path;
     }
+    else {
+        pfp.src = `./website/resources/profile/pfp/${defaultImage}`;
+    }
+
+    const pfpInput = document.getElementById('pfpInput') as HTMLInputElement;
+    pfpInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const imageBlob = new Blob([e.target.result], {type: 'image/jpeg'}); // Create a Blob object
+
+                const newPfp = await client.uploadImage(user.userId, imageBlob);
+
+                if (newPfp !== null) {
+                    const path = `./resources/profile/pfp/${newPfp}`;
+
+                    pfp.src = path;
+                }
+            };
+            reader.readAsArrayBuffer(this.files[0]); // Read the file as an ArrayBuffer
+        }
+    });
 
     const filteredAbilities = abilities.filter(ability => ability.parentId === 1);
     const abilitiesList = document.getElementById("abilities");

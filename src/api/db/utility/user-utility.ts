@@ -90,6 +90,7 @@ export class UserUtility {
             return await Database.updateUser(id, username, firstname, lastname, pfp, email, clazz, birthdate.toDateString(), biografie, permissions, department);
         }
         catch (e) {
+            console.log(e);
             return false;
         }
     }

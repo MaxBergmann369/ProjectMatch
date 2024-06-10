@@ -18,6 +18,20 @@ export class HttpClient {
             .then(response => response.text());
     }
 
+    async uploadImage(userId: string, image: Blob): Promise<string> {
+        const formData = new FormData();
+        formData.append('image', image);
+
+        return await fetch(`${this.baseUrl}/user/${userId}/image`, {
+            method: 'POST',
+            headers: {
+                Authorization: this.bearer
+            },
+            body: formData
+        })
+            .then(response => response.ok ? response.text() : null);
+    }
+
     async addUser(username: string, birthdate: string) {
         return await fetch(`${this.baseUrl}/user`, {
             method: 'POST',
