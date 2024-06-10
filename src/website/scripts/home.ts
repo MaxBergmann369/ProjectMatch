@@ -45,11 +45,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         urls.push(`./resources/project/backgrounds/bg${i}.webp`);
     }
 
-// variables
     let cardCount = 0;
-
-// functions
-    await initNotifications(user);
 
     async function appendEndCard() {
         const card = new Card({
