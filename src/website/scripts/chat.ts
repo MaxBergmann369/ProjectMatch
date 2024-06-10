@@ -241,8 +241,6 @@ async function loadChatMessages(id: number) {
     const messages: Message[] = data[1];
     messageAmount = data[0];
 
-    messages.reverse();
-
     let otherUsername: string | undefined = undefined;
 
     let lastDate = "";
@@ -259,7 +257,7 @@ async function loadChatMessages(id: number) {
             return timeA.localeCompare(timeB);
         }
 
-        return dateA.localeCompare(dateB);
+        return dateB.localeCompare(dateA);
     });
 
     let recentMessages: string[] = [];
