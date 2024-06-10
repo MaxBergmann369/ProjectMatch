@@ -12,8 +12,10 @@ export function createProjectEndpoints() {
         try {
             const {name, ownerId, thumbnail, description, links, maxMembers} = req.body;
 
-            if (await ProjectUtility.addProject(name, ownerId, thumbnail, description, links, maxMembers)) {
-                res.sendStatus(200);
+            const projectId = await ProjectUtility.addProject(name, ownerId, thumbnail, description, links, maxMembers)
+
+            if (projectId >= 0) {
+                res.status(200).send(projectId.toString());
             } else {
                 res.sendStatus(400);
             }

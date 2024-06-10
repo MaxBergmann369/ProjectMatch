@@ -1,9 +1,10 @@
 # Start your image with a node base image
-FROM node:latest
+FROM node:latest as build
+LABEL authors="A.Höllerl,M.Bergmann,A.Jasic"
 
 COPY . /app
 
-WORKDIR /app
+WORKDIR /app/src
 
 # Install node packages, install serve, build the app, and remove dependencies at the end
 RUN npm install

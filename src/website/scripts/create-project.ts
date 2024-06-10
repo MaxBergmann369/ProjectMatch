@@ -44,15 +44,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const form = event.target as HTMLFormElement;
         const data = new FormData(form);
 
-        const abilities = data.getAll("abilities") as string[];
-        const abilitiesIds = abilities.map(ability => parseInt(ability));
-
-        const abResponse = await client.addProjectAbilities(keycloak.tokenParsed.preferred_username, abilitiesIds);
-
-        if (!abResponse) {
-            alert("Failed to add ability to project");
-        }
-
         const projectTitle = data.get("project-name") as string;
         const description = data.get("description") as string;
         const maxMembers = data.get("max-member") as string;
@@ -62,7 +53,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if(ValProject.isValid(projectTitle, keycloak.tokenParsed.preferred_username, picture, description, new Date(), link, parseInt(maxMembers))) {
 
             const project = {
-                id: 1,
                 name: projectTitle,
                 ownerId: keycloak.tokenParsed.preferred_username,
                 thumbnail: picture,
@@ -72,14 +62,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                 maxMembers: parseInt(maxMembers)
             }
 
-            const response = await client.addProject(project);
+            const projectId = await client.addProject(project);
+            console.log('Project id before parseing: ',projectId);
+            parseInt(projectId);
+            console.log('Project id: ',projectId);
 
-            if (response) {
-                //location.href = "home.html";
-            } else {
+            if (projectId < 0) {
                 console.error("Failed to create project");
-            }
          }
+
+        const abilities = data.getAll("abilities") as string[];
+        const abilitiesIds = abilities.map(ability => parseInt(ability));
+        console.log(abilitiesIds);
+        console.log(abilities);
+
+        const abResponse = await client.addProjectAbilities(projectId, abilitiesIds);
+
+        if (!abResponse) {
+            alert("Failed to add ability to project");
+        }
+
+        //location.href = "home.html";
+        }
     });
 });
 

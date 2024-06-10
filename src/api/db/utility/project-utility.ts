@@ -5,34 +5,40 @@ import {SystemNotification} from "../system-notifications";
 
 export class ProjectUtility {
     /* region Base */
-    static async addProject(name: string, ownerId: string, thumbnail: string, description: string, links: string, maxMembers: number): Promise<boolean> {
+    static async addProject(name: string, ownerId: string, thumbnail: string, description: string, links: string, maxMembers: number): Promise<number> {
         try {
             const owId = ownerId.toLowerCase();
 
             const date = new Date(Date.now());
 
-            if(!ValProject.isValid(name, owId, thumbnail, description, date, links, maxMembers) || await this.getAmountOfProjects(ownerId) >= 5){
-                return false;
+            if(!ValProject.isValid(name, owId, thumbnail, description, date, links, maxMembers) || await this.getAmountOfProjects(ownerId) >= 50){
+                console.log("ProjectUtility: addProject: Project is not valid");
+                return -1;
             }
 
             if(!await ValUser.isUserValid(owId)) {
-                return false;
+                console.log("ProjectUtility: addProject: User is not valid");
+                return -1;
             }
 
             if(await this.alreadyProjectWithSameName(owId, name, 0)) {
-                return false;
+                console.log("ProjectUtility: addProject: Project with same name already exists");
+                return -1;
             }
-
             const projectId:number = await Database.addProject(name, owId, thumbnail, description, date.toDateString(), links, maxMembers);
 
             if (projectId === null) {
-                return false;
+                console.log("ProjectUtility: addProject: Project was not created");
+                return -1;
             }
-
-            return await Database.addProjectMember(owId, projectId, true);
+            if (!await Database.addProjectMember(owId, projectId, true)){
+                console.log("ProjectUtility: addProject: Owner was not added as member");
+                return -1;
+            }
+            return projectId;
         }
         catch (e) {
-            return false;
+            return -1;
         }
     }
 

@@ -9,13 +9,18 @@ export const keycloak = new Keycloak({
 
 export async function initKeycloak() {
     try {
+        const origin = window.location.origin;
+        const pathname = window.location.pathname;
+
+        const desiredPath = pathname.substring(0, pathname.lastIndexOf('/'));
+        const fullUrl = origin + desiredPath;
         return await keycloak.init({
             onLoad: "check-sso",
             flow: "implicit",
             pkceMethod: 'S256',
             // enableLogging: true,
             silentCheckSsoRedirectUri:
-               window.location.origin + '/silent-check-sso.html',
+                fullUrl + '/silent-check-sso.html',
         });
     }
     catch (error) {
@@ -23,5 +28,3 @@ export async function initKeycloak() {
         return false;
     }
 }
-
-
