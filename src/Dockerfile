@@ -1,18 +1,15 @@
 # Start your image with a node base image
-FROM node:18-alpine
+FROM node:latest as build
+LABEL authors="A.Höllerl,M.Bergmann,A.Jasic"
 
-# The /app directory should act as the main application directory
-WORKDIR /src
+COPY . /app
 
-# Copy the app package and package-lock.json file
-COPY package*.json ./
+WORKDIR /app/src
 
 # Install node packages, install serve, build the app, and remove dependencies at the end
 RUN npm install
 
-# Copy local directories to the current local directory of our docker image (/app)
-COPY ./api ./api
-COPY ./website ./website
+RUN npm run build
 
 EXPOSE 3000
 

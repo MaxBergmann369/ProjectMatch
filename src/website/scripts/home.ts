@@ -4,25 +4,24 @@ import {Project, User} from "../../models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 import "./general";
-// this tells webpack to include the general.ts file in the bundle
+import {initNotifications} from "./notifications"; // this tells webpack to include the general.ts file in the bundle
 
 const authenticatedPromise = initKeycloak();
+let client : HttpClient = null;
 
 document.addEventListener("DOMContentLoaded", async function () {
     const authenticated = await authenticatedPromise;
-    let client : HttpClient = null;
 
     if (!authenticated) {
         console.log("User is not authenticated");
         location.href = "index.html";
         return;
     }
+
+    client = new HttpClient();
     window.addEventListener('beforeunload', async () => {
         await client.deleteData();
     });
-
-    client = new HttpClient();
-
     console.log("User is authenticated");
     const user = new TokenUser(keycloak.tokenParsed);
 
@@ -39,6 +38,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const dislike = document.querySelector('#dislike') as HTMLElement;
     // constants
     const urls = [];
+    const backImage: string = "./resources/project/cardback/test.jpg";
     let allowRepeats = false;
     const projects: Project[] = [];
     for (let i = 1; i <= 33; i++) {
@@ -49,10 +49,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     let cardCount = 0;
 
 // functions
+    await initNotifications(user);
+
     async function appendEndCard() {
         const card = new Card({
             id: 0,
             imageUrl: urls[cardCount % urls.length],
+            backImageUrl: backImage,
             onDismiss: () => {
                 appendNewCard();
             },
@@ -130,6 +133,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const card = new Card({
             id: project.id,
             imageUrl: url,
+            backImageUrl: backImage,
             onDismiss: () =>{
                 client.addView(project.id, user.userId);
                 appendNewCard();

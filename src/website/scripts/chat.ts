@@ -20,7 +20,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await authenticatedPromise;
     if (authenticated) {
         client = new HttpClient();
-
+        window.addEventListener("beforeunload", async () => {
+            await client.updateDirectChat(chatId, user.userId);
+        });
         const tokenUser = new TokenUser(keycloak.tokenParsed);
 
         user = await client.getUser(tokenUser.userId);
@@ -432,6 +434,3 @@ async function searchForChat() {
     });
 }
 
-window.addEventListener("beforeunload", async () => {
-    await client.updateDirectChat(chatId, user.userId);
-});
