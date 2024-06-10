@@ -19,12 +19,14 @@ export async function initNotifications(tokenUser: TokenUser) {
 
     const notifications = document.getElementById('notifications');
     const notificationBox = document.getElementById('notification-box');
+
     window.addEventListener('click', async (event) => {
         if (event.target !== notifications && event.target !== notificationBox) {
             notificationBox.style.display = 'none';
             clicked = false;
         }
     });
+
     notifications.addEventListener('click', async () => {
         if(clicked) {
             notificationBox.style.display = 'none';
@@ -37,6 +39,7 @@ export async function initNotifications(tokenUser: TokenUser) {
             clicked = true;
         }
     });
+
 }
 
 async function loadNotifications(): Promise<void> {
