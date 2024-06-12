@@ -111,7 +111,7 @@ export class Card {
                 }
 
                 if (this.id > 0) {
-                    window.location.href = `detailView.html?project=${this.id}`;
+                    window.location.href = `project.html?id=${this.id}`;
                 }
             };
         }
@@ -124,7 +124,7 @@ export class Card {
                     clearInterval(animationId);
 
                     if(this.id > 0) {
-                        window.location.href = `detailView.html?project=${this.id}`;
+                        window.location.href = `project.html?id=${this.id}`;
                     }
                 }
 

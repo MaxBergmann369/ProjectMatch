@@ -1,6 +1,6 @@
 import {Database} from "../db";
 import {ValProject, ValUser} from "../validation";
-import {Ability, Like, Project, ProjectMember, View} from "../../../models";
+import {Ability, Like, Project, ProjectMember, User, View} from "../../../models";
 import {SystemNotification} from "../system-notifications";
 
 export class ProjectUtility {
@@ -246,7 +246,7 @@ export class ProjectUtility {
         }
     }
 
-    static async getProjectMembers(projectId: number): Promise<ProjectMember[] | null> {
+    static async getProjectMembers(projectId: number): Promise<User[] | null> {
         try {
             if(projectId < 1) {
                 return null;

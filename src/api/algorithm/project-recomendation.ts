@@ -51,7 +51,6 @@ export class ProjectAlgo {
             const mostLiked = await Database.getProjectsAlgorithm(userId, viewed, amount, true, false);
             const mostViewed = await Database.getProjectsAlgorithm(userId, viewed, amount, false, true);
             const mostRecent = await Database.getProjectsAlgorithm(userId, viewed, amount, false, false);
-
             if (mostLiked === null || mostViewed === null || mostRecent === null ||
                 mostLiked.length === 0 || mostViewed.length === 0 || mostRecent.length === 0) {
                 return [];

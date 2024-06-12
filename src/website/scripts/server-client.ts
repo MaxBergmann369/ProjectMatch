@@ -201,7 +201,7 @@ export class HttpClient {
     }
 
     async getProject(projectId: number): Promise<Project | null> {
-        return await fetch(`${this.baseUrl}/id/projects/${projectId}`, {
+        return await fetch(`${this.baseUrl}/projects/id/${projectId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -258,7 +258,7 @@ export class HttpClient {
     }
 
     async addProjectMember(projectId: number, userId: string) {
-        return await fetch(`${this.baseUrl}/projects/${projectId}/members`, {
+        return await fetch(`${this.baseUrl}/projects/members/${projectId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -271,8 +271,8 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getProjectMembers(projectId: number) : Promise<ProjectMember[] | null> {
-        return await fetch(`${this.baseUrl}/projects/${projectId}`, {
+    async getProjectMembers(projectId: number) : Promise<User[] | null> {
+        return await fetch(`${this.baseUrl}/projects/members/${projectId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer

@@ -102,7 +102,7 @@ function notificationTypes(text: string): string {
         case 'chat':
             return `chat.html?chat=${data[2]}`;
         case 'project':
-            return `project.html?project=${data[2]}`;
+            return `project.html?id=${data[2]}`;
         default:
             return '';
     }

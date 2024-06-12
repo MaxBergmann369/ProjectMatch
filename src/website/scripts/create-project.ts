@@ -1,5 +1,6 @@
 import {HttpClient} from "./server-client";
 import {Ability} from "../../models";
+import "./general";
 import {initKeycloak, keycloak} from "./keycloak";
 import {ValProject} from "./validation";
 
@@ -101,7 +102,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Failed to add ability to project");
         }
 
-        //location.href = "home.html";
+        location.href = "home.html";
         }
     });
 });

@@ -47,6 +47,7 @@ export function createProjectEndpoints() {
 
     projectRouter.get('/projects/:showOld', async (req, res) => {
         try {
+            console.log("entered this endpoint");
             const authHeader = req.headers.authorization;
 
             const tokenUser = EndPoints.getToken(authHeader);
@@ -59,6 +60,7 @@ export function createProjectEndpoints() {
             const limit: number = 5;
 
             const projectIds = await ProjectAlgo.recommendProjects(tokenUser.userId, showOld, limit);
+            console.log(projectIds);
             const projects = await ProjectUtility.getProjects(projectIds);
             if (projects !== null && projects.length > 0) {
                 res.status(200).send(projects);
@@ -150,7 +152,7 @@ export function createProjectEndpoints() {
 
     /* region ProjectMember */
 
-    projectRouter.post('/projects/:projId/members', async (req, res) => {
+    projectRouter.post('/projects/members/:projId', async (req, res) => {
         try {
             const {userId} = req.body;
             const projectId = parseInt(req.params.projId);
@@ -169,7 +171,7 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/projects/:projId', async (req, res) => {
+    projectRouter.get('/projects/members/:projId', async (req, res) => {
         try {
             const projectId = req.params.projId;
 

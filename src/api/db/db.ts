@@ -545,17 +545,24 @@ export class Database {
         });
     }
 
-    static async getProjectMembersByProjectId(projectId: number): Promise<ProjectMember[]> {
+    static async getProjectMembersByProjectId(projectId: number): Promise<User[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM ProjectMember WHERE projectId = ? AND isAccepted = 1`, [projectId], (err, rows: ProjectMember[]) => {
+            db.all(`select * from User where userId in (SELECT userId FROM ProjectMember WHERE projectId = ? AND isAccepted = 1)`, [projectId], (err, rows: User[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const projectMembers: ProjectMember[] = rows.map(row => ({
-                        id: row.id,
-                        projectId: row.projectId,
+                    const projectMembers: User[] = rows.map(row => ({
                         userId: row.userId,
-                        isAccepted: row.isAccepted
+                        username: row.username,
+                        firstname: row.firstname,
+                        lastname: row.lastname,
+                        pfp: row.pfp,
+                        email: row.email,
+                        clazz: row.clazz,
+                        birthdate: new Date(row.birthdate),
+                        biografie: row.biografie,
+                        permissions: row.permissions,
+                        department: row.department
                     }));
                     resolve(projectMembers);
                 }
