@@ -914,8 +914,8 @@ export class Database {
             FROM Message m
             JOIN DirectChat d ON m.chatId = d.id
             WHERE m.chatId = ? AND m.userId != ? AND (
-                (d.userId = ? AND (m.date < d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime))) OR
-                (d.otherUserId = ? AND (m.date < d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime)))
+                (d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime))) OR
+                (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime)))
             )
         `;
             db.get(sql, [chatId, userId, userId, userId], (err, row: any) => {
@@ -936,8 +936,8 @@ export class Database {
             JOIN Message m ON d.id = m.chatId
             WHERE (d.userId = ? OR d.otherUserId = ?)
             AND m.userId != ?
-            AND ((d.userId = ? AND (m.date < d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime)))
-            OR (d.otherUserId = ? AND (m.date < d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime))))
+            AND ((d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime)))
+            OR (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime))))
         `;
             db.get(sql, [userId, userId, userId, userId, userId], (err, row) => {
                 if (err) {
