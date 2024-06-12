@@ -914,8 +914,8 @@ export class Database {
             FROM Message m
             JOIN DirectChat d ON m.chatId = d.id
             WHERE m.chatId = ? AND m.userId != ? AND (
-                (d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime))) OR
-                (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime)))
+                (d.userId = ? AND (strftime('%Y-%m-%d %H:%M', m.date || ' ' || m.time) > strftime('%Y-%m-%d %H:%M', d.userLastOpenedDate || ' ' || d.userLastOpenedTime))) OR
+                (d.otherUserId = ? AND (strftime('%Y-%m-%d %H:%M', m.date || ' ' || m.time) > strftime('%Y-%m-%d %H:%M', d.otherLastOpenedDate || ' ' || d.otherLastOpenedTime)))
             )
         `;
             db.get(sql, [chatId, userId, userId, userId], (err, row: any) => {
@@ -931,19 +931,21 @@ export class Database {
     static async hasUnreadMessages(userId: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             const sql: string = `
-            SELECT COUNT(*) 
+            SELECT COUNT(*) as count
             FROM DirectChat d
             JOIN Message m ON d.id = m.chatId
             WHERE (d.userId = ? OR d.otherUserId = ?)
             AND m.userId != ?
-            AND ((d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime)))
-            OR (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime))))
+            AND (
+                (d.userId = ? AND (strftime('%Y-%m-%d %H:%M', m.date || ' ' || m.time) > strftime('%Y-%m-%d %H:%M', d.userLastOpenedDate || ' ' || d.userLastOpenedTime))) OR
+                (d.otherUserId = ? AND (strftime('%Y-%m-%d %H:%M', m.date || ' ' || m.time) > strftime('%Y-%m-%d %H:%M', d.otherLastOpenedDate || ' ' || d.otherLastOpenedTime)))
+            )
         `;
-            db.get(sql, [userId, userId, userId, userId, userId], (err, row) => {
+            db.get(sql, [userId, userId, userId, userId, userId], (err, row: any) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(row['COUNT(*)'] > 0);
+                    resolve(row.count > 0);
                 }
             });
         });
