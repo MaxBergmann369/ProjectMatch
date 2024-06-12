@@ -2,35 +2,55 @@
   --rounded: 2rem;
 }
 
-.center{
+.main{
     display: flex;
   flex-wrap: wrap;
+  flex-direction: row;
     justify-content: space-evenly;
     height: 100%;
     width: 100%;
-  gap: 1rem;
+  gap: 5rem;
   .container{
     //border: 2px solid black;
     border-radius: var(--rounded);
     background: #ededed;
-    padding: 2rem;
+    padding: 1.5rem;
     width: 100%;
   }
 }
 
 #project-details{
+  h1{
+    text-align: center;
+  }
   flex: 3;
   #minor-details{
-    img{
-      vertical-align: middle;
-      width: 1.2rem;
-      height: 1.2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 3rem;
+    p{
+      font-weight: bold;
+      border-radius: var(--rounded);
+      padding: 0.3rem 0.6rem;
+      background: #bababa;
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      img{
+        vertical-align: middle;
+
+        width: 1.2rem;
+        height: 1.2rem;
+      }
     }
+
   }
 }
 
 #project-members{
-    flex: 2;
+  height: 100%;
+  flex: 2;
 
 }
 

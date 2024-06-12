@@ -14,6 +14,7 @@ module.exports = {
         register: "./website/scripts/register.ts",
         chat: "./website/scripts/chat.ts",
         createProject: "./website/scripts/create-project.ts",
+        project: "./website/scripts/project.ts",
         profile: "./website/scripts/profile.ts",
     },
     output: {
