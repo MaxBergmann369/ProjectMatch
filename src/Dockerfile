@@ -4,14 +4,27 @@ LABEL authors="A.Höllerl,M.Bergmann,A.Jasic"
 
 COPY . /app
 
-WORKDIR /app/src
+WORKDIR /app
 
-# Install node packages, install serve, build the app, and remove dependencies at the end
+# Install node packages and build the app
 RUN npm install
-
 RUN npm run build
 
-EXPOSE 3000
+# Setup Nginx to act as a reverse proxy
+FROM nginx:latest
 
-# Start the app using serve command
-CMD [ "npm", "start" ]
+# Copy the Nginx configuration file. This file should include configuration
+# for proxying requests to the Express server running on port 3000.
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy the built app and the start script
+COPY --from=build /app /app
+COPY start.sh /start.sh
+
+# Make the start script executable
+RUN chmod +x /start.sh
+
+EXPOSE 80
+
+# Use the custom start script as the entry point
+ENTRYPOINT ["/start.sh"]
