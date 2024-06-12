@@ -72,9 +72,10 @@ async function addEventListener() {
         }
     });
 
-    const sendBtn = document.getElementById("sendMessage");
+    const sendBtn = document.getElementById("input-bar");
 
-    sendBtn.addEventListener("click", async () => {
+    sendBtn.addEventListener("submit", async (event) => {
+        event.preventDefault();
         const message = (document.getElementById("messageInput") as HTMLInputElement);
 
         if(chatId !== -1 && message.value !== "") {
@@ -247,17 +248,10 @@ async function loadChatMessages(id: number) {
     let date = "";
 
     const orderedMessages: Message[] = messages.sort((a, b) => {
-        const dateA = a.date;
-        const dateB = b.date;
+        const dateTimeA = new Date(`${a.date} ${a.time}`);
+        const dateTimeB = new Date(`${b.date} ${b.time}`);
 
-        const timeA = a.time;
-        const timeB = b.time;
-
-        if (dateA === dateB) {
-            return timeA.localeCompare(timeB);
-        }
-
-        return dateB.localeCompare(dateA);
+        return dateTimeA.getTime() - dateTimeB.getTime();
     });
 
     let recentMessages: string[] = [];

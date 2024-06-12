@@ -4,7 +4,7 @@ import {Project, User} from "../../models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 import "./general";
-import {initNotifications} from "./notifications"; // this tells webpack to include the general.ts file in the bundle
+// this tells webpack to include the general.ts file in the bundle
 
 const authenticatedPromise = initKeycloak();
 let client : HttpClient = null;
