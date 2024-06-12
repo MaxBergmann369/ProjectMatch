@@ -91,14 +91,29 @@ export class Card {
 
         let rotation = 0;
         const rotationIncrement = 360 / (seconds * fps); // 2 seconds * 60 frames per second
+
+        for (const card of cards) {
+            card.classList.remove('card-distance');
+            card.classList.add('card-distance-spin');
+        }
+
         if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
             card.animate([
-                { transform: 'rotateY(0deg)' },
-                { transform: 'rotateY(360deg)' }
+                {transform: 'rotateY(0deg)'},
+                {transform: 'rotateY(360deg)'}
             ], {
                 duration: seconds * 1000,
                 iterations: 1
-            });
+            }).onfinish = () => {
+                for (const card of cards) {
+                    card.classList.remove('card-distance-spin');
+                    card.classList.add('card-distance');
+                }
+
+                if (this.id > 0) {
+                    window.location.href = `detailView.html?project=${this.id}`;
+                }
+            };
         }
         else{
             const animationId = setInterval(() => {
@@ -107,6 +122,10 @@ export class Card {
                 if (rotation >= 360) {
                     rotation = 360;
                     clearInterval(animationId);
+
+                    if(this.id > 0) {
+                        window.location.href = `detailView.html?project=${this.id}`;
+                    }
                 }
 
                 if (rotation >= 90 && rotation < 270) {
@@ -122,10 +141,6 @@ export class Card {
                         card.classList.remove('card-distance-spin');
                         card.classList.add('card-distance');
                     }
-                }
-
-                if(rotation >= 360 && this.id > 0) {
-                    window.location.href = `detailView.html?project=${this.id}`;
                 }
 
                 card.style.transform = `rotateY(${rotation}deg)`;

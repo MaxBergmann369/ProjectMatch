@@ -1,3 +1,8 @@
+:root{
+    --rounded: 2rem;
+
+}
+
 
 body {
   height: 100vh;
@@ -7,9 +12,11 @@ body {
 }
 
 .side-bar {
-  border: 1px solid black;
+  border: 2px solid black;
+  border-radius: var(--rounded);
+  padding: 1rem;
   width: 20%;
-  height: 80%;
+  height: 75%;
   overflow-y: hidden;
   overflow-x: hidden;
   float: left;
@@ -22,7 +29,7 @@ body {
   min-height: 1.5rem;
   background: white;
   border: 1px solid black;
-  float: left;
+  //float: left;
   position: absolute;
 }
 
@@ -46,13 +53,9 @@ body {
 }
 
 #chat-window {
-  background-image: url('../resources/chat/chat-bg.jpg');
   background-size: cover;
-  border: 1px solid black;
-  width: 79%;
-  height: 75%;
+  height: 90%;
   overflow-y: auto;
-  float: right;
 }
 
 #layer-down, #layer-up {
@@ -63,26 +66,44 @@ body {
 #credits {
   font-size: 0.8rem;
   position: absolute;
-  float: left;
-  bottom: 2%;
+  bottom: 10px;
+  right: 10px;
   text-decoration: none;
   color: grey;
 }
 
-.chat {
-  border: 1px solid black;
+#chat{
+  height: 100%;
+  display: flex;
+    flex-direction: row;
+  gap: 3rem;
+  justify-content: space-around;
 }
 
-.input-bar {
-  position: absolute;
-  bottom: 0;
-  margin-bottom: 2%;
-  margin-left: 0.3vw;
-  width: 85%;
+#input-bar{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+
+#chatandinput{
+  background-image: url('../resources/chat/chat-bg.jpg');
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+  height: 75%;
+    width: 79%;
+  justify-content: space-between;
+  border: 2px solid black;
+    border-radius: var(--rounded);
+  padding-bottom: 1rem;
+  overflow: hidden;
 }
 
 #messageInput {
-  width: 83%;
+  width: 85%;
 }
 
 .own-message, .other-message, .date {
@@ -101,4 +122,8 @@ body {
 .other-message {
     display: flex;
     justify-content: flex-end;
+}
+
+.chat{
+  border: 1px solid black;
 }

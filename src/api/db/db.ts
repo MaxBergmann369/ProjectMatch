@@ -593,9 +593,9 @@ export class Database {
         });
     }
 
-    static async getProjectsWhereUserIsMember(userId: string): Promise<Project[]> {
+    static async getProjectsWhereUserIsMember(userId: string, isAccepted:boolean): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM ProjectMember WHERE userId = ?)`, [userId], (err, rows: Project[]) => {
+            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM ProjectMember WHERE userId = ? and isAccepted = ?)`, [userId, isAccepted], (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -617,7 +617,7 @@ export class Database {
 
     static async getLikedProjectsByUserId(userId: string): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM Like WHERE userId = ?)`, [userId], (err, rows: Project[]) => {
+            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM Like WHERE userId = ? LIMIT 100)`, [userId], (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -914,8 +914,8 @@ export class Database {
             FROM Message m
             JOIN DirectChat d ON m.chatId = d.id
             WHERE m.chatId = ? AND m.userId != ? AND (
-                (d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime))) OR
-                (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime)))
+                (d.userId = ? AND (m.date < d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime))) OR
+                (d.otherUserId = ? AND (m.date < d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime)))
             )
         `;
             db.get(sql, [chatId, userId, userId, userId], (err, row: any) => {
@@ -936,8 +936,8 @@ export class Database {
             JOIN Message m ON d.id = m.chatId
             WHERE (d.userId = ? OR d.otherUserId = ?)
             AND m.userId != ?
-            AND ((d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime)))
-            OR (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime))))
+            AND ((d.userId = ? AND (m.date < d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime)))
+            OR (d.otherUserId = ? AND (m.date < d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime))))
         `;
             db.get(sql, [userId, userId, userId, userId, userId], (err, row) => {
                 if (err) {
@@ -1127,7 +1127,7 @@ export class Database {
 
     static async updateUser(userId: string, username: string, firstname: string, lastname: string, pfp:string, email:string, clazz:string, birthdate: string, biografie: string, permissions: number, department: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, email = ?, clazz = ?, birthdate = ?, biografie = ?, permissions = ?, department = ? WHERE userId = ?`, [username, firstname, lastname, email, clazz, birthdate, biografie, permissions, department, userId], (err) => {
+            db.run(`UPDATE User SET username = ?, firstname = ?, lastname = ?, pfp = ?, email = ?, clazz = ?, birthdate = ?, biografie = ?, permissions = ?, department = ? WHERE userId = ?`, [username, firstname, lastname, pfp, email, clazz, birthdate, biografie, permissions, department, userId], (err) => {
                 if (err) {
                     reject(err);
                 } else {

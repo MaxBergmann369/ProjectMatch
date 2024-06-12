@@ -1,6 +1,45 @@
-import express from "express";
 import {UserUtility} from "../db/utility/user-utility";
 import {EndPoints} from "../db/validation";
+import { Multer } from 'multer';
+import sharp from 'sharp';
+import fs from 'fs';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
+import multer from 'multer';
+import path from "path";
+
+import * as express from 'express';
+
+declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace Express {
+        interface Request {
+            file?: Multer.File;
+        }
+    }
+}
+
+promisify(pipeline);
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '/../../website/resources/profile/pfp'));
+    },
+    filename: function (req, file, cb) {
+        cb(null, req.params.userId + '-' + Date.now() + '.jpeg');
+    }
+});
+multer({
+    storage: storage,
+    limits: { fileSize: 1024 * 1024 * 10 }, // Set file size limit if needed
+    fileFilter: function (req, file, cb) {
+        const acceptableMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (acceptableMimeTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(null, false);
+        }
+    }
+});
 
 const userRouter = express.Router();
 
@@ -170,6 +209,75 @@ export function createUserEndpoints() {
 
 
         } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
+    userRouter.post('/user/:userId/image', async (req , res ) => {
+        let imagePath;
+
+        try {
+            const userId = req.params.userId;
+
+            const user = await UserUtility.getUser(userId);
+
+            if (!user) {
+                console.log("User not found");
+                res.sendStatus(404);
+                return;
+            }
+
+            if (user.pfp !== null || user.pfp !== "") {
+                try {
+                    fs.unlinkSync(path.join(__dirname, '/../../website/resources/profile/pfp/' + user.pfp));
+                } catch (e) {
+                    // Do nothing
+                }
+            }
+
+            const upload = multer({
+                storage: storage,
+                limits: { fileSize: 1024 * 1024 * 10 } // Set file size limit if needed
+            });
+
+            upload.single('image')(req, res, async (err) => {
+                if (err) {
+                    console.log("Error while uploading image");
+                    res.sendStatus(400);
+                    return;
+                }
+
+                if (!req.file) {
+                    console.log("No file uploaded");
+                    res.sendStatus(400);
+                    return;
+                }
+
+                imagePath = req.file.path; // The path where multer has stored the file
+
+                // Resize the image to 540x540 pixels and overwrite the original image
+                await sharp(imagePath)
+                    .resize(540, 540)
+                    .toBuffer()
+                    .then(data => fs.writeFileSync(imagePath, data));
+
+                const filename = req.file.filename;
+
+                if (await UserUtility.updateUser(userId, user.username, user.firstname, user.lastname, filename, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department)) {
+                    res.status(200).send(filename);
+                } else {
+                    fs.unlinkSync(imagePath);
+                    res.sendStatus(400);
+                }
+            });
+        } catch (e) {
+            try {
+                fs.unlinkSync(imagePath);
+            }
+            catch (e) {
+                // Do nothing
+            }
+            console.log(e);
             res.sendStatus(400);
         }
     });

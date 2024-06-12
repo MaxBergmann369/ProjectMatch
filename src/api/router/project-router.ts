@@ -90,22 +90,6 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/projects/owner/:userId', async (req, res) => {
-        try {
-            const userId = req.params.userId;
-
-            const projects = await ProjectUtility.getProjectsWhereUserIsOwner(userId);
-
-            if (projects !== null) {
-                res.status(200).send(projects);
-            } else {
-                res.sendStatus(400);
-            }
-        } catch (e) {
-            res.sendStatus(400);
-        }
-    });
-
     projectRouter.put('/projects', async (req, res) => {
         try {
             const {id, name, ownerId, thumbnail, description, links, maxMembers} = req.body;
@@ -209,15 +193,29 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/projects/members/:userId', async (req, res) => {
+    projectRouter.get('/projects/liked/:userId', async (req, res) => {
         try {
             const userId = req.params.userId;
-            const projects = await ProjectUtility.getProjectsWhereUserIsMember(userId);
+            const projects = await ProjectUtility.getLikedProjectsByUserId(userId);
 
             if (projects !== null) {
                 res.status(200).send(projects);
             } else {
-                res.sendStatus(400);
+                res.sendStatus(404);
+            }
+        } catch (e) {
+            res.sendStatus(400);
+        }
+    });projectRouter.get('/projects/members/:userId/:isAccepted', async (req, res) => {
+        try {
+            const userId = req.params.userId;
+            const isAccepted = req.params.isAccepted === "true";
+            const projects = await ProjectUtility.getProjectsWhereUserIsMember(userId, isAccepted);
+
+            if (projects !== null) {
+                res.status(200).send(projects);
+            } else {
+                res.sendStatus(404);
             }
         } catch (e) {
             res.sendStatus(400);

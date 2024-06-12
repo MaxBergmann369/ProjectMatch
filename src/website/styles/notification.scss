@@ -1,6 +1,7 @@
 #notification-box {
   padding: 0.5rem;
-  margin-left: 5vw;
+  margin-left: 1.1rem;
+  margin-top: 1.1rem;
   width: 30rem;
   height: 15rem;
   background: rgba(182, 175, 175, 0.75);
@@ -10,6 +11,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   border: 1px solid black;
+  backdrop-filter: blur(4px);
 }
 
 .notification-new {
@@ -26,29 +28,29 @@
   position: relative;
   border-bottom: 1px solid black;
   cursor: pointer;
+  *{
+    margin: 0;
+    padding: 0;
+  }
 }
 
-#chat {
+#chatNavButton {
   position: relative;
 }
 
 .notification-icon, .chat-notification-icon {
   position: absolute;
-  width: 1vw;
-  height: 1.7vh;
+  width: 1rem;
+  height: 1rem;
   -webkit-user-drag: none;
   user-select: none;
 }
 
-.notification-icon {
-  top: 1.3vh;
-  right: 2.5vw;
+.notification-icon,.chat-notification-icon {
+  top: 0.3rem;
+  right: 0.5rem;
 }
 
-.chat-notification-icon {
-  top: 0.3vh;
-  right: 0.3vw;
-}
 
 .nav-notification{
   span {
@@ -68,5 +70,10 @@
     color: var(--nav-accent);
     font-weight: bold;
   }
+
+}
+
+#notification-btn{
+  position: relative;
 
 }

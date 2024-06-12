@@ -2,6 +2,7 @@ import {initKeycloak, keycloak} from "./keycloak";
 import {DirectChat, Message, User} from "../../models";
 import {HttpClient} from "./server-client";
 import {TokenUser} from "./tokenUser";
+import "./general";
 
 const authenticatedPromise = initKeycloak();
 
@@ -240,8 +241,6 @@ async function loadChatMessages(id: number) {
     const messages: Message[] = data[1];
     messageAmount = data[0];
 
-    messages.reverse();
-
     let otherUsername: string | undefined = undefined;
 
     let lastDate = "";
@@ -258,7 +257,7 @@ async function loadChatMessages(id: number) {
             return timeA.localeCompare(timeB);
         }
 
-        return dateA.localeCompare(dateB);
+        return dateB.localeCompare(dateA);
     });
 
     let recentMessages: string[] = [];

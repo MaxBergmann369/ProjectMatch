@@ -3,9 +3,6 @@ import {HttpClient} from "./server-client";
 import {initKeycloak, keycloak} from "./keycloak";
 import {Ability, User} from "../../models";
 
-
-
-
 const auth = initKeycloak();
 document.addEventListener("DOMContentLoaded", async () => {
     const authenticated = await auth;
