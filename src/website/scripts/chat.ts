@@ -248,13 +248,11 @@ async function loadChatMessages(id: number) {
     let date = "";
 
     const orderedMessages: Message[] = messages.sort((a, b) => {
-        const dateTimeA = new Date(`${a.date}T${a.time}:00`);
-        const dateTimeB = new Date(`${b.date}T${b.time}:00`);
+        const dateTimeA = new Date(`${a.date} ${a.time}`);
+        const dateTimeB = new Date(`${b.date} ${b.time}`);
 
         return dateTimeA.getTime() - dateTimeB.getTime();
     });
-
-    orderedMessages.reverse();
 
     let recentMessages: string[] = [];
 

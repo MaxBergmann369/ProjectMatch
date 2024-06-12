@@ -119,6 +119,7 @@ export class Database {
             message TEXT NOT NULL,
             date TEXT NOT NULL,
             time TEXT NOT NULL,
+            isRead BOOLEAN NOT NULL DEFAULT 0,
             FOREIGN KEY(chatId) REFERENCES DirectChat(id),
             FOREIGN KEY(userId) REFERENCES User(userId)
         )`);
@@ -907,22 +908,13 @@ export class Database {
         });
     }
 
-    static async getUnreadMessagesByChatId(chatId: number, userId: string): Promise<number> {
+    static async getUnreadMessages(chatId: number, userId: string): Promise<number> {
         return new Promise((resolve, reject) => {
-            const sql: string = `
-            SELECT COUNT(m.id) as count
-            FROM Message m
-            JOIN DirectChat d ON m.chatId = d.id
-            WHERE m.chatId = ? AND m.userId != ? AND (
-                (d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime))) OR
-                (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime)))
-            )
-        `;
-            db.get(sql, [chatId, userId, userId, userId], (err, row: any) => {
+            db.get(`SELECT COUNT(*) FROM Message WHERE chatId = ? AND userId != ? AND isRead = 0`, [chatId, userId], (err, row) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(row.count || 0);
+                    resolve(row['COUNT(*)'] || 0);
                 }
             });
         });
@@ -931,19 +923,17 @@ export class Database {
     static async hasUnreadMessages(userId: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             const sql: string = `
-            SELECT COUNT(*) 
-            FROM DirectChat d
-            JOIN Message m ON d.id = m.chatId
-            WHERE (d.userId = ? OR d.otherUserId = ?)
-            AND m.userId != ?
-            AND ((d.userId = ? AND (m.date > d.userLastOpenedDate OR (m.date = d.userLastOpenedDate AND m.time > d.userLastOpenedTime)))
-            OR (d.otherUserId = ? AND (m.date > d.otherLastOpenedDate OR (m.date = d.otherLastOpenedDate AND m.time > d.otherLastOpenedTime))))
+            SELECT EXISTS(
+                SELECT 1 FROM DirectChat d
+                JOIN Message m ON m.chatId = d.id
+                WHERE (d.userId = ? OR d.otherUserId = ?) AND m.userId != ? AND m.isRead = 0
+            ) as hasUnreadMessages
         `;
-            db.get(sql, [userId, userId, userId, userId, userId], (err, row) => {
+            db.get(sql, [userId, userId, userId], (err, row: any) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(row['COUNT(*)'] > 0);
+                    resolve(row.hasUnreadMessages === 1);
                 }
             });
         });
@@ -961,9 +951,22 @@ export class Database {
                         userId: row.userId,
                         message: row.message,
                         date: row.date,
-                        time: row.time
+                        time: row.time,
+                        isRead: row.isRead
                     }));
                     resolve(messages);
+                }
+            });
+        });
+    }
+
+    static async markMessagesAsRead(chatId: number, userId: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.run(`UPDATE Message SET isRead = 1 WHERE chatId = ? AND userId != ?`, [chatId, userId], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
                 }
             });
         });

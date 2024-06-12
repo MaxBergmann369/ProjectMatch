@@ -171,7 +171,15 @@ export class ChatUtility {
                 min = amount - diff < 0 ? 0 : amount - diff;
             }
 
-            return await Database.getMessagesByChatId(chatId, min, max);
+            const messages = await Database.getMessagesByChatId(chatId, min, max);
+
+            if(messages === null) {
+                return null;
+            }
+
+            await Database.markMessagesAsRead(chatId, userId);
+
+            return messages;
         }
         catch (e) {
             return null;
@@ -199,7 +207,7 @@ export class ChatUtility {
                 return -1;
             }
 
-            return await Database.getUnreadMessagesByChatId(chatId, id);
+            return await Database.getUnreadMessages(chatId, id);
         }
         catch (e) {
             return -1;
