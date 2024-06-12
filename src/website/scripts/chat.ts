@@ -72,9 +72,10 @@ async function addEventListener() {
         }
     });
 
-    const sendBtn = document.getElementById("sendMessage");
+    const sendBtn = document.getElementById("input-bar");
 
-    sendBtn.addEventListener("click", async () => {
+    sendBtn.addEventListener("submit", async (event) => {
+        event.preventDefault();
         const message = (document.getElementById("messageInput") as HTMLInputElement);
 
         if(chatId !== -1 && message.value !== "") {
