@@ -6,8 +6,6 @@ import {Ability, Project} from "../../models";
 
 const authenticatedPromise = initKeycloak();
 
-const defaultImage = "default.jpg";
-
 document.addEventListener("DOMContentLoaded", async function () {
     const authenticated = await authenticatedPromise;
     if (!authenticated) {
@@ -22,8 +20,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         id = tokenUser.userId;
     }
     const client = new HttpClient();
-    let abilities = await client.getUserAbilities(id); // todo: change to const and remove the line below
-    abilities = await client.getAbilities(); // only for testing purposes
+    const abilities = await client.getUserAbilities(id);
     await loadUserUI(client, abilities, id);
     await loadProjectUI(client, id);
     addPopupEventListener(abilities);
@@ -87,9 +84,7 @@ async function loadUserUI(client: HttpClient, abilities: Ability[], id: string) 
     department.textContent = user.department;
 
     if (user.pfp) {
-        const path = `./resources/profile/pfp/${user.pfp}`;
-
-        pfp.src = path;
+        pfp.src = `./resources/profile/pfp/${user.pfp}`;
     }
 
     const pfpInput = document.getElementById('pfpInput') as HTMLInputElement;
@@ -102,9 +97,7 @@ async function loadUserUI(client: HttpClient, abilities: Ability[], id: string) 
                 const newPfp = await client.uploadImage(user.userId, imageBlob);
 
                 if (newPfp !== null) {
-                    const path = `./resources/profile/pfp/${newPfp}`;
-
-                    pfp.src = path;
+                    pfp.src = `./resources/profile/pfp/${newPfp}`;
                 }
             };
             reader.readAsArrayBuffer(this.files[0]); // Read the file as an ArrayBuffer

@@ -86,6 +86,7 @@ export interface Message {
     message: string;
     date: string;
     time: string;
+    isRead: boolean;
 }
 
 export enum Role {
