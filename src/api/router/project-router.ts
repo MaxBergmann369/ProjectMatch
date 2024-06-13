@@ -317,7 +317,7 @@ export function createProjectEndpoints() {
             const views = await ProjectUtility.getViews(projectId);
 
             if (views !== null) {
-                res.status(200).send(views);
+                res.status(200).send(views.toString());
             } else {
                 res.sendStatus(400);
             }
@@ -395,7 +395,7 @@ export function createProjectEndpoints() {
             const likes = await ProjectUtility.getLikes(projectId);
 
             if (likes !== null) {
-                res.status(200).send(likes);
+                res.status(200).send(likes.toString());
             } else {
                 res.sendStatus(400);
             }

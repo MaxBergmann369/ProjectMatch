@@ -341,7 +341,7 @@ export class ProjectUtility {
         }
     }
 
-    static async getLikes(projectId: number): Promise<Like[]> {
+    static async getLikes(projectId: number): Promise<number> {
         try {
             return await Database.getLikesByProjectId(projectId);
         }

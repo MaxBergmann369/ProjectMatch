@@ -715,18 +715,13 @@ export class Database {
         });
     }
 
-    static async getLikesByProjectId(projectId: number): Promise<Like[]> {
+    static async getLikesByProjectId(projectId: number): Promise<number> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Like WHERE projectId = ?`, [projectId], (err, rows: Like[]) => {
+            db.all(`SELECT COUNT(*) FROM Like WHERE projectId = ?`, [projectId], (err, row) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const likes: Like[] = rows.map(row => ({
-                        id: row.id,
-                        projectId: row.projectId,
-                        userId: row.userId
-                    }));
-                    resolve(likes);
+                    resolve(row['COUNT(*)'] || 0);
                 }
             });
         });
