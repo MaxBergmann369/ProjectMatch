@@ -19,7 +19,7 @@
     </div>
 
     <label for="project-name" class="label">Projectname (max 30 characters):</label>
-    <input type="text" id="project-name" name="project-name" placeholder="Project Title" class="input-field">
+    <input required type="text" id="project-name" name="project-name" placeholder="Project Title" class="input-field">
 
     <label for="abilities" class="label">Needed Abilities:</label>
     <div id="abilities" class="input abilities">
@@ -27,10 +27,10 @@
     </div>
 
     <label for="description" class="label">Description (max 1000 characters):</label>
-    <textarea maxlength="1000" id="description" name="description" placeholder="Description" class="input-field description"></textarea>
+    <textarea required maxlength="1000" id="description" name="description" placeholder="Description" class="input-field description"></textarea>
 
     <label for="max-member" class="label">Maximal Members:</label>
-    <input type="number" max="10" min="1" id="max-member" name="max-member" placeholder="Maximal Members" class="input-field">
+    <input required type="number" max="10" min="1" id="max-member" name="max-member" placeholder="Maximal Members" class="input-field">
 
     <label for="link" class="label">Add Links:</label>
     <div>
