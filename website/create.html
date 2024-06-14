@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a new Project - ProjectMatch</title>
+    <link rel="stylesheet" href="styles/general.css">
+    <link rel="stylesheet" href="styles/create-project.css">
+    <script defer src="scripts/dist/createProject.bundle.js"></script>
+</head>
+<body>
+<form id="create-project" class="create-project" onsubmit="false">
+    <div id="popup-pictures" class="popup">
+        <img src="./resources/x.svg" id="close" alt="Close Popup">
+    </div>
+
+    <div id="picture" class="thumbnail">
+        <img id="picture-preview" src="resources/project/backgrounds/bg1.webp" alt="Project Picture">
+        <button id="add-picture-button" class="add-btn" type="button"><img src="resources/pencil.svg" alt="Edit"></button>
+    </div>
+
+    <label for="project-name" class="label">Projectname (max 30 characters):</label>
+    <input type="text" id="project-name" name="project-name" placeholder="Project Title" class="input-field">
+
+    <label for="abilities" class="label">Needed Abilities:</label>
+    <div id="abilities" class="input abilities">
+        <!-- the script inserts abilities here -->
+    </div>
+
+    <label for="description" class="label">Description (max 1000 characters):</label>
+    <textarea maxlength="1000" id="description" name="description" placeholder="Description" class="input-field description"></textarea>
+
+    <label for="max-member" class="label">Maximal Members:</label>
+    <input type="number" max="10" min="1" id="max-member" name="max-member" placeholder="Maximal Members" class="input-field">
+
+    <label for="link" class="label">Add Links:</label>
+    <div>
+        <input type="text" id="link" name="link" placeholder="e.g. https://github.com/github" class="input-field">
+        <button type="button" class="add-btn" id="add-link-button">+</button>
+    </div>
+
+
+    <div class="input link-container">
+        <div>
+            <ul id="add-link">
+
+            </ul>
+        </div>
+    </div>
+
+    <button type="submit" class="submit-btn">Create Project</button>
+</form>
+</body>
+</html>
