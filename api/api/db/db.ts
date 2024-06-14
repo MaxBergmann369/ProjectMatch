@@ -625,7 +625,7 @@ export class Database {
 
     static async getLikedProjectsByUserId(userId: string): Promise<Project[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM Like WHERE userId = ? LIMIT 100)`, [userId], (err, rows: Project[]) => {
+            db.all(`SELECT * FROM Project WHERE id IN (SELECT projectId FROM "Like" WHERE userId = ? LIMIT 100)`, [userId], (err, rows: Project[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -647,7 +647,7 @@ export class Database {
 
     static async isProjectLikedByUser(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM Like WHERE userId = ? AND projectId = ?`, [userId, projectId], (err, row: Like) => {
+            db.get(`SELECT * FROM "Like" WHERE userId = ? AND projectId = ?`, [userId, projectId], (err, row: Like) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -700,7 +700,7 @@ export class Database {
 
     static async getLikesByUserId(userId: string): Promise<Like[]> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT * FROM Like WHERE userId = ?`, [userId], (err, rows: Like[]) => {
+            db.all(`SELECT * FROM "Like" WHERE userId = ?`, [userId], (err, rows: Like[]) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -717,7 +717,7 @@ export class Database {
 
     static async getLikesByProjectId(projectId: number): Promise<number> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT COUNT(*) FROM Like WHERE projectId = ?`, [projectId], (err, row) => {
+            db.all(`SELECT COUNT(*) FROM "Like" WHERE projectId = ?`, [projectId], (err, row) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1041,7 +1041,7 @@ export class Database {
 
     static async addLike(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Like (userId, projectId) VALUES (?, ?)`, [userId, projectId], (err) => {
+            db.run(`INSERT INTO "Like" (userId, projectId) VALUES (?, ?)`, [userId, projectId], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1348,7 +1348,7 @@ export class Database {
 
     static async deleteLikesByUserId(userId: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`DELETE FROM Like WHERE userId = ?`, [userId], (err) => {
+            db.run(`DELETE FROM "Like" WHERE userId = ?`, [userId], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1440,7 +1440,7 @@ export class Database {
 
     static async deleteLikesByProjectId(projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`DELETE FROM Like WHERE projectId = ?`, [projectId], (err) => {
+            db.run(`DELETE FROM "Like" WHERE projectId = ?`, [projectId], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -1476,7 +1476,7 @@ export class Database {
 
     static async deleteLike(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`DELETE FROM Like WHERE userId = ? AND projectId = ?`, [userId, projectId], (err) => {
+            db.run(`DELETE FROM "Like" WHERE userId = ? AND projectId = ?`, [userId, projectId], (err) => {
                 if (err) {
                     reject(err);
                 } else {

@@ -85,24 +85,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             };
 
             const projectId = parseInt(await client.addProject(project));
-            console.log('Project id: ',projectId);
 
             if (projectId < 0) {
                 console.error("Failed to create project");
-         }
+                alert("Failed to create project");
+                location.href = "create.html";
+                return;
+            }
 
-        const abilities = data.getAll("abilities") as string[];
-        const abilitiesIds = abilities.map(ability => parseInt(ability));
-        console.log(abilitiesIds);
-        console.log(abilities);
+            const abilities = data.getAll("abilities") as string[];
+            const abilitiesIds = abilities.map(ability => parseInt(ability));
 
-        const abResponse = await client.addProjectAbilities(projectId, abilitiesIds);
+            const abResponse = await client.addProjectAbilities(projectId, abilitiesIds);
 
-        if (!abResponse) {
-            alert("Failed to add ability to project");
-        }
+            if (!abResponse) {
+                alert("Failed to add ability to project");
+            }
 
-        location.href = "home.html";
+            location.href = "project.html?id=" + projectId;
         }
     });
 });

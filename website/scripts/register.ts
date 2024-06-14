@@ -1,4 +1,3 @@
-import "./general";
 import {HttpClient} from "./server-client";
 import {initKeycloak, keycloak} from "./keycloak";
 import {Ability, User} from "../models";
