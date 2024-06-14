@@ -18,11 +18,11 @@ spec:
           image: docker.io/alinjasic/projectmatch:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 3000
+            - containerPort: 8080
               protocol: TCP
           env:
             - name: ASPNETCORE_URLS
-              value: http://+:3000
+              value: http://+:8080
 ---
 apiVersion: v1
 kind: Service
@@ -32,7 +32,7 @@ metadata:
 spec:
   ports:
     - port: 80
-      targetPort: 3000
+      targetPort: 8080
       protocol: TCP
       name: http
   selector:

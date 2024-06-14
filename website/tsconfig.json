@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2016",
+        "sourceMap": true,
+        "esModuleInterop": true
+
+    },
+    "include": [
+        "scripts/**/*.ts",
+    ],
+    "exclude": [
+        "node_modules",
+        "scripts/**/dependencies.ts"
+    ]
+}
