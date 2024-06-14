@@ -58,7 +58,13 @@
 }
 
 #project-members{
+  position: relative;
   flex: 2;
+}
+
+#membersCnt {
+  font-weight: lighter;
+  font-size: 1.5rem;
 }
 
 .member{
