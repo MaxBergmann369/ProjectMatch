@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async() => {
     name.textContent = project.name;
     description.textContent = project.description;
     const projectMembers:User[] = await client.getProjectMembers(id);
-    loadMembers(projectMembers,project.ownerId, project.maxMembers);
+    loadMembers(projectMembers,project, project.maxMembers);
     const projectAbilities:Ability[] = await client.getProjectAbilities(id);
     loadProjectAbilities(projectAbilities);
     const urls = project.links.split(";");
