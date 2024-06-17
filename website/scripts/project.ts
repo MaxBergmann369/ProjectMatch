@@ -67,18 +67,18 @@ function handleProjectOwner(project: Project) {
         if(!switched) {
             title.textContent = "Requests";
             members = await client.getProjectMembers(project.id, false);
-            await loadMembers(members, project.ownerId, members.length);
+            await loadMembers(members, project, members.length, true);
         } else {
             title.textContent = "Members";
             members = await client.getProjectMembers(project.id);
-            await loadMembers(members, project.ownerId, project.maxMembers);
+            await loadMembers(members, project, project.maxMembers);
         }
 
         switched = !switched;
     });
 }
 
-function loadMembers(projectMembers:User[],ownerId:string, maxMembers: number) {
+function loadMembers(projectMembers:User[],project: Project, maxMembers: number, request:boolean=false) {
     const members = document.getElementById("members");
 
     const membersCnt = document.getElementById("membersCnt");
@@ -96,18 +96,61 @@ function loadMembers(projectMembers:User[],ownerId:string, maxMembers: number) {
         const div2 = document.createElement("div");
         const p = document.createElement("p");
         p.textContent = fullName;
-        if (member.userId === ownerId) {
+        if (member.userId === project.ownerId) {
             const img2 = document.createElement("img");
             img2.src = "resources/crown.svg";
             img2.alt = "Owner";
             p.appendChild(img2);
         }
-        div2.appendChild(p);
-        div.appendChild(img);
-        div.appendChild(div2);
-        div.addEventListener("click", () => {
+
+        img.addEventListener("click", () => {
             location.href = `profile.html?id=${member.userId}`;
         });
+
+        p.addEventListener("click", () => {
+            location.href = `profile.html?id=${member.userId}`;
+        });
+
+        div2.appendChild(p);
+
+        if(request) {
+            const accept = document.createElement("button");
+            //add image
+            accept.addEventListener("click", async () => {
+                await client.acceptProjectMember(project.id, member.userId);
+            });
+
+            const img = document.createElement("img");
+            img.src = "resources/check.svg";
+            img.alt = "Checkmark";
+            img.style.width = "20px";
+            img.style.height = "20px";
+            accept.appendChild(img);
+
+            div2.appendChild(accept);
+        }
+
+        const decline = document.createElement("button");
+
+        decline.addEventListener("click", async () => {
+            const text = request ? "Are you sure you want to decline this request?" : "Are you sure you want to remove this user?";
+            let confirmation = confirm(text);
+            if (confirmation) {
+                await client.deleteProjectMember(project.id, member.userId);
+            }
+        });
+
+        const img3 = document.createElement("img");
+        img3.src = "resources/cross.svg";
+        img3.alt = "Owner";
+        img3.style.width = "20px";
+        img3.style.height = "20px";
+        decline.appendChild(img3);
+
+        div2.appendChild(decline);
+
+        div.appendChild(img);
+        div.appendChild(div2);
         members.appendChild(div);
     }
 }

@@ -181,8 +181,6 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            console.log("isAccepted: " + isAccepted);
-
             const projectMembers = await ProjectUtility.getProjectMembers(id, isAccepted);
 
             if (projectMembers !== null) {

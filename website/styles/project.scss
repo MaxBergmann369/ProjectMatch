@@ -68,7 +68,6 @@
 }
 
 .member{
-  cursor: pointer;
   display: flex;
   flex-direction: row;
   height: 5rem;
@@ -76,6 +75,7 @@
   justify-content: space-between;
   border-bottom: 1px solid black;
   .pfp{
+    cursor: pointer;
     border-radius: 50%;
     object-fit: cover;
     height: 100%;
@@ -87,6 +87,7 @@
     flex-direction: column;
     justify-content: center;
     p{
+      cursor: pointer;
       display: flex;
       flex-direction: row;
       gap: 1rem;

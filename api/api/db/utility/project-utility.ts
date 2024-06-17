@@ -112,7 +112,7 @@ export class ProjectUtility {
         try {
             const owId = userId.toLowerCase();
 
-            if(!await this.isUserOwnerOfProject(owId, projectId)) {
+            if(!(await this.isUserOwnerOfProject(owId, projectId))) {
                 return false;
             }
 
@@ -279,6 +279,10 @@ export class ProjectUtility {
             const id = userId.toLowerCase();
 
             if(!ValUser.isUserIdValid(id)) {
+                return false;
+            }
+
+            if(await this.isUserOwnerOfProject(id, projectId)) {
                 return false;
             }
 
