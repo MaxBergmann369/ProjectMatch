@@ -284,7 +284,7 @@ export class HttpClient {
     }
 
     async getProjectsWhereUserIsMember(userId: string, isAccepted:boolean=true):Promise<Project[] | null> {
-        return await fetch(`${this.baseUrl}/projects/members/${userId}/${isAccepted}`, {
+        return await fetch(`${this.baseUrl}/users/members/${userId}/${isAccepted}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer

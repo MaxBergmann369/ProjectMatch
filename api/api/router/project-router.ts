@@ -209,7 +209,7 @@ export function createProjectEndpoints() {
         } catch (e) {
             res.sendStatus(400);
         }
-    });projectRouter.get('/projects/members/:userId/:isAccepted', async (req, res) => {
+    });projectRouter.get('/users/members/:userId/:isAccepted', async (req, res) => {
         try {
             const userId = req.params.userId;
             const isAccepted = req.params.isAccepted === "true";
