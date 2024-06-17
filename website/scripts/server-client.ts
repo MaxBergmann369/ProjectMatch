@@ -273,8 +273,8 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getProjectMembers(projectId: number) : Promise<User[] | null> {
-        return await fetch(`${this.baseUrl}/projects/members/${projectId}`, {
+    async getProjectMembers(projectId: number, isAccepted: boolean=true) : Promise<User[] | null> {
+        return await fetch(`${this.baseUrl}/projects/members/${projectId}/${isAccepted}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer

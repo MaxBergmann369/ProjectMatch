@@ -169,9 +169,10 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/projects/members/:projId', async (req, res) => {
+    projectRouter.get('/projects/members/:projId/:isAccepted', async (req, res) => {
         try {
             const projectId = req.params.projId;
+            const isAccepted = req.params.isAccepted === "true";
 
             const id = parseInt(projectId);
 
@@ -180,7 +181,9 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            const projectMembers = await ProjectUtility.getProjectMembers(id);
+            console.log("isAccepted: " + isAccepted);
+
+            const projectMembers = await ProjectUtility.getProjectMembers(id, isAccepted);
 
             if (projectMembers !== null) {
                 res.status(200).send(projectMembers);

@@ -246,41 +246,13 @@ export class ProjectUtility {
         }
     }
 
-    static async getProjectMembers(projectId: number): Promise<User[] | null> {
+    static async getProjectMembers(projectId: number, isAccepted: boolean): Promise<User[] | null> {
         try {
             if(projectId < 1) {
                 return null;
             }
 
-            return await Database.getProjectMembersByProjectId(projectId);
-        }
-        catch (e) {
-            return null;
-        }
-    }
-
-    static async getPendingRequestsByProjectId(projectId: number): Promise<ProjectMember[] | null> {
-        try {
-            if(projectId < 1) {
-                return null;
-            }
-
-            return await Database.getNotAcceptedProjectMembersByProjectId(projectId);
-        }
-        catch (e) {
-            return null;
-        }
-    }
-
-    static async getPendingRequestsByUserId(userId: string): Promise<Project[] | null> {
-        try {
-            const id = userId.toLowerCase();
-
-            if(!(await ValUser.isUserValid(id))) {
-                return null;
-            }
-
-            return await Database.getProjectsWhereUserIsMember(id, true);
+            return await Database.getProjectMembersByProjectId(projectId, isAccepted);
         }
         catch (e) {
             return null;
