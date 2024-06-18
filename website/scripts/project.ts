@@ -158,7 +158,7 @@ function loadMembers(projectMembers:User[],project: Project, maxMembers: number,
             div3.appendChild(accept);
         }
 
-        if(request || (member.userId === user.userId && member.userId !== project.ownerId)) {
+        if((member.userId === user.userId && member.userId !== project.ownerId) || (project.ownerId === user.userId && member.userId !== project.ownerId)) {
             const decline = document.createElement("button");
 
             decline.addEventListener("click", async () => {
