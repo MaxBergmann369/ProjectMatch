@@ -6,7 +6,7 @@ import {Ability, Project} from "./models";
 import {renderAbilities} from "./utils";
 
 const authenticatedPromise = initKeycloak();
-let abilities;
+let abilities : Ability[];
 document.addEventListener("DOMContentLoaded", async function () {
     const authenticated = await authenticatedPromise;
     if (!authenticated) {
@@ -24,7 +24,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const client = new HttpClient();
     abilities = await client.getUserAbilities(id);
-    await loadUserUI(client, id);
+    if (abilities === null) {
+        alert(`Sorry, it seems like the user with the id "${id}" doesn't exist.`);
+        location.href = "home.html";
+    }
+    const showEdit = id === tokenUser.userId;
+    await loadUserUI(client, id, showEdit);
     await loadProjectUI(client, id);
     addPopupEventListener();
 
@@ -71,7 +76,7 @@ async function loadProjectUI(client: HttpClient, id: string) {
 
 
 
-async function loadUserUI(client: HttpClient, id: string) {
+async function loadUserUI(client: HttpClient, id: string, showEdit:boolean) {
     const user = await client.getUser(id);
     const username = document.getElementById("username");
     username.textContent = user.username;
@@ -95,51 +100,55 @@ async function loadUserUI(client: HttpClient, id: string) {
     if (user.pfp) {
         pfp.src = `${HttpClient.pfpUrl}/${user.pfp}`;
     }
-
     const editBtn = document.getElementById("editProfile");
-    editBtn.addEventListener("click", async function () {
-        const parent = document.getElementById("user");
-        parent.classList.toggle("editing");
-        if (parent.classList.contains("editing")) {
-            editBtn.getElementsByTagName("img")[0].src = "./resources/save.svg";
-            const usernameInput = document.getElementById("usernameEdit") as HTMLInputElement;
-            usernameInput.value = user.username;
-            const bioInput = document.getElementById("bioEdit") as HTMLInputElement;
-            bioInput.value = user.biografie;
-            await renderAbilities(client, "abilitiesEdit");
-            for (const ability of abilities) {
-                const input = document.getElementById(`ability_${ability.id}`) as HTMLInputElement;
-                input.checked = true;
-            }
-            document.querySelectorAll(".ability input").forEach((input) => {
-                input.dispatchEvent(new Event("change"));
-            });
-        }
-        else{
-            editBtn.getElementsByTagName("img")[0].src = "./resources/pencil.svg";
-            const usernameInput = document.getElementById("usernameEdit") as HTMLInputElement;
-            const bioInput = document.getElementById("bioEdit") as HTMLInputElement;
-            if (usernameInput.value !== user.username || bioInput.value !== user.biografie) {
-                await client.updateUser(id, usernameInput.value, bioInput.value);
-                username.textContent = usernameInput.value;
-                bio.textContent = bioInput.value;
-                user.username = usernameInput.value;
-                user.biografie = bioInput.value;
-            }
-            const abilitiesChecks = document.querySelectorAll(".ability input");
-            const selectedAbilities:number[] = [];
-            for (const ability of abilitiesChecks) {
-                if ((ability as HTMLInputElement).checked) {
-                    selectedAbilities.push(parseInt((ability as HTMLInputElement).value));
+
+    if (showEdit) {
+        editBtn.addEventListener("click", async function () {
+            const parent = document.getElementById("user");
+            parent.classList.toggle("editing");
+            if (parent.classList.contains("editing")) {
+                editBtn.getElementsByTagName("img")[0].src = "./resources/save.svg";
+                const usernameInput = document.getElementById("usernameEdit") as HTMLInputElement;
+                usernameInput.value = user.username;
+                const bioInput = document.getElementById("bioEdit") as HTMLInputElement;
+                bioInput.value = user.biografie;
+                await renderAbilities(client, "abilitiesEdit");
+                for (const ability of abilities) {
+                    const input = document.getElementById(`ability_${ability.id}`) as HTMLInputElement;
+                    input.checked = true;
                 }
+                document.querySelectorAll(".ability input").forEach((input) => {
+                    input.dispatchEvent(new Event("change"));
+                });
+            } else {
+                editBtn.getElementsByTagName("img")[0].src = "./resources/pencil.svg";
+                const usernameInput = document.getElementById("usernameEdit") as HTMLInputElement;
+                const bioInput = document.getElementById("bioEdit") as HTMLInputElement;
+                if (usernameInput.value !== user.username || bioInput.value !== user.biografie) {
+                    await client.updateUser(id, usernameInput.value, bioInput.value);
+                    username.textContent = usernameInput.value;
+                    bio.textContent = bioInput.value;
+                    user.username = usernameInput.value;
+                    user.biografie = bioInput.value;
+                }
+                const abilitiesChecks = document.querySelectorAll(".ability input");
+                const selectedAbilities: number[] = [];
+                for (const ability of abilitiesChecks) {
+                    if ((ability as HTMLInputElement).checked) {
+                        selectedAbilities.push(parseInt((ability as HTMLInputElement).value));
+                    }
+                }
+                await client.updateUserAbilities(id, selectedAbilities);
+                abilities = await client.getUserAbilities(id);
+                loadAbilities();
+                const abElement = document.getElementById("abilitiesEdit");
+                abElement.innerHTML = "";
             }
-            await client.updateUserAbilities(id, selectedAbilities);
-            abilities = await client.getUserAbilities(id);
-            loadAbilities();
-            const abElement = document.getElementById("abilitiesEdit");
-            abElement.innerHTML = "";
-        }
-    });
+        });
+    }
+    else{
+        editBtn.style.display = "none";
+    }
 
     const pfpInput = document.getElementById('pfpInput') as HTMLInputElement;
     pfpInput.addEventListener('change', function() {

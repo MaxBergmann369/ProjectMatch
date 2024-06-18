@@ -332,7 +332,7 @@ export function createUserEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400);
+            res.sendStatus(400);
         }
     });
 
@@ -361,7 +361,7 @@ export function createUserEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400);
+            res.sendStatus(400);
         }
     });
 
@@ -386,7 +386,7 @@ export function createUserEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400);
+            res.sendStatus(400);
         }
     });
 
@@ -398,7 +398,7 @@ export function createUserEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+            if (tokenUser === null) {
                 res.sendStatus(400);
                 return;
             }
@@ -542,7 +542,7 @@ export function createUserEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400);
+            res.sendStatus(400);
         }
     });
 

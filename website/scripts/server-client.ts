@@ -151,7 +151,7 @@ export class HttpClient {
                 Authorization: this.bearer
             }
         })
-            .then(response => response.json());
+            .then(response => response.ok? response.json(): null);
     }
 
     async getNotifications(userId: string): Promise<Notification[]> {
