@@ -15,7 +15,7 @@
         <div id="pfpWrapper">
         <div id="pfp">
             <img id="pfpImg" src="resources/profile/pfp/default.jpg" alt="Profile Picture">
-            <div id="editPfp">
+            <div id="editPfp" class="edit">
                 <label for="pfpInput"><img src="resources/profile/image-plus.svg" alt="add new profile picture"></label>
                 <input type="file" id="pfpInput" accept="image/*">
             </div>
@@ -23,8 +23,10 @@
         </div>
 
         <div id="data">
+            <button id="editProfile"><img src="resources/pencil.svg" alt="Edit"></button>
             <p id="fullname"><span id="firstname">Loading...</span> <span id="lastname"></span></p>
-            <p id="username">Loading...</p>
+            <p class="hideOnEdit" id="username">Loading...</p>
+            <div class="edit"><input id="usernameEdit" class="input" type="text" placeholder="Username"></div>
             <div id="smallInfos">
                 <div id="department">
                     <img src="resources/profile/department.svg" alt="Department: ">
@@ -39,17 +41,21 @@
                     <span>Loading...</span>
                 </div>
             </div>
-            <p id="bio">Loading...</p>
+            <p id="bio" class="hideOnEdit">Loading...</p>
+            <div class="edit"><textarea id="bioEdit" class="input" placeholder="Some infos about you..."></textarea></div>
+
             <p>Abilities:</p>
-            <div id="abilities">
+            <div class="hideOnEdit" id="abilities">
             </div>
-            <a href="javascript:void(0)" id="showmore">Show more</a>
-<!--            <button id="editProfile">Edit Profile</button>-->
+            <div id="abilitiesEdit" class="input edit">
+                <!-- the script inserts abilities here -->
+            </div>
+            <a href="javascript:void(0)" class="hideOnEdit" id="showmore">Show more</a>
         </div>
     </div>
     <div id="projects" class="container">
         <div id="projectTabs">
-            <button class="tab active" id="myProjects">My Projects</button>
+            <button class="tab" id="myProjects">My Projects</button>
             <button class="tab" id="pendingReqs">Pending requests</button>
             <button class="tab" id="favProjects">Favourite Projects</button>
         </div>

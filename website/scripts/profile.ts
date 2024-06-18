@@ -2,10 +2,11 @@ import {initKeycloak, keycloak} from "./keycloak";
 import "./general";
 import {HttpClient} from "./server-client";
 import {TokenUser} from "./tokenUser";
-import {Ability, Project} from "../models";
+import {Ability, Project} from "./models";
+import {renderAbilities} from "./utils";
 
 const authenticatedPromise = initKeycloak();
-
+let abilities;
 document.addEventListener("DOMContentLoaded", async function () {
     const authenticated = await authenticatedPromise;
     if (!authenticated) {
@@ -22,10 +23,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.log(id);
 
     const client = new HttpClient();
-    const abilities = await client.getUserAbilities(id);
-    await loadUserUI(client, abilities, id);
+    abilities = await client.getUserAbilities(id);
+    await loadUserUI(client, id);
     await loadProjectUI(client, id);
-    addPopupEventListener(abilities);
+    addPopupEventListener();
 
 
 });
@@ -47,16 +48,22 @@ async function loadProjectUI(client: HttpClient, id: string) {
     addProjectsToList(projects);
     const myProjectsButton = document.getElementById("myProjects");
     myProjectsButton.addEventListener("click", async function () {
+        document.querySelector(".tab.active").classList.remove("active");
+        this.classList.add("active");
         const myProjects = await client.getProjectsWhereUserIsMember(id);
         addProjectsToList(myProjects);
     });
     const pendingReqButton = document.getElementById("pendingReqs");
     pendingReqButton.addEventListener("click", async function () {
+        document.querySelector(".tab.active").classList.remove("active");
+        this.classList.add("active");
         const pendingRequests = await client.getProjectsWhereUserIsMember(id, false);
         addProjectsToList(pendingRequests);
     });
     const favProjectsButton = document.getElementById("favProjects");
     favProjectsButton.addEventListener("click", async function () {
+        document.querySelector(".tab.active").classList.remove("active");
+        this.classList.add("active");
         const favProjects = await client.getProjectsLikedByUser(id);
         addProjectsToList(favProjects);
     });
@@ -64,7 +71,7 @@ async function loadProjectUI(client: HttpClient, id: string) {
 
 
 
-async function loadUserUI(client: HttpClient, abilities: Ability[], id: string) {
+async function loadUserUI(client: HttpClient, id: string) {
     const user = await client.getUser(id);
     const username = document.getElementById("username");
     username.textContent = user.username;
@@ -89,6 +96,51 @@ async function loadUserUI(client: HttpClient, abilities: Ability[], id: string) 
         pfp.src = `${HttpClient.pfpUrl}/${user.pfp}`;
     }
 
+    const editBtn = document.getElementById("editProfile");
+    editBtn.addEventListener("click", async function () {
+        const parent = document.getElementById("user");
+        parent.classList.toggle("editing");
+        if (parent.classList.contains("editing")) {
+            editBtn.getElementsByTagName("img")[0].src = "./resources/save.svg";
+            const usernameInput = document.getElementById("usernameEdit") as HTMLInputElement;
+            usernameInput.value = user.username;
+            const bioInput = document.getElementById("bioEdit") as HTMLInputElement;
+            bioInput.value = user.biografie;
+            await renderAbilities(client, "abilitiesEdit");
+            for (const ability of abilities) {
+                const input = document.getElementById(`ability_${ability.id}`) as HTMLInputElement;
+                input.checked = true;
+            }
+            document.querySelectorAll(".ability input").forEach((input) => {
+                input.dispatchEvent(new Event("change"));
+            });
+        }
+        else{
+            editBtn.getElementsByTagName("img")[0].src = "./resources/pencil.svg";
+            const usernameInput = document.getElementById("usernameEdit") as HTMLInputElement;
+            const bioInput = document.getElementById("bioEdit") as HTMLInputElement;
+            if (usernameInput.value !== user.username || bioInput.value !== user.biografie) {
+                await client.updateUser(id, usernameInput.value, bioInput.value);
+                username.textContent = usernameInput.value;
+                bio.textContent = bioInput.value;
+                user.username = usernameInput.value;
+                user.biografie = bioInput.value;
+            }
+            const abilitiesChecks = document.querySelectorAll(".ability input");
+            const selectedAbilities:number[] = [];
+            for (const ability of abilitiesChecks) {
+                if ((ability as HTMLInputElement).checked) {
+                    selectedAbilities.push(parseInt((ability as HTMLInputElement).value));
+                }
+            }
+            await client.updateUserAbilities(id, selectedAbilities);
+            abilities = await client.getUserAbilities(id);
+            loadAbilities();
+            const abElement = document.getElementById("abilitiesEdit");
+            abElement.innerHTML = "";
+        }
+    });
+
     const pfpInput = document.getElementById('pfpInput') as HTMLInputElement;
     pfpInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
@@ -106,18 +158,23 @@ async function loadUserUI(client: HttpClient, abilities: Ability[], id: string) 
         }
     });
 
-    const filteredAbilities = abilities.filter(ability => ability.parentId === 1);
-    const abilitiesList = document.getElementById("abilities");
-    for (const ability of filteredAbilities) {
-        const span = document.createElement("span");
-        span.textContent = ability.name;
-        span.classList.add("ability");
-        abilitiesList.appendChild(span);
-    }
+    loadAbilities();
     document.title = `${user.firstname} ${user.lastname}'s Profile - ProjectMatch`;
 }
 
-function addPopupEventListener(abilities: Ability[]) {
+function loadAbilities(){
+    const filteredAbilities = abilities.filter(ability => ability.parentId === 1 || ability.parentId === 2);
+    const abilitiesList = document.getElementById("abilities");
+    abilitiesList.innerHTML = "";
+    for (const ability of filteredAbilities) {
+        const span = document.createElement("span");
+        span.textContent = ability.name;
+        abilitiesList.appendChild(span);
+    }
+}
+
+
+function addPopupEventListener() {
     document.getElementById("showmore").addEventListener("click", function () {
         if (document.getElementById("ability-popup")) {
             return; // If it's open, don't open it again
@@ -159,4 +216,3 @@ function addPopupEventListener(abilities: Ability[]) {
         }
     });
 }
-

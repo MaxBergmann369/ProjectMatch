@@ -1,4 +1,4 @@
-import {User, Project, Message, DirectChat, ProjectMember, Ability, Notification} from "../models";
+import {User, Project, Message, DirectChat, Ability, Notification} from "./models";
 import {keycloak} from "./keycloak";
 
 export class HttpClient {
@@ -90,7 +90,7 @@ export class HttpClient {
             .then(response => response.ok? response.text() : null);
     }
 
-    async updateUser(userId: string, username:string, birthdate: string, pfp: string) {
+    async updateUser(userId: string, username:string, bio: string) {
         return await fetch(`${this.baseUrl}/user`, {
             method: 'PUT',
             headers: {
@@ -100,8 +100,7 @@ export class HttpClient {
             body: JSON.stringify({
                 userId: userId,
                 username: username,
-                birthdate: birthdate,
-                pfp: pfp
+                bio: bio
             })
         })
             .then(response => response.text());
@@ -120,6 +119,20 @@ export class HttpClient {
     async addUserAbilities(userId: string, abilityIds: number[]) {
         return await fetch(`${this.baseUrl}/user/${userId}/abilities`, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: this.bearer
+            },
+            body: JSON.stringify({
+                abilityId: abilityIds
+            })
+        })
+            .then(response => response.ok);
+    }
+
+    async updateUserAbilities(userId: string, abilityIds: number[]) {
+        return await fetch(`${this.baseUrl}/user/${userId}/abilities`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: this.bearer

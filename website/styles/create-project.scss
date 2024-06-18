@@ -148,3 +148,19 @@ a:hover{
     cursor: pointer;
   }
 }
+
+.children{
+  display: none;
+}
+
+.ability{
+  border: 1px solid black;
+  padding: 5px;
+  background-color: #ececec;
+  label{
+    user-select: none;
+  }
+  *{
+    cursor: pointer;
+  }
+}

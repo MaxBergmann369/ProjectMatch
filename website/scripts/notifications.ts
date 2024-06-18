@@ -1,6 +1,6 @@
 import {HttpClient} from "./server-client";
 import {TokenUser} from "./tokenUser";
-import {Notification} from "../models";
+import {Notification} from "./models";
 
 let client: HttpClient = null;
 let user: TokenUser = null;

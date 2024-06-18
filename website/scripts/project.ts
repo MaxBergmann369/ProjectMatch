@@ -1,7 +1,7 @@
 import "./general";
 import {initKeycloak} from "./keycloak";
 import {HttpClient} from "./server-client";
-import {Ability, Project, User} from "../models";
+import {Ability, Project, User} from "./models";
 const authenticatedPromise = initKeycloak();
 
 document.addEventListener("DOMContentLoaded", async() => {

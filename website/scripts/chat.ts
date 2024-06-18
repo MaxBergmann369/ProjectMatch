@@ -1,5 +1,5 @@
 import {initKeycloak, keycloak} from "./keycloak";
-import {DirectChat, Message, User} from "../models";
+import {DirectChat, Message, User} from "./models";
 import {HttpClient} from "./server-client";
 import {TokenUser} from "./tokenUser";
 import "./general";
