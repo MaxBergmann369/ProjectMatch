@@ -398,7 +398,7 @@ export function createUserEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+            if (tokenUser === null) {
                 res.sendStatus(400);
                 return;
             }

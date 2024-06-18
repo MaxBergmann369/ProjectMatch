@@ -6,6 +6,7 @@ import {TokenUser} from "./tokenUser";
 const authenticatedPromise = initKeycloak();
 
 let client: HttpClient;
+let user: TokenUser;
 document.addEventListener("DOMContentLoaded", async() => {
     const auth = await authenticatedPromise;
     if (!auth) {
@@ -14,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         return;
     }
 
-    const user = new TokenUser(keycloak.tokenParsed);
+    user = new TokenUser(keycloak.tokenParsed);
 
     const urlParams = new URLSearchParams(window.location.search);
     const id = parseInt(urlParams.get("id"));
@@ -157,28 +158,30 @@ function loadMembers(projectMembers:User[],project: Project, maxMembers: number,
             div3.appendChild(accept);
         }
 
-        const decline = document.createElement("button");
+        if(request || (member.userId === user.userId && member.userId !== project.ownerId)) {
+            const decline = document.createElement("button");
 
-        decline.addEventListener("click", async () => {
-            const text = request ? "Are you sure you want to decline this request?" : "Are you sure you want to remove this user?";
-            let confirmation = confirm(text);
-            if (confirmation) {
-                await client.deleteProjectMember(project.id, member.userId);
-                const members = await client.getProjectMembers(project.id);
-                await loadMembers(members, project, project.maxMembers);
-                return;
-            }
-        });
+            decline.addEventListener("click", async () => {
+                const text = request ? "Are you sure you want to decline this request?" : "Are you sure you want to remove this user?";
+                let confirmation = confirm(text);
+                if (confirmation) {
+                    await client.deleteProjectMember(project.id, member.userId);
+                    const members = await client.getProjectMembers(project.id);
+                    await loadMembers(members, project, project.maxMembers);
+                    return;
+                }
+            });
 
-        const img3 = document.createElement("img");
-        img3.src = "resources/cross.svg";
-        img3.alt = "Owner";
-        img3.style.width = "30px";
-        img3.style.height = "30px";
-        img3.style.alignSelf = "center";
-        decline.appendChild(img3);
+            const img3 = document.createElement("img");
+            img3.src = "resources/cross.svg";
+            img3.alt = "Owner";
+            img3.style.width = "30px";
+            img3.style.height = "30px";
+            img3.style.alignSelf = "center";
+            decline.appendChild(img3);
 
-        div3.appendChild(decline);
+            div3.appendChild(decline);
+        }
 
         div.appendChild(img);
         div.appendChild(div2);
