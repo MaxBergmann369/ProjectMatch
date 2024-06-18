@@ -546,13 +546,13 @@ export class Database {
         });
     }
 
-    static async getProjectMembersByProjectId(projectId: number): Promise<User[]> {
+    static async getProjectMembersByProjectId(projectId: number, isAccepted: boolean): Promise<User[]> {
         return new Promise((resolve, reject) => {
-            db.all(`select * from User where userId in (SELECT userId FROM ProjectMember WHERE projectId = ? AND isAccepted = 1)`, [projectId], (err, rows: User[]) => {
+            db.all(`SELECT * FROM User WHERE userId IN (SELECT userId FROM ProjectMember WHERE projectId = ? AND isAccepted = ?)`, [projectId, isAccepted], (err, rows: User[]) => {
                 if (err) {
                     reject(err);
                 } else {
-                    const projectMembers: User[] = rows.map(row => ({
+                    const users: User[] = rows.map(row => ({
                         userId: row.userId,
                         username: row.username,
                         firstname: row.firstname,
@@ -565,7 +565,7 @@ export class Database {
                         permissions: row.permissions,
                         department: row.department
                     }));
-                    resolve(projectMembers);
+                    resolve(users);
                 }
             });
         });
@@ -1182,7 +1182,7 @@ export class Database {
 
     static async isProjectMember(userId: string, projectId: number, accepted: boolean): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM ProjectMember WHERE userId = ? AND projectId = ? AND isAccepted`, [userId, projectId, accepted], (err, row: ProjectMember) => {
+            db.get(`SELECT * FROM ProjectMember WHERE userId = ? AND projectId = ? AND isAccepted = ?`, [userId, projectId, accepted], (err, row: ProjectMember) => {
                 if (err) {
                     reject(err);
                 } else {

@@ -169,9 +169,10 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.get('/projects/members/:projId', async (req, res) => {
+    projectRouter.get('/projects/members/:projId/:isAccepted', async (req, res) => {
         try {
             const projectId = req.params.projId;
+            const isAccepted = req.params.isAccepted === "true";
 
             const id = parseInt(projectId);
 
@@ -180,7 +181,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            const projectMembers = await ProjectUtility.getProjectMembers(id);
+            const projectMembers = await ProjectUtility.getProjectMembers(id, isAccepted);
 
             if (projectMembers !== null) {
                 res.status(200).send(projectMembers);
@@ -206,7 +207,7 @@ export function createProjectEndpoints() {
         } catch (e) {
             res.sendStatus(400);
         }
-    });projectRouter.get('/projects/members/:userId/:isAccepted', async (req, res) => {
+    });projectRouter.get('/users/members/:userId/:isAccepted', async (req, res) => {
         try {
             const userId = req.params.userId;
             const isAccepted = req.params.isAccepted === "true";
@@ -231,7 +232,7 @@ export function createProjectEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
+            if (tokenUser === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
@@ -255,7 +256,7 @@ export function createProjectEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
+            if (tokenUser === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }

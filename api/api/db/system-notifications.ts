@@ -15,7 +15,7 @@ export class SystemNotification {
         try {
             const user = await UserUtility.getUser(userId);
             const project = await ProjectUtility.getProject(projectId);
-            await UserUtility.addNotification(project.ownerId, `${user.firstname} ${user.lastname} wants to be a member in your project!`, `${user.firstname} ${user.lastname} wants to be a member in your project ${project.name}.${separator}project${separator}${projectId}`);
+            await UserUtility.addNotification(project.ownerId, `${user.firstname} ${user.lastname} wants to be a member in your project!`, `${user.firstname} ${user.lastname} wants to be a member in your project ${project.name}.${separator}project${separator}${projectId}${separator}true`);
         } catch (e) { /* empty */ }
     }
 

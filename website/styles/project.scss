@@ -67,26 +67,43 @@
   font-size: 1.5rem;
 }
 
+.member-info {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+}
+
+#switch {
+  display: none;
+}
+
+.member-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
 .member{
-  cursor: pointer;
   display: flex;
   flex-direction: row;
   height: 5rem;
   padding: 1rem;
   justify-content: space-between;
   border-bottom: 1px solid black;
+  gap: 1rem;
   .pfp{
+    cursor: pointer;
     border-radius: 50%;
     object-fit: cover;
     height: 100%;
     aspect-ratio: 1;
   }
   div{
-    width: 70%;
-    display: flex;
-    flex-direction: column;
     justify-content: center;
     p{
+      cursor: pointer;
       display: flex;
       flex-direction: row;
       gap: 1rem;

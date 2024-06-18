@@ -286,8 +286,8 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async getProjectMembers(projectId: number) : Promise<User[] | null> {
-        return await fetch(`${this.baseUrl}/projects/members/${projectId}`, {
+    async getProjectMembers(projectId: number, isAccepted: boolean=true) : Promise<User[] | null> {
+        return await fetch(`${this.baseUrl}/projects/members/${projectId}/${isAccepted}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -297,7 +297,7 @@ export class HttpClient {
     }
 
     async getProjectsWhereUserIsMember(userId: string, isAccepted:boolean=true):Promise<Project[] | null> {
-        return await fetch(`${this.baseUrl}/projects/members/${userId}/${isAccepted}`, {
+        return await fetch(`${this.baseUrl}/users/members/${userId}/${isAccepted}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -328,7 +328,7 @@ export class HttpClient {
     }
 
     async deleteProjectMember(projectId: number, userId: string) {
-        return await fetch(`${this.baseUrl}/project/${projectId}/member/${userId}`, {
+        return await fetch(`${this.baseUrl}/projects/${projectId}/members/${userId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
