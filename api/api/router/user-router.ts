@@ -19,10 +19,12 @@ declare global {
     }
 }
 
+const pfpPath = '/../../public/pfp/';
+
 promisify(pipeline);
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '/../../public/pfp/'));
+        cb(null, path.join(__dirname, pfpPath));
     },
     filename: function (req, file, cb) {
         cb(null, req.params.userId + '-' + Date.now() + '.jpeg');
@@ -229,7 +231,7 @@ export function createUserEndpoints() {
 
             if (user.pfp !== null || user.pfp !== "") {
                 try {
-                    fs.unlinkSync(path.join(__dirname, '/../../website/resources/profile/pfp/' + user.pfp));
+                    fs.unlinkSync(path.join(__dirname, pfpPath, user.pfp));
                 } catch (e) {
                     // Do nothing
                 }

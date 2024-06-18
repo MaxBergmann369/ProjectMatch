@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async() => {
     name.textContent = project.name;
     description.textContent = project.description;
     const projectMembers:User[] = await client.getProjectMembers(id);
-    loadMembers(projectMembers,project.ownerId);
+    loadMembers(projectMembers,project.ownerId, project.maxMembers);
     const projectAbilities:Ability[] = await client.getProjectAbilities(id);
     loadProjectAbilities(projectAbilities);
     const urls = project.links.split(";");
@@ -46,8 +46,12 @@ document.addEventListener("DOMContentLoaded", async() => {
     favsElement.textContent = favs;
 });
 
-function loadMembers(projectMembers:User[],ownerId:string) {
+function loadMembers(projectMembers:User[],ownerId:string, maxMembers: number) {
     const members = document.getElementById("members");
+
+    const membersCnt = document.getElementById("membersCnt");
+    membersCnt.textContent = `(${projectMembers.length}/${maxMembers})`;
+
     members.innerHTML = "";
     for (const member of projectMembers) {
         const fullName = `${member.firstname} ${member.lastname}`;
