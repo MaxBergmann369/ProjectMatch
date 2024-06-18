@@ -34,10 +34,29 @@ document.addEventListener("DOMContentLoaded", async() => {
         description.textContent = "The project you are looking for does not exist.";
         return;
     }
+
+    if(user.userId === project.ownerId) {
+        const switchBtn = document.getElementById("switch");
+        switchBtn.style.display = "inline";
+    }
+
     name.textContent = project.name;
     description.textContent = project.description;
-    const projectMembers:User[] = await client.getProjectMembers(id);
-    loadMembers(projectMembers,project, project.maxMembers);
+
+    const title = document.getElementById("title");
+
+    const load = urlParams.get("pending") === "true";
+    let projectMembers: User[];
+    if(!load) {
+        title.textContent = "Members";
+        projectMembers = await client.getProjectMembers(id);
+        loadMembers(projectMembers,project, project.maxMembers);
+    } else if(user.userId === project.ownerId) {
+        title.textContent = "Requests";
+        projectMembers = await client.getProjectMembers(id, false);
+        loadMembers(projectMembers,project, projectMembers.length, true);
+    }
+
     const projectAbilities:Ability[] = await client.getProjectAbilities(id);
     loadProjectAbilities(projectAbilities);
     const urls = project.links.split(";");
@@ -62,7 +81,7 @@ function handleProjectOwner(project: Project) {
     switchBtn.addEventListener("click", async () => {
         const title = document.getElementById("title");
 
-        let members:User[] = [];
+        let members:User[];
 
         if(!switched) {
             title.textContent = "Requests";
