@@ -315,7 +315,7 @@ export class HttpClient {
     }
 
     async deleteProjectMember(projectId: number, userId: string) {
-        return await fetch(`${this.baseUrl}/project/${projectId}/member/${userId}`, {
+        return await fetch(`${this.baseUrl}/projects/${projectId}/members/${userId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer

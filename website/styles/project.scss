@@ -67,6 +67,20 @@
   font-size: 1.5rem;
 }
 
+.member-info {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+}
+
+.member-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
 .member{
   display: flex;
   flex-direction: row;
@@ -82,9 +96,6 @@
     aspect-ratio: 1;
   }
   div{
-    width: 70%;
-    display: flex;
-    flex-direction: column;
     justify-content: center;
     p{
       cursor: pointer;

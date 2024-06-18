@@ -232,7 +232,7 @@ export function createProjectEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
+            if (tokenUser === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
@@ -256,7 +256,7 @@ export function createProjectEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
+            if (tokenUser === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }

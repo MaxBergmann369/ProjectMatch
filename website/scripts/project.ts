@@ -94,6 +94,7 @@ function loadMembers(projectMembers:User[],project: Project, maxMembers: number,
         img.alt = `${fullName}'s Profile Picture`;
         img.src = member.pfp? `${HttpClient.pfpUrl}/${member.pfp}` : "resources/profile/pfp/default.jpg";
         const div2 = document.createElement("div");
+        div2.classList.add("member-info");
         const p = document.createElement("p");
         p.textContent = fullName;
         if (member.userId === project.ownerId) {
@@ -113,21 +114,27 @@ function loadMembers(projectMembers:User[],project: Project, maxMembers: number,
 
         div2.appendChild(p);
 
+        const div3 = document.createElement("div");
+        div3.classList.add("member-actions");
+
         if(request) {
             const accept = document.createElement("button");
             //add image
             accept.addEventListener("click", async () => {
                 await client.acceptProjectMember(project.id, member.userId);
+                const members = await client.getProjectMembers(project.id, false);
+                await loadMembers(members, project, members.length, true);
+                return;
             });
 
             const img = document.createElement("img");
             img.src = "resources/check.svg";
             img.alt = "Checkmark";
-            img.style.width = "20px";
-            img.style.height = "20px";
+            img.style.width = "30px";
+            img.style.height = "30px";
             accept.appendChild(img);
 
-            div2.appendChild(accept);
+            div3.appendChild(accept);
         }
 
         const decline = document.createElement("button");
@@ -137,20 +144,25 @@ function loadMembers(projectMembers:User[],project: Project, maxMembers: number,
             let confirmation = confirm(text);
             if (confirmation) {
                 await client.deleteProjectMember(project.id, member.userId);
+                const members = await client.getProjectMembers(project.id);
+                await loadMembers(members, project, project.maxMembers);
+                return;
             }
         });
 
         const img3 = document.createElement("img");
         img3.src = "resources/cross.svg";
         img3.alt = "Owner";
-        img3.style.width = "20px";
-        img3.style.height = "20px";
+        img3.style.width = "30px";
+        img3.style.height = "30px";
+        img3.style.alignSelf = "center";
         decline.appendChild(img3);
 
-        div2.appendChild(decline);
+        div3.appendChild(decline);
 
         div.appendChild(img);
         div.appendChild(div2);
+        div.appendChild(div3);
         members.appendChild(div);
     }
 }
