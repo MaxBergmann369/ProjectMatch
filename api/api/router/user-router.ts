@@ -332,7 +332,7 @@ export function createUserEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400);
+            res.sendStatus(400);
         }
     });
 
@@ -361,7 +361,7 @@ export function createUserEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400);
+            res.sendStatus(400);
         }
     });
 
@@ -386,7 +386,7 @@ export function createUserEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400);
+            res.sendStatus(400);
         }
     });
 
@@ -542,7 +542,7 @@ export function createUserEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
-            res.status(400);
+            res.sendStatus(400);
         }
     });
 
