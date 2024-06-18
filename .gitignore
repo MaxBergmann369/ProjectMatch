@@ -130,11 +130,11 @@ dist
 .pnp.*
 
 # SCSS output
-/src/website/styles/*.css
-/src/website/styles/*.css.map
+/website/styles/*.css
+/website/styles/*.css.map
 
 # tsc output (we are using typescript only)
-/src/website/dist/*.js
-/src/website/dist/*.js.map
-/src/api/**/*.js
-/src/api/**/*.js.map
+/website/dist/*.js
+/website/dist/*.js.map
+/api/**/*.js
+/api/**/*.js.map

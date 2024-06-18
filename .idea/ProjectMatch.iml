@@ -6,6 +6,8 @@
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/api/website/scripts/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/website/scripts/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/httpRequests" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

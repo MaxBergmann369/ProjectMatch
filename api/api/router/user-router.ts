@@ -287,8 +287,7 @@ export function createUserEndpoints() {
             const {
                 userId,
                 username,
-                birthdate,
-                pfp
+                bio
             } = req.body;
 
             const authHeader = req.headers.authorization;
@@ -300,11 +299,9 @@ export function createUserEndpoints() {
                 return;
             }
 
-            const bd = new Date(birthdate);
-
             const user = await UserUtility.getUser(userId);
 
-            if (await UserUtility.updateUser(userId, username, user.firstname, user.lastname, pfp, user.email, user.clazz, bd, user.biografie, user.permissions, user.department)) {
+            if (await UserUtility.updateUser(userId, username, user.firstname, user.lastname, user.pfp, user.email, user.clazz, user.birthdate, bio, user.permissions, user.department)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -366,6 +363,31 @@ export function createUserEndpoints() {
         }
     });
 
+    userRouter.put('/user/:userId/abilities', async (req, res) => {
+        try {
+            const userId = req.params.userId;
+            const abilityIds = req.body.abilityId;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
+
+            if(await UserUtility.updateUserAbilities(userId, abilityIds)) {
+                res.sendStatus(200);
+            }
+            else {
+                res.sendStatus(400);
+            }
+        } catch (e) {
+            res.status(400);
+        }
+    });
+
     userRouter.get('/user/:userId/abilities', async (req, res) => {
         try {
             const userId = req.params.userId;
@@ -374,10 +396,10 @@ export function createUserEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            // if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
-            //     res.sendStatus(400);
-            //     return;
-            // }
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(400);
+                return;
+            }
 
             const userAbility = await UserUtility.getUserAbilities(userId);
 
