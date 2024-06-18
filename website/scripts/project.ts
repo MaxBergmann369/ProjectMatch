@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", async() => {
     } else if(user.userId === project.ownerId) {
         title.textContent = "Requests";
         projectMembers = await client.getProjectMembers(id, false);
+        switched = true;
         loadMembers(projectMembers,project, projectMembers.length, true);
     }
 
