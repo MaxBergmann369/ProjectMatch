@@ -1,5 +1,5 @@
 import {KeycloakTokenParsed} from "keycloak-js";
-import {Department, Role} from "../models";
+import {Department, Role} from "./models";
 
 export class TokenUser {
     userId: string;

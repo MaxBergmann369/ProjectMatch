@@ -1,7 +1,7 @@
 import "./general";
 import {initKeycloak, keycloak} from "./keycloak";
 import {HttpClient} from "./server-client";
-import {Ability, Project, User} from "../models";
+import {Ability, Project, User} from "./models";
 import {TokenUser} from "./tokenUser";
 const authenticatedPromise = initKeycloak();
 

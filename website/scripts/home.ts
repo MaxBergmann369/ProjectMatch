@@ -1,6 +1,6 @@
 import { Card } from './card';
 import {initKeycloak, keycloak} from "./keycloak";
-import {Project, User} from "../models";
+import {Project, User} from "./models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 import "./general";

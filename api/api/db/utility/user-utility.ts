@@ -122,6 +122,7 @@ export class UserUtility {
     /* endregion */
 
     /* region UserAbility */
+
     static async addUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
         try {
             const id = userId.toLowerCase();
@@ -139,6 +140,26 @@ export class UserUtility {
             }
 
             return await Database.addUserAbilities(id, newAbilities);
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
+    static async updateUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
+        try {
+            const id = userId.toLowerCase();
+
+            if(!(await ValUser.isUserValid(id)) || abilityIds.length < 1) {
+                return false;
+            }
+
+            const abilities = await Database.getUserAbilitiesByUserId(id);
+            const newAbilities = abilityIds.filter(abilityId => !abilities.some(ability => ability.id === abilityId));
+            const removedAbilities :number[]= abilities.filter(ability => !abilityIds.some(abilityId => ability.id === abilityId)).map(ability => ability.id);
+            const remove = await Database.deleteUserAbilities(id, removedAbilities);
+            const add = await Database.addUserAbilities(id, newAbilities);
+            return remove && add;
         }
         catch (e) {
             return false;

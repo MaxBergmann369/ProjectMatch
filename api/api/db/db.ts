@@ -1076,6 +1076,20 @@ export class Database {
         });
     }
 
+    static async deleteUserAbilities(userId: string, abilityIds: number[]): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            const values = abilityIds.map(() => "?").join(", ");
+            db.run(`DELETE FROM UserAbility WHERE userId = ? AND abilityId IN (${values})`, [userId, ...abilityIds], (err) =>
+            {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
     static async addProjectAbilities(projectId: number, abilityIds: number[]): Promise<boolean> {
         return new Promise((resolve, reject) => {
             const values = abilityIds.map(() => "(?, ?)").join(", ");
