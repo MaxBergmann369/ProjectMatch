@@ -53,22 +53,16 @@ async function loadProjectUI(client: HttpClient, id: string) {
     addProjectsToList(projects);
     const myProjectsButton = document.getElementById("myProjects");
     myProjectsButton.addEventListener("click", async function () {
-        document.querySelector(".tab.active").classList.remove("active");
-        this.classList.add("active");
         const myProjects = await client.getProjectsWhereUserIsMember(id);
         addProjectsToList(myProjects);
     });
     const pendingReqButton = document.getElementById("pendingReqs");
     pendingReqButton.addEventListener("click", async function () {
-        document.querySelector(".tab.active").classList.remove("active");
-        this.classList.add("active");
         const pendingRequests = await client.getProjectsWhereUserIsMember(id, false);
         addProjectsToList(pendingRequests);
     });
     const favProjectsButton = document.getElementById("favProjects");
     favProjectsButton.addEventListener("click", async function () {
-        document.querySelector(".tab.active").classList.remove("active");
-        this.classList.add("active");
         const favProjects = await client.getProjectsLikedByUser(id);
         addProjectsToList(favProjects);
     });
