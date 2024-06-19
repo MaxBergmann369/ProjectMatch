@@ -61,7 +61,7 @@ async function addEventListener() {
 
         input.value = "";
 
-        userFullName = userFullName.replace(" ", "-");
+        userFullName = userFullName.replace(" ", "+");
         if(userFullName !== "" ) {
             const userId = await client.getUserId(userFullName);
             console.log(userId);
@@ -323,9 +323,9 @@ async function renderChatMessages(id : number, scrollDown: boolean = false) {
             const message: string = data[3];
 
             if (userId === user.userId) {
-                html += `<div class="own-message"><span class="time">(${time})</span>&nbsp;<span class="username">${username}:</span>&nbsp;<span class="message">${message}</span></div>`;
+                html += `<div class="own-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
             } else {
-                html += `<div class="other-message"><span class="time">(${time})</span>&nbsp;<span class="username">${username}:</span>&nbsp;<span class="message">${message}</span></div>`;
+                html += `<div class="other-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
             }
         }
     }
@@ -364,7 +364,7 @@ async function loadUsernames() {
     const input = document.getElementById("input-user") as HTMLInputElement;
 
     input.addEventListener("input", async () => {
-        let fullName = input.value.replace(" ", "-");
+        let fullName = input.value.replace(" ", "+");
         const list = document.getElementById("user-list");
         let html = "";
 
@@ -373,8 +373,8 @@ async function loadUsernames() {
             return;
         }
 
-        if(!fullName.includes("-")) {
-            fullName += "-";
+        if(!fullName.includes("+")) {
+            fullName += "+";
         }
 
         const users = await client.getTop10UserMatching(fullName);

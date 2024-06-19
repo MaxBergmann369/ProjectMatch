@@ -53,7 +53,7 @@ export class UserUtility {
     }
 
     static async getTop10UserMatching(fullName:string) {
-        const names = fullName.split("-");
+        const names = fullName.split("+");
 
         if(fullName.length < 1 || fullName.length > 40) {
             return null;
@@ -64,7 +64,7 @@ export class UserUtility {
 
     static async getUserIdByFullName(fullName: string): Promise<string | null> {
         try {
-            const names = fullName.split("-");
+            const names = fullName.split("+");
 
             if(fullName.length < 1 || fullName.length > 40 || names.length !== 2 || names[0].length < 1 || names[1].length < 1 || !checkInvalidChars(names[0]) || !checkInvalidChars(names[1])) {
                 return null;
