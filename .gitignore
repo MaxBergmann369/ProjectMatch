@@ -139,3 +139,4 @@ dist
 /api/api/**/*.js
 /api/api/**/*.js.map
 /api/public/pfp/*.jpeg
+/api/projectMatch.db
