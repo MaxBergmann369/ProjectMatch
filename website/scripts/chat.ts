@@ -321,7 +321,8 @@ async function renderChatMessages(id : number, scrollDown: boolean = false) {
             const time: string = data[1];
             const username: string = data[2];
             const message: string = data[3];
-
+            message.replace(/</g, "&lt;");
+            message.replace(/>/g, "&gt;");
             if (userId === user.userId) {
                 html += `<div class="own-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
             } else {

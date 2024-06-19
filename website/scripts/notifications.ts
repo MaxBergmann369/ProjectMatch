@@ -82,7 +82,8 @@ async function renderNotifications(notificationElement: HTMLElement) {
         if (!notification.seen) {
             html += '<div class="notification-new"></div>';
         }
-
+        notification.title = notification.title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        notification.text = notification.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         html += `<h2>${notification.title}</h2>`;
 
         html += `<p>${notification.text.split(separator)[0]}</p>`;
