@@ -106,85 +106,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 });
-//
-// async function renderAbilities() {
-//     const abilities: Ability[] = await client.getAbilities();
-//     const abilitiesElement = document.getElementById("abilities");
-//
-//     if (abilitiesElement !== null) {
-//         let html = "";
-//         const abilitiesMap: { [key: number]: Ability[] } = {};
-//         const topLevelAbilities: Ability[] = [];
-//
-//         abilities.forEach(ability => {
-//             if (ability.parentId === null) {
-//                 topLevelAbilities.push(ability);
-//             } else {
-//                 if (!abilitiesMap[ability.parentId]) {
-//                     abilitiesMap[ability.parentId] = [];
-//                 }
-//                 abilitiesMap[ability.parentId].push(ability);
-//             }
-//         });
-//
-//         const renderAbility = (ability: Ability, depth: number) => {
-//             html += `
-//             <div class="ability" style="margin-left: ${depth}rem;">
-//                 <input type="checkbox" id="ability_${ability.id}" name="abilities" value="${ability.id}">
-//                 <label for="ability_${ability.id}">${ability.name}</label>
-//             </div>
-//
-//             `;
-//
-//             if (abilitiesMap[ability.id]) {
-//                 html += `<div class='children' id="children_${ability.id}">`;
-//                 abilitiesMap[ability.id].forEach(child => renderAbility(child, depth + 1));
-//                 html += "</div>";
-//             }
-//         };
-//
-//         topLevelAbilities.forEach(ability => renderAbility(ability, 0));
-//
-//         abilitiesElement.innerHTML = html;
-//
-//         document.querySelectorAll(".ability input").forEach((input) => {
-//                 input.addEventListener("change", (event) => {
-//
-//                     const id = parseInt((event.target as HTMLInputElement).id.split("_")[1]);
-//                     const checked = (event.target as HTMLInputElement).checked;
-//                     const children = document.getElementById(`children_${id}`);
-//                     if (!children) {
-//                         return;
-//                     }
-//                     (children as HTMLElement).style.display = checked ? "block" : "none";
-//                     const childrenChildren = children.children;
-//                     if (!childrenChildren || childrenChildren.length === 0) {
-//                         return;
-//                     }
-//                     if (checked) {
-//                         for (let i = 0; i < childrenChildren.length; i++) {
-//                             const child = childrenChildren.item(i);
-//                             if (child instanceof HTMLElement) {
-//                                 const childInput = child.querySelector("input");
-//                                 if (childInput) {
-//                                     (childInput as HTMLInputElement).checked = false;
-//                                     childInput.dispatchEvent(new Event("change"));
-//                                 }
-//                             }
-//                         }
-//                     }
-//                 });
-//             }
-//         );
-//         topLevelAbilities.forEach(ability => {
-//             const input = document.getElementById(`ability_${ability.id}`) as HTMLInputElement;
-//             if (input) {
-//                 input.dispatchEvent(new Event("change"));
-//             }
-//         });
-//     }
-//
-// }
 
 async function addLink() {
     const link = document.getElementById("link") as HTMLInputElement;
@@ -193,7 +114,7 @@ async function addLink() {
         alert("There is no link to add");
         return;
     }
-    const regex = /^(?:http|https):\/\/[^!@#$%^&*()-_=+[\]{}\\|;:'"<>,.?/ ]+\.[a-zA-Z]+$/;
+    const regex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&\/=]*)$/;
 
     if (!regex.test(link.value)) {
         alert("Invalid link");
