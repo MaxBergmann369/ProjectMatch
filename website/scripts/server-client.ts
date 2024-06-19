@@ -20,9 +20,27 @@ export class HttpClient {
             .then(response => response.text());
     }
 
+    async resizeImage(image: Blob, maxWidth: number, maxHeight: number): Promise<Blob> {
+        return new Promise((resolve, reject) => {
+            let img = document.createElement('img');
+            img.onload = () => {
+                let canvas = document.createElement('canvas');
+                let ctx = canvas.getContext('2d');
+                let ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
+                canvas.width = img.width * ratio;
+                canvas.height = img.height * ratio;
+                ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(resolve, 'image/jpeg', 0.95);
+            };
+            img.onerror = reject;
+            img.src = URL.createObjectURL(image);
+        });
+    }
+
     async uploadImage(userId: string, image: Blob): Promise<string> {
+        const resizedImage = await this.resizeImage(image, 540, 540);
         const formData = new FormData();
-        formData.append('image', image);
+        formData.append('image', resizedImage);
 
         return await fetch(`${this.baseUrl}/user/${userId}/image`, {
             method: 'POST',
