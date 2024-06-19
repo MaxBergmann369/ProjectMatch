@@ -323,9 +323,9 @@ async function renderChatMessages(id : number, scrollDown: boolean = false) {
             const message: string = data[3];
 
             if (userId === user.userId) {
-                html += `<div class="own-message"><span class="time">(${time})</span>&nbsp;<span class="username">${username}:</span>&nbsp;<span class="message">${message}</span></div>`;
+                html += `<div class="own-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
             } else {
-                html += `<div class="other-message"><span class="time">(${time})</span>&nbsp;<span class="username">${username}:</span>&nbsp;<span class="message">${message}</span></div>`;
+                html += `<div class="other-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
             }
         }
     }

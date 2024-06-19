@@ -1,5 +1,5 @@
 :root{
-    --rounded: 2rem;
+  --rounded: 2rem;
 
 }
 
@@ -76,7 +76,7 @@ body {
 #chat{
   height: 100%;
   display: flex;
-    flex-direction: row;
+  flex-direction: row;
   gap: 3rem;
   justify-content: space-around;
 }
@@ -91,14 +91,14 @@ body {
 
 #chatandinput{
   background-image: url('../resources/chat/chat-bg.jpg');
-    background-size: cover;
-    display: flex;
-    flex-direction: column;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
   height: 75%;
-    width: 79%;
+  width: 79%;
   justify-content: space-between;
   border: 2px solid black;
-    border-radius: var(--rounded);
+  border-radius: var(--rounded);
   padding-bottom: 1rem;
   overflow: hidden;
 }
@@ -107,22 +107,51 @@ body {
   width: 85%;
 }
 
-.own-message, .other-message, .date {
-  font-size: 2.5vh;
-}
 
 .date {
   text-align: center;
+  font-size: 1.2rem;
 }
 
 .own-message {
+  justify-content: flex-start;
+  .msg-content{
+    background: #87b1fd;
+  }
+}
+
+.message{
+  margin: 1rem;
+  display: flex;
+  font-size: 1.1rem;
+  .msg-content{
     display: flex;
-    justify-content: flex-start;
+    flex-direction: column;
+    position: relative;
+    gap: 0.2rem;
+    padding: 1rem;
+    min-width: 15%;
+    border-radius: var(--rounded);
+    overflow-y: auto;
+    div{
+      display:flex;
+      flex-direction: row;
+        justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .time{
+      font-size: 0.9rem;
+      color: #404040;
+
+    }
+  }
 }
 
 .other-message {
-    display: flex;
-    justify-content: flex-end;
+  justify-content: flex-end;
+  .msg-content{
+    background: #d1d1d1;
+  }
 }
 
 .chat{
