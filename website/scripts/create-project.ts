@@ -12,7 +12,10 @@ const pictures :string[] = [];
 for (let i = 1; i <= 33; i++) {
     pictures.push(`./resources/project/backgrounds/bg${i}.webp`);
 }
-let selection= Math.floor(Math.random() * (pictures.length - 1));
+let selection:number;
+do {
+    selection = Math.floor(Math.random() * (pictures.length - 1));
+} while (selection === 0);
 
 
 
