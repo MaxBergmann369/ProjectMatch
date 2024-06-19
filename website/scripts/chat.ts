@@ -61,7 +61,7 @@ async function addEventListener() {
 
         input.value = "";
 
-        userFullName = userFullName.replace(" ", "-");
+        userFullName = userFullName.replace(" ", ";");
         if(userFullName !== "" ) {
             const userId = await client.getUserId(userFullName);
             console.log(userId);
@@ -364,7 +364,7 @@ async function loadUsernames() {
     const input = document.getElementById("input-user") as HTMLInputElement;
 
     input.addEventListener("input", async () => {
-        let fullName = input.value.replace(" ", "-");
+        let fullName = input.value.replace(" ", ";");
         const list = document.getElementById("user-list");
         let html = "";
 
