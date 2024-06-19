@@ -25,6 +25,13 @@ export class ProjectUtility {
                 console.log("ProjectUtility: addProject: Project with same name already exists");
                 return -1;
             }
+
+            name = name.replace(/</g, "&lt;");
+            name = name.replace(/>/g, "&gt;");
+
+            description = description.replace(/</g, "&lt;");
+            description = description.replace(/>/g, "&gt;");
+
             const projectId:number = await Database.addProject(name, owId, thumbnail, description, date.toDateString(), links, maxMembers);
 
             if (projectId === null) {
@@ -78,6 +85,12 @@ export class ProjectUtility {
                 return false;
             }
 
+            name = name.replace(/</g, "&lt;");
+            name = name.replace(/>/g, "&gt;");
+
+            description = description.replace(/</g, "&lt;");
+            description = description.replace(/>/g, "&gt;");
+
             return await Database.updateProject(id, name, owId, thumbnail, description, links, maxMembers);
         }
         catch (e) {
@@ -92,6 +105,9 @@ export class ProjectUtility {
             if(!ValUser.isUserIdValid(owId) || projectName.length < 1 || projectName.length > 30) {
                 return false;
             }
+
+            projectName = projectName.replace(/</g, "&lt;");
+            projectName = projectName.replace(/>/g, "&gt;");
 
             const projects = await Database.getProjectsByOwnerId(owId);
 
@@ -123,27 +139,6 @@ export class ProjectUtility {
         }
     }
 
-    static async deleteProjectByName(projectName: string, userId: string): Promise<boolean> {
-        try {
-            const owId = userId.toLowerCase();
-
-            if(!ValUser.isUserIdValid(owId) || projectName.length < 1 || projectName.length > 30) {
-                return false;
-            }
-
-            const projectId = await this.getProjectId(projectName, owId);
-
-            if (projectId === null) {
-                return false;
-            }
-
-            return await this.deleteProject(owId, projectId);
-        }
-        catch (e) {
-            return false;
-        }
-    }
-
     static async isUserOwnerOfProject(userId: string, projectId: number): Promise<boolean> {
         try {
             const owId = userId.toLowerCase();
@@ -166,6 +161,9 @@ export class ProjectUtility {
             if(!ValUser.isUserIdValid(owId) || projectName.length < 1 || projectName.length > 30) {
                 return null;
             }
+
+            projectName = projectName.replace(/</g, "&lt;");
+            projectName = projectName.replace(/>/g, "&gt;");
 
             return await Database.getProjectIdBy(owId, projectName);
         }
