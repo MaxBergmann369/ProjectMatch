@@ -142,12 +142,9 @@ export class ChatUtility {
                 return false;
             }
 
-            const data = new Date(Date.now());
+            const date = new Date(Date.now()).toUTCString();
 
-            const date = data.toLocaleDateString();
-            const time = data.toLocaleTimeString();
-
-            return await Database.addMessage(chatId, id, message, date, time);
+            return await Database.addMessage(chatId, id, message, date);
         }
         catch (e) {
             return false;
