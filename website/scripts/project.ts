@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         loadMembers(projectMembers,project, projectMembers.length, true);
     }
 
-    const projectAbilities:Ability[] = await client.getProjectAbilities(id);
+    const projectAbilities:Ability[] = (await client.getProjectAbilities(id)).filter(value => value.id !== 1 && value.id !== 2);
     loadProjectAbilities(projectAbilities);
     const urls = project.links.split(";");
     loadLinks(urls);

@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
 
-        let tags = (await client.getProjectAbilities(project.id)).map(value => value.name);
+        let tags = (await client.getProjectAbilities(project.id)).filter(value => value.id !== 1 && value.id !== 2).map(value => value.name);
         const favourite = await client.isLiked(project.id, user.userId);
         if (tags.length > 6){
             tags= tags.slice(0,6);
