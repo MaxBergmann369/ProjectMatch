@@ -147,6 +147,9 @@ export class ChatUtility {
             const date = data.toLocaleDateString();
             const time = data.toLocaleTimeString();
 
+            message = message.replace(/</g, "&lt;");
+            message = message.replace(/>/g, "&gt;");
+
             return await Database.addMessage(chatId, id, message, date, time);
         }
         catch (e) {
@@ -236,6 +239,9 @@ export class ChatUtility {
             if(!ValMessage.isValid(id, message) || messageId < 1 || chatId < 1){
                 return false;
             }
+
+            message = message.replace(/</g, "&lt;");
+            message = message.replace(/>/g, "&gt;");
 
             return await Database.updateMessage(messageId, chatId, id, message);
         }
