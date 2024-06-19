@@ -248,10 +248,10 @@ async function loadChatMessages(id: number) {
     let date = "";
 
     const orderedMessages: Message[] = messages.sort((a, b) => {
-        const dateTimeA = new Date(`${a.date} ${a.time}`);
-        const dateTimeB = new Date(`${b.date} ${b.time}`);
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
 
-        return dateTimeA.getTime() - dateTimeB.getTime();
+        return dateA.getTime() - dateB.getTime();
     });
 
     let recentMessages: string[] = [];
@@ -269,8 +269,8 @@ async function loadChatMessages(id: number) {
             username = otherUsername;
         }
 
-        const time = message.time.slice(0, 5);
-        date = message.date;
+        const time = message.date.split(" ")[4].substring(0, 5);
+        date = message.date.split(" ")[2] + " " + message.date.split(" ")[1] + " " + message.date.split(" ")[3];
 
         if(lastDate === "") {
             lastDate = date;
