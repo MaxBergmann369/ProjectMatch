@@ -208,11 +208,9 @@ export class UserUtility {
                 return false;
             }
 
-            const date = new Date(Date.now());
+            const date = new Date(Date.now()).toUTCString();
 
-            const dateTime = `${date.toLocaleDateString()};${date.toLocaleTimeString()}`;
-
-            return await Database.addNotification(id, title, text, dateTime);
+            return await Database.addNotification(id, title, text, date);
         }
         catch (e) {
             return false;
