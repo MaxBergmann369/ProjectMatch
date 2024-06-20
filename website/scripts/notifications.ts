@@ -39,7 +39,6 @@ export async function initNotifications(tokenUser: TokenUser) {
             clicked = true;
         }
     });
-
 }
 
 async function loadNotifications(): Promise<void> {
@@ -62,17 +61,10 @@ async function renderNotifications(notificationElement: HTMLElement) {
     notificationElement.innerHTML = '';
 
     const orderedNotifications: Notification[] = notifications.sort((a, b) => {
-        const dateA = a.dateTime.split(separator)[0];
-        const dateB = b.dateTime.split(separator)[0];
+        const dateA = new Date(a.dateTime);
+        const dateB = new Date(b.dateTime);
 
-        const timeA = a.dateTime.split(separator)[1];
-        const timeB = b.dateTime.split(separator)[1];
-
-        if (dateA === dateB) {
-            return timeB.localeCompare(timeA);
-        }
-
-        return dateB.localeCompare(dateA);
+        return dateB.getTime() - dateA.getTime();
     });
 
     for (const notification of orderedNotifications) {
@@ -86,7 +78,8 @@ async function renderNotifications(notificationElement: HTMLElement) {
         html += `<h2>${notification.title}</h2>`;
 
         html += `<p>${notification.text.split(separator)[0]}</p>`;
-        html += `<p>${notification.dateTime}</p>`;
+        const date = new Date(notification.dateTime);
+        html += `<p>${date.toLocaleString()}</p>`;
         html += '</div>';
 
         notificationTexts.set(notification.id, notification.text);
