@@ -492,7 +492,7 @@ export function createProjectEndpoints() {
                 return;
             }
 
-            if (await ProjectUtility.deleteAbilityFromProject(projectId, abilityId)) {
+            if (await ProjectUtility.deleteAbilityFromProject(projectId, abilityId, tokenUser.userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
