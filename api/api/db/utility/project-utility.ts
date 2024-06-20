@@ -425,7 +425,6 @@ export class ProjectUtility {
             if(abilityIds.length === 0 || projectId < 1 || await Database.getProject(projectId) === null){
                 return false;
             }
-
             const projectAbilities: Ability[] = await this.getAbilitiesByProjectId(projectId);
 
             const newAbilities = abilityIds.filter(abilityId => !projectAbilities.some(ability => ability.id === abilityId));
@@ -446,8 +445,11 @@ export class ProjectUtility {
         }
     }
 
-    static async deleteAbilityFromProject(projectId: number, abilityId: number): Promise<boolean> {
+    static async deleteAbilityFromProject(projectId: number, abilityId: number, userId:string): Promise<boolean> {
         try {
+            if (!await ProjectUtility.isUserOwnerOfProject(userId, projectId)){
+                return false;
+            }
             return await Database.deleteProjectAbility(projectId, abilityId);
         }
         catch (e) {

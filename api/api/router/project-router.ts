@@ -126,26 +126,26 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.post('/projects/:projId/abilities', async (req, res) => {
-        try {
-            const {abilityIds} = req.body;
-            const projectId = parseInt(req.params.projId);
-
-            if (isNaN(projectId)) {
-                res.sendStatus(400);
-                return;
-            }
-
-            if (await ProjectUtility.addProjectAbilities(projectId, abilityIds)) {
-                res.sendStatus(200);
-            } else {
-                res.sendStatus(400);
-            }
-            
-        } catch (e) {
-            res.sendStatus(400);
-        }
-    });
+    // projectRouter.post('/projects/:projId/abilities', async (req, res) => {
+    //     try {
+    //         const {abilityIds} = req.body;
+    //         const projectId = parseInt(req.params.projId);
+    //
+    //         if (isNaN(projectId)) {
+    //             res.sendStatus(400);
+    //             return;
+    //         }
+    //
+    //         if (await ProjectUtility.addProjectAbilities(projectId, abilityIds)) {
+    //             res.sendStatus(200);
+    //         } else {
+    //             res.sendStatus(400);
+    //         }
+    //
+    //     } catch (e) {
+    //         res.sendStatus(400);
+    //     }
+    // });
     /* endregion */
 
     /* region ProjectMember */
@@ -440,7 +440,7 @@ export function createProjectEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || isNaN(projectId)) {
+            if (tokenUser === null || isNaN(projectId) || !await ProjectUtility.isUserOwnerOfProject(tokenUser.userId, projectId)) {
                 res.sendStatus(400);
                 return;
             }
