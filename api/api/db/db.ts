@@ -716,7 +716,7 @@ export class Database {
 
     static async getLikesByProjectId(projectId: number): Promise<number> {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT COUNT(*) FROM "Like" WHERE projectId = ?`, [projectId], (err, row) => {
+            db.get(`SELECT COUNT(*) FROM "Like" WHERE projectId = ?`, [projectId], (err, row) => {
                 if (err) {
                     reject(err);
                 } else {
