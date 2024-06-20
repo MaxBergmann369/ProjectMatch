@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
         cb(null, path.join(__dirname, pfpPath));
     },
     filename: function (req, file, cb) {
-        cb(null, req.params.userId + '-' + Date.now() + '.jpeg');
+        cb(null, req.params.userId + '-' + Date.now());
     }
 });
 multer({

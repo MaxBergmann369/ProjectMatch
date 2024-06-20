@@ -1,6 +1,9 @@
 import { keycloak} from "./keycloak";
 import {initNotifications} from "./notifications";
 import {TokenUser} from "./tokenUser";
+import {io} from "socket.io-client";
+
+export const socket = io("http://localhost:3000");
 
 function insertGlobalHtmlElements() {
     document.head.insertAdjacentHTML('beforeend', `<link rel="icon" href="./resources/favicon.ico" />`);
@@ -20,6 +23,7 @@ function insertGlobalHtmlElements() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+    io("http://localhost:3000");
     insertGlobalHtmlElements();
     const logoutButton = document.getElementById("logout");
     logoutButton?.addEventListener("click",  () => {
