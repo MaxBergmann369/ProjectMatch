@@ -248,10 +248,10 @@ async function loadChatMessages(id: number) {
     let date = "";
 
     const orderedMessages: Message[] = messages.sort((a, b) => {
-        const dateTimeA = new Date(`${a.date} ${a.time}`);
-        const dateTimeB = new Date(`${b.date} ${b.time}`);
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
 
-        return dateTimeA.getTime() - dateTimeB.getTime();
+        return dateA.getTime() - dateB.getTime();
     });
 
     let recentMessages: string[] = [];
@@ -269,8 +269,8 @@ async function loadChatMessages(id: number) {
             username = otherUsername;
         }
 
-        const time = message.time.slice(0, 5);
-        date = message.date;
+        const time = message.date.split(" ")[4].substring(0, 5);
+        date = message.date.split(" ")[2] + " " + message.date.split(" ")[1] + " " + message.date.split(" ")[3];
 
         if(lastDate === "") {
             lastDate = date;
@@ -321,11 +321,12 @@ async function renderChatMessages(id : number, scrollDown: boolean = false) {
             const time: string = data[1];
             const username: string = data[2];
             const message: string = data[3];
-
+            message.replace(/</g, "&lt;");
+            message.replace(/>/g, "&gt;");
             if (userId === user.userId) {
-                html += `<div class="own-message"><span class="time">(${time})</span>&nbsp;<span class="username">${username}:</span>&nbsp;<span class="message">${message}</span></div>`;
+                html += `<div class="own-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
             } else {
-                html += `<div class="other-message"><span class="time">(${time})</span>&nbsp;<span class="username">${username}:</span>&nbsp;<span class="message">${message}</span></div>`;
+                html += `<div class="other-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
             }
         }
     }

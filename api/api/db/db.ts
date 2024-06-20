@@ -118,7 +118,6 @@ export class Database {
             userId TEXT NOT NULL,
             message TEXT NOT NULL,
             date TEXT NOT NULL,
-            time TEXT NOT NULL,
             isRead BOOLEAN NOT NULL DEFAULT 0,
             FOREIGN KEY(chatId) REFERENCES DirectChat(id),
             FOREIGN KEY(userId) REFERENCES User(userId)
@@ -953,7 +952,6 @@ export class Database {
                         userId: row.userId,
                         message: row.message,
                         date: row.date,
-                        time: row.time,
                         isRead: row.isRead
                     }));
                     resolve(messages);
@@ -1128,9 +1126,9 @@ export class Database {
         });
     }
 
-    static async addMessage(chatId: number, userId: string, message: string, date: string, time: string): Promise<boolean> {
+    static async addMessage(chatId: number, userId: string, message: string, date: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            db.run(`INSERT INTO Message (chatId, userId, message, date, time) VALUES (?, ?, ?, ?, ?)`, [chatId, userId, message, date, time], (err) => {
+            db.run(`INSERT INTO Message (chatId, userId, message, date) VALUES (?, ?, ?, ?)`, [chatId, userId, message, date], (err) => {
                 if (err) {
                     reject(err);
                 } else {

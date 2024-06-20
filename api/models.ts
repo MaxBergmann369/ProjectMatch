@@ -85,7 +85,6 @@ export interface Message {
     userId: string;
     message: string;
     date: string;
-    time: string;
     isRead: boolean;
 }
 
