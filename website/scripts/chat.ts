@@ -269,8 +269,8 @@ async function loadChatMessages(id: number) {
             username = otherUsername;
         }
 
-        const time = message.date.split(" ")[4].substring(0, 5);
-        date = message.date.split(" ")[2] + " " + message.date.split(" ")[1] + " " + message.date.split(" ")[3];
+        date = new Date(message.date).toLocaleDateString();
+        const time = new Date(message.date).toLocaleTimeString().slice(0, 5);
 
         if(lastDate === "") {
             lastDate = date;
