@@ -1,6 +1,6 @@
 import {Database} from "../db";
 import {ValProject, ValUser} from "../validation";
-import {Ability, Like, Project, ProjectMember, User, View} from "../../../models";
+import {Ability, Project, User, View} from "../../../models";
 import {SystemNotification} from "../system-notifications";
 
 export class ProjectUtility {
