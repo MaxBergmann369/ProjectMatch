@@ -1,23 +1,25 @@
-import {Server} from "socket.io";
+import { Server, Socket } from "socket.io";
 
 export class SocketController {
+    private static io: Server;
 
-    private static onlineUser: number = 0;
-
-    get onlineUser(): number {
-        return this.onlineUser;
-    }
-    
     static initializeSocket(server: Server) {
-        server.on("connection", this.onConnection);
-        server.on("disconnect", this.onDisconnect);
+        SocketController.io = server;
+        server.on("connection", (socket) => this.onConnection(socket));
     }
-    
-    static onConnection(socket: any) {
-        SocketController.onlineUser++;
+
+    static onConnection(socket: Socket) {
+        console.log("User connected");
+        SocketController.io.emit('onlineUser', SocketController.io.engine.clientsCount);
+
+        socket.on("disconnect", () => this.onDisconnect());
     }
-    
-    static onDisconnect(socket: any) {
-        SocketController.onlineUser--;
+
+    static onDisconnect() {
+        console.log("User disconnected");
+        // Use a setTimeout to ensure the disconnect event has completed
+        setTimeout(() => {
+            SocketController.io.emit('onlineUser', SocketController.io.engine.clientsCount);
+        }, 100);
     }
 }

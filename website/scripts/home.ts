@@ -4,6 +4,7 @@ import {Project, User} from "./models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 import "./general";
+import {SocketClient} from "./socket-client";
 // this tells webpack to include the general.ts file in the bundle
 
 const authenticatedPromise = initKeycloak();
@@ -19,6 +20,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     client = new HttpClient();
+
+    const socketClient = SocketClient.getInstance();
+
+    socketClient.onOnlineUserUpdate((onlineUser) => {
+        // Update your element here with the new user count
+        console.log(onlineUser);
+    });
+
     window.addEventListener('beforeunload', async () => {
         await client.deleteData();
     });
