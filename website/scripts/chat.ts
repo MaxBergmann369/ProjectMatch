@@ -4,6 +4,7 @@ import {HttpClient} from "./server-client";
 import {TokenUser} from "./tokenUser";
 import "./general";
 import {SocketClient} from "./socket-client";
+import {renderChatNotificationIcon} from "./notifications";
 
 const authenticatedPromise = initKeycloak();
 
@@ -124,6 +125,8 @@ async function loadChatProfileButtons() {
                 }
 
                 await renderChatMessages(id);
+                await renderChatProfiles(true);
+                await renderChatNotificationIcon();
             }
         });
     }
@@ -350,6 +353,7 @@ async function sendMessage(chatId: number, message: string) {
     layer = 0;
 
     await renderChatMessages(chatId);
+    await renderChatNotificationIcon();
     scrollToBottom();
 }
 

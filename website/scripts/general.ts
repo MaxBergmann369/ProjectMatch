@@ -1,6 +1,7 @@
 import { keycloak} from "./keycloak";
 import {initNotifications} from "./notifications";
 import {TokenUser} from "./tokenUser";
+import {SocketClient} from "./socket-client";
 
 function insertGlobalHtmlElements() {
     document.head.insertAdjacentHTML('beforeend', `<link rel="icon" href="./resources/favicon.ico" />`);

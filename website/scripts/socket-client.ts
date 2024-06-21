@@ -25,4 +25,8 @@ export class SocketClient {
     onMessage(callback: (data: any) => void) {
         this.socket.on('message', callback);
     }
+
+    onNotification(callback: () => void) {
+        this.socket.on('notification', callback);
+    }
 }

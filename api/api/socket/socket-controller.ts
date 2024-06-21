@@ -34,6 +34,13 @@ export class SocketController {
         }
     }
 
+    static updateNotification(userId) {
+        const recipientSocketId = this.userSocketMap.get(userId);
+        if (recipientSocketId) {
+            this.io.to(recipientSocketId).emit('notification');
+        }
+    }
+
     static onDisconnect() {
         setTimeout(() => {
             SocketController.io.emit('onlineUser', SocketController.io.engine.clientsCount);
