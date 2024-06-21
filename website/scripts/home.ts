@@ -23,9 +23,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const socketClient = SocketClient.getInstance();
 
+    const onlineUserEl = document.getElementById('onlineUser');
+
     socketClient.onOnlineUserUpdate((onlineUser) => {
-        // Update your element here with the new user count
-        console.log(onlineUser);
+        onlineUserEl.innerText = `${onlineUser.toString()} online user`;
     });
 
     window.addEventListener('beforeunload', async () => {
