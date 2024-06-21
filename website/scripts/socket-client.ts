@@ -1,11 +1,14 @@
 import { io, Socket } from "socket.io-client";
+import {keycloak} from "./keycloak";
 
 export class SocketClient {
     private static instance: SocketClient;
     private socket: Socket;
+    private bearer = `Bearer ${keycloak.token}`;
 
     private constructor() {
         this.socket = io("http://localhost:3000");
+        this.socket.emit('register', this.bearer);
     }
 
     public static getInstance(): SocketClient {
@@ -17,5 +20,9 @@ export class SocketClient {
 
     onOnlineUserUpdate(callback: (data: number) => void) {
         this.socket.on('onlineUser', callback);
+    }
+
+    onMessage(callback: (data: any) => void) {
+        this.socket.on('message', callback);
     }
 }
