@@ -7,6 +7,7 @@ import {renderAbilities} from "./utils";
 
 const authenticatedPromise = initKeycloak();
 let abilities : Ability[];
+let tokenUser: TokenUser;
 document.addEventListener("DOMContentLoaded", async function () {
     const authenticated = await authenticatedPromise;
     if (!authenticated) {
@@ -14,7 +15,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         location.href = "index.html";
         return;
     }
-    const tokenUser = new TokenUser(keycloak.tokenParsed);
+
+    tokenUser = new TokenUser(keycloak.tokenParsed);
     const urlParams = new URLSearchParams(window.location.search);
     let id = urlParams.get("id");
     if (!id) {
@@ -95,8 +97,11 @@ async function loadUserUI(client: HttpClient, id: string, showEdit:boolean) {
         pfp.src = `${HttpClient.pfpUrl}/${user.pfp}`;
     }
     const editBtn = document.getElementById("editProfile");
+    const img = document.createElement("img");
+    editBtn.append(img);
 
     if (showEdit) {
+        editBtn.getElementsByTagName("img")[0].src = "./resources/pencil.svg";
         editBtn.addEventListener("click", async function () {
             const parent = document.getElementById("user");
             parent.classList.toggle("editing");
@@ -141,7 +146,18 @@ async function loadUserUI(client: HttpClient, id: string, showEdit:boolean) {
         });
     }
     else{
-        editBtn.style.display = "none";
+        editBtn.getElementsByTagName("img")[0].src = "./resources/profile/add-chat.svg";
+        editBtn.addEventListener("click", async function () {
+           const chatId = await client.addDirectChat(tokenUser.userId, user.userId);
+
+           let id = parseInt(chatId);
+
+           if(isNaN(id)){
+               id = (await client.getDirectChat(tokenUser.userId, user.userId)).id;
+           }
+
+           location.href = `chat.html?chat=${id}`;
+        });
     }
 
     const pfpInput = document.getElementById('pfpInput') as HTMLInputElement;
