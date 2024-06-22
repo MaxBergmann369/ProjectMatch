@@ -37,12 +37,12 @@ export class HttpClient {
         });
     }
 
-    async uploadImage(userId: string, image: Blob): Promise<string> {
+    async uploadImage(image: Blob): Promise<string> {
         const resizedImage = await this.resizeImage(image, 720, 720);
         const formData = new FormData();
         formData.append('image', resizedImage);
 
-        return await fetch(`${this.baseUrl}/user/${userId}/image`, {
+        return await fetch(`${this.baseUrl}/user/image`, {
             method: 'POST',
             headers: {
                 Authorization: this.bearer

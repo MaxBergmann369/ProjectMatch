@@ -215,13 +215,21 @@ export function createUserEndpoints() {
         }
     });
 
-    userRouter.post('/user/:userId/image', async (req , res ) => {
+    userRouter.post('/user/image', async (req , res ) => {
         let imagePath;
 
         try {
-            const userId = req.params.userId;
 
-            const user = await UserUtility.getUser(userId);
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser.userId === null) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const user = await UserUtility.getUser(tokenUser.userId);
 
             if (!user) {
                 console.log("User not found");
@@ -265,7 +273,7 @@ export function createUserEndpoints() {
 
                 const filename = req.file.filename;
 
-                if (await UserUtility.updateUser(userId, user.username, user.firstname, user.lastname, filename, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department)) {
+                if (await UserUtility.updateUser(tokenUser.userId, user.username, user.firstname, user.lastname, filename, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department)) {
                     res.status(200).send(filename);
                 } else {
                     fs.unlinkSync(imagePath);
