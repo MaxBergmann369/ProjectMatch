@@ -167,7 +167,7 @@ async function loadUserUI(client: HttpClient, id: string, showEdit:boolean) {
             reader.onload = async function(e) {
                 const imageBlob = new Blob([e.target.result], {type: 'image/jpeg'}); // Create a Blob object
 
-                const newPfp = await client.uploadImage(user.userId, imageBlob);
+                const newPfp = await client.uploadImage(imageBlob);
 
                 if (newPfp !== null) {
                     pfp.src = `${HttpClient.pfpUrl}/${newPfp}`;
