@@ -4,6 +4,8 @@ import {Project, User} from "./models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 import "./general";
+import {SocketClient} from "./socket-client";
+import {initRanking} from "./ranking";
 // this tells webpack to include the general.ts file in the bundle
 
 const authenticatedPromise = initKeycloak();
@@ -19,12 +21,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     client = new HttpClient();
+
+    const socketClient = SocketClient.getInstance();
+
+    const onlineUserEl = document.getElementById('onlineUser');
+
+    socketClient.onOnlineUserUpdate((onlineUser) => {
+        onlineUserEl.innerText = `${onlineUser.toString()} online user`;
+    });
+
     window.addEventListener('beforeunload', async () => {
         await client.deleteData();
     });
     console.log("User is authenticated");
     const user = new TokenUser(keycloak.tokenParsed);
 
+    await initRanking(user);
 
     const user1: User | null = await client.getUser(user.userId);
 
@@ -131,22 +143,22 @@ document.addEventListener("DOMContentLoaded", async function () {
             imageUrl: url,
             backImageUrl: backImage,
             onDismiss: () =>{
-                client.addView(project.id, user.userId);
+                client.addView(project.id);
                 appendNewCard();
             },
             onLike: () => {
                 like.style.animationPlayState = 'running';
                 like.classList.toggle('trigger');
-                client.addProjectMember(project.id, user.userId);
+                client.addProjectMember(project.id);
             },
             onDislike: () => {
                 dislike.style.animationPlayState = 'running';
                 dislike.classList.toggle('trigger');
             },
             onFavorite: () => {
-                client.addLike(project.id, user.userId).then((value) => {
+                client.addLike(project.id).then((value) => {
                     if (!value){
-                        client.deleteLike(project.id, user.userId);
+                        client.deleteLike(project.id);
                     }
                 });
             },

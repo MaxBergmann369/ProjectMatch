@@ -1,7 +1,8 @@
 import {Database} from "../db";
 import {ValProject, ValUser} from "../validation";
-import {Ability, Like, Project, ProjectMember, User, View} from "../../../models";
+import {Ability, Project, User, View} from "../../../models";
 import {SystemNotification} from "../system-notifications";
+import {SocketController} from "../../socket/socket-controller";
 
 export class ProjectUtility {
     /* region Base */
@@ -12,17 +13,14 @@ export class ProjectUtility {
             const date = new Date(Date.now());
 
             if(!ValProject.isValid(name, owId, thumbnail, description, date, links, maxMembers) || await this.getAmountOfProjects(ownerId) >= 50){
-                console.log("ProjectUtility: addProject: Project is not valid");
                 return -1;
             }
 
             if(!await ValUser.isUserValid(owId)) {
-                console.log("ProjectUtility: addProject: User is not valid");
                 return -1;
             }
 
             if(await this.alreadyProjectWithSameName(owId, name, 0)) {
-                console.log("ProjectUtility: addProject: Project with same name already exists");
                 return -1;
             }
 
@@ -32,14 +30,12 @@ export class ProjectUtility {
             description = description.replace(/</g, "&lt;");
             description = description.replace(/>/g, "&gt;");
 
-            const projectId:number = await Database.addProject(name, owId, thumbnail, description, date.toDateString(), links, maxMembers);
+            const projectId:number = await Database.addProject(name, owId, thumbnail, description, date.toUTCString(), links, maxMembers);
 
             if (projectId === null) {
-                console.log("ProjectUtility: addProject: Project was not created");
                 return -1;
             }
             if (!await Database.addProjectMember(owId, projectId, true)){
-                console.log("ProjectUtility: addProject: Owner was not added as member");
                 return -1;
             }
             return projectId;
@@ -207,11 +203,12 @@ export class ProjectUtility {
         }
     }
 
-    static async projectMemberAccepted(projectId: number, userId: string): Promise<boolean> {
+    static async projectMemberAccepted(projectId: number, ownerId: string, userId: string): Promise<boolean> {
         try {
+            const owId = ownerId.toLowerCase();
             const id = userId.toLowerCase();
 
-            if(!ValUser.isUserIdValid(id) || projectId < 1) {
+            if(!ValUser.isUserIdValid(id) || !ValUser.isUserIdValid(owId) || projectId < 1) {
                 return false;
             }
 
@@ -221,7 +218,7 @@ export class ProjectUtility {
                 return false;
             }
 
-            if(await this.isUserOwnerOfProject(id, projectId)) {
+            if(!(await this.isUserOwnerOfProject(owId, projectId))) {
                 return false;
             }
 
@@ -237,7 +234,7 @@ export class ProjectUtility {
 
             await SystemNotification.projectAccepted(userId, projectId);
 
-            return Database.acceptProjectMember(id, projectId);
+            return await Database.acceptProjectMember(id, projectId);
         }
         catch (e) {
             return false;
@@ -272,15 +269,16 @@ export class ProjectUtility {
         }
     }
 
-    static async deleteProjectMember(projectId: number, userId: string): Promise<boolean> {
+    static async deleteProjectMember(projectId: number, ownerId:string, userId: string): Promise<boolean> {
         try {
+            const owId = ownerId.toLowerCase();
             const id = userId.toLowerCase();
 
             if(!ValUser.isUserIdValid(id)) {
                 return false;
             }
 
-            if(await this.isUserOwnerOfProject(id, projectId)) {
+            if(!(await this.isUserOwnerOfProject(owId, projectId))) {
                 return false;
             }
 
@@ -308,7 +306,12 @@ export class ProjectUtility {
                 return false;
             }
 
-            return await Database.addLike(id, projectId);
+            if(await Database.addLike(id, projectId)) {
+                await SocketController.onLike(projectId);
+                return true;
+            }
+
+            return false;
         }
         catch (e) {
             return false;
@@ -362,7 +365,12 @@ export class ProjectUtility {
                 return false;
             }
 
-            return await Database.deleteLike(id, projectId);
+            if(await Database.deleteLike(id, projectId)) {
+                await SocketController.onLike(projectId);
+                return true;
+            }
+
+            return false;
         }
         catch (e) {
             return false;
@@ -384,7 +392,12 @@ export class ProjectUtility {
                 return false;
             }
 
-            return await Database.addView(id, projectId);
+            if(await Database.addView(id, projectId)) {
+                await SocketController.onView(projectId);
+                return true;
+            }
+
+            return false;
         }
         catch (e) {
             return false;
@@ -447,7 +460,7 @@ export class ProjectUtility {
 
     static async deleteAbilityFromProject(projectId: number, abilityId: number, userId:string): Promise<boolean> {
         try {
-            if (!await ProjectUtility.isUserOwnerOfProject(userId, projectId)){
+            if (!(await ProjectUtility.isUserOwnerOfProject(userId, projectId))){
                 return false;
             }
             return await Database.deleteProjectAbility(projectId, abilityId);

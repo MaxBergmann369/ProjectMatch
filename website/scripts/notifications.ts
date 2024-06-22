@@ -1,6 +1,8 @@
 import {HttpClient} from "./server-client";
 import {TokenUser} from "./tokenUser";
 import {Notification} from "./models";
+import {SocketClient} from "./socket-client";
+import {keycloak} from "./keycloak";
 
 let client: HttpClient = null;
 let user: TokenUser = null;
@@ -17,6 +19,22 @@ export async function initNotifications(tokenUser: TokenUser) {
 
     await renderNotificationIcons();
 
+    const socketClient = SocketClient.getInstance();
+
+    socketClient.onNotification(() => {
+        renderNotificationIcons().then(() => {
+            addEventListener();
+        });
+    });
+
+    socketClient.onMessage(async () => {
+        await renderChatNotificationIcon();
+    });
+
+    addEventListener();
+}
+
+function addEventListener() {
     const notifications = document.getElementById('notifications');
     const notificationBox = document.getElementById('notification-box');
 
@@ -28,6 +46,7 @@ export async function initNotifications(tokenUser: TokenUser) {
     });
 
     notifications.addEventListener('click', async () => {
+        console.log(clicked);
         if(clicked) {
             notificationBox.style.display = 'none';
             clicked = false;
@@ -102,19 +121,28 @@ function notificationTypes(text: string): string {
     }
 }
 
+export async function renderChatNotificationIcon() {
+    const chat = document.getElementById('chatNavButton');
+
+    const unread = await client.hasUnreadMessages(user.userId);
+    console.log(unread)
+
+    const icon = document.getElementById('chat-icon');
+
+    if (unread && chat !== null && icon === null) {
+        chat.innerHTML += '<img src="./resources/icons/badge-11.ico" id="chat-icon" class="chat-notification-icon" alt="new Notifaction">';
+    }
+    else {
+        if (icon !== null) {
+            icon.remove();
+        }
+    }
+}
+
 async function renderNotificationIcons() {
     await loadNotifications();
 
-    const chat = document.getElementById('chatNavButton');
-
     const notificationBtn = document.getElementById('notification-btn');
-
-    const unread = await client.hasUnreadMessages(user.userId);
-
-    if (unread && chat !== null) {
-        chat.classList.remove('chat-notification-icon');
-        chat.innerHTML += '<img src="./resources/icons/badge-11.ico" class="chat-notification-icon" alt="new Notifaction">';
-    }
 
     if(notificationsLoaded === undefined) {
         return;

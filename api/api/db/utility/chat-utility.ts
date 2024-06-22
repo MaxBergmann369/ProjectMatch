@@ -1,6 +1,7 @@
 import {Database} from "../db";
 import {ValMessage, ValUser} from "../validation";
 import {DirectChat, Message} from "../../../models";
+import {SocketController} from "../../socket/socket-controller";
 
 export class ChatUtility {
     /* region Chat */
@@ -148,7 +149,13 @@ export class ChatUtility {
             message = message.replace(/</g, "&lt;");
             message = message.replace(/>/g, "&gt;");
 
-            return await Database.addMessage(chatId, id, message, date);
+            if(await Database.addMessage(chatId, id, message, date)) {
+                const otherUserId = chat.userId === id ? chat.otherUserId : chat.userId;
+                await SocketController.addMessage(chatId, otherUserId);
+                return true;
+            }
+
+            return false;
         }
         catch (e) {
             return false;

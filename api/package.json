@@ -8,6 +8,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "socket.io": "^4.7.5",
     "cors": "^2.8.5",
     "crypto-browserify": "^3.12.0",
     "crypto-js": "^4.2.0",

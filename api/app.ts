@@ -8,6 +8,8 @@ import {createUserEndpoints} from "./api/router/user-router";
 import {createProjectEndpoints} from "./api/router/project-router";
 import {createChatEndpoints} from "./api/router/chat-router";
 import helmet from "helmet";
+import {Server} from "socket.io";
+import {SocketController} from "./api/socket/socket-controller";
 
 const app = express();
 
@@ -46,11 +48,18 @@ app.use('/api',keycloak.protect(), chatRouter);
 
 app.use(express.static('public'));
 
-const server = http.createServer(app);
 const port: number = 3000;
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:63342"
+    }
+});
 
 Database.createTables();
 Database.initData();
+
+SocketController.initializeSocket(io);
 
 server.listen(port, () => {
     console.log(`Server listening on port http://localhost:${port}`);

@@ -3,6 +3,8 @@ import {DirectChat, Message, User} from "./models";
 import {HttpClient} from "./server-client";
 import {TokenUser} from "./tokenUser";
 import "./general";
+import {SocketClient} from "./socket-client";
+import {renderChatNotificationIcon} from "./notifications";
 
 const authenticatedPromise = initKeycloak();
 
@@ -32,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         await renderChatProfiles();
-        manageMessages();
+        await manageMessages();
         await addEventListener();
 
         // Get the chat parameter from the URL
@@ -123,6 +125,8 @@ async function loadChatProfileButtons() {
                 }
 
                 await renderChatMessages(id);
+                await renderChatProfiles(true);
+                await renderChatNotificationIcon();
             }
         });
     }
@@ -193,9 +197,10 @@ async function loadChatButtons() {
 }
 
 async function manageMessages() {
-    // eslint-disable-next-line no-constant-condition
-    while(true) {
-        if(chatId !== -1 && layer === 0) {
+    const socketClient = SocketClient.getInstance();
+
+    socketClient.onMessage(async (socketChatId) => {
+        if(chatId !== -1 && layer === 0 && socketChatId == chatId) {
             await renderChatMessages(chatId);
             await client.updateDirectChat(chatId, user.userId);
         }
@@ -203,9 +208,7 @@ async function manageMessages() {
         if(!searching) {
             await renderChatProfiles();
         }
-
-        await new Promise(resolve => setTimeout(resolve, 5000));
-    }
+    });
 }
 
 const chatMessages = new Map<string, string[]>();
@@ -350,6 +353,7 @@ async function sendMessage(chatId: number, message: string) {
     layer = 0;
 
     await renderChatMessages(chatId);
+    await renderChatNotificationIcon();
     scrollToBottom();
 }
 
