@@ -2,6 +2,7 @@ import express from "express";
 import {ProjectUtility} from "../db/utility/project-utility";
 import {EndPoints} from "../db/validation";
 import {ProjectAlgo} from "../algorithm/project-recomendation";
+import {Database} from "../db/db";
 
 const projectRouter = express.Router();
 
@@ -11,6 +12,14 @@ export function createProjectEndpoints() {
     projectRouter.post('/projects', async (req, res) => {
         try {
             const {name, ownerId, thumbnail, description, links, maxMembers} = req.body;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== ownerId.toLowerCase()){
+                res.sendStatus(400);
+                return;
+            }
 
             const projectId = await ProjectUtility.addProject(name, ownerId, thumbnail, description, links, maxMembers);
 
@@ -41,6 +50,21 @@ export function createProjectEndpoints() {
                 res.sendStatus(400);
             }
         } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
+    projectRouter.get('/projects/top10', async (req, res) => {
+        try {
+            const projects = await Database.getTop10Projects();
+
+            if (projects !== null) {
+                res.status(200).send(projects);
+            } else {
+                res.sendStatus(404);
+            }
+        }
+        catch (e) {
             res.sendStatus(400);
         }
     });
@@ -94,6 +118,14 @@ export function createProjectEndpoints() {
         try {
             const {id, name, ownerId, thumbnail, description, links, maxMembers} = req.body;
 
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== ownerId.toLowerCase()){
+                res.sendStatus(400);
+                return;
+            }
+
             if (await ProjectUtility.updateProject(id, name, ownerId, thumbnail, description, links, maxMembers)) {
                 res.sendStatus(200);
             } else {
@@ -104,19 +136,21 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.delete('/projects/:userId/:projId', async (req, res) => {
+    projectRouter.delete('/projects/:projId', async (req, res) => {
         try {
-            const userId = req.params.userId;
             const projectId = req.params.projId;
 
             const id = parseInt(projectId);
 
-            if (isNaN(id)) {
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+            if (tokenUser.userId === null || isNaN(id)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if (await ProjectUtility.deleteProject(userId, id)) {
+            if (await ProjectUtility.deleteProject(tokenUser.userId, id)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -152,14 +186,17 @@ export function createProjectEndpoints() {
 
     projectRouter.post('/projects/members/:projId', async (req, res) => {
         try {
-            const {userId} = req.body;
             const projectId = parseInt(req.params.projId);
-            if (isNaN(projectId)) {
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+            if (tokenUser.userId === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if(await ProjectUtility.addMemberRequest(projectId, userId)) {
+            if(await ProjectUtility.addMemberRequest(projectId, tokenUser.userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -207,7 +244,9 @@ export function createProjectEndpoints() {
         } catch (e) {
             res.sendStatus(400);
         }
-    });projectRouter.get('/users/members/:userId/:isAccepted', async (req, res) => {
+    });
+
+    projectRouter.get('/users/members/:userId/:isAccepted', async (req, res) => {
         try {
             const userId = req.params.userId;
             const isAccepted = req.params.isAccepted === "true";
@@ -232,12 +271,12 @@ export function createProjectEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || isNaN(projectId)) {
+            if (tokenUser.userId === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if (await ProjectUtility.projectMemberAccepted(projectId, userId)) {
+            if (await ProjectUtility.projectMemberAccepted(projectId, tokenUser.userId, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -256,12 +295,12 @@ export function createProjectEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || isNaN(projectId)) {
+            if (tokenUser.userId === null || isNaN(projectId)){
                 res.sendStatus(400);
                 return;
             }
 
-            if (await ProjectUtility.deleteProjectMember(projectId, userId)) {
+            if (await ProjectUtility.deleteProjectMember(projectId, tokenUser.userId, userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -277,7 +316,7 @@ export function createProjectEndpoints() {
 
     projectRouter.post('/views', async (req, res) => {
         try {
-            const {projectId, userId} = req.body;
+            const {projectId} = req.body;
 
             const id = parseInt(projectId);
 
@@ -285,12 +324,12 @@ export function createProjectEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(id)) {
+            if (tokenUser.userId === null || isNaN(id)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if (await ProjectUtility.addView(id, userId)) {
+            if (await ProjectUtility.addView(id, tokenUser.userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -331,7 +370,7 @@ export function createProjectEndpoints() {
 
     projectRouter.post('/likes', async (req, res) => {
         try {
-            const {projectId, userId} = req.body;
+            const {projectId} = req.body;
 
             const id = parseInt(projectId);
 
@@ -339,12 +378,12 @@ export function createProjectEndpoints() {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(id)) {
+            if (tokenUser.userId === null || isNaN(id)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if(await ProjectUtility.addLike(id, userId)) {
+            if(await ProjectUtility.addLike(id, tokenUser.userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
@@ -403,21 +442,20 @@ export function createProjectEndpoints() {
         }
     });
 
-    projectRouter.delete('/likes/:projId/:userId', async (req, res) => {
+    projectRouter.delete('/likes/:projId', async (req, res) => {
         try {
             const projectId = parseInt(req.params.projId);
-            const userId = req.params.userId;
 
             const authHeader = req.headers.authorization;
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(projectId)) {
+            if (tokenUser.userId === null || isNaN(projectId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if(await ProjectUtility.deleteLike(projectId, userId)) {
+            if(await ProjectUtility.deleteLike(projectId, tokenUser.userId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);

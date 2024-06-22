@@ -21,7 +21,7 @@ export async function initRanking(tokenUser: TokenUser) {
     ranking.addEventListener('click', async () => {
         if(!clicked) {
             background = createRankingCard();
-            await addContentToTable();
+            await addTableContent();
             background.style.display = 'flex';
             clicked = true;
         }
@@ -93,10 +93,11 @@ function createRankingCard() {
     return background;
 }
 
-async function addContentToTable() {
+async function addTableContent() {
     const viewTableContent = document.getElementById('viewTableContent');
     const likeTableContent = document.getElementById('likeTableContent');
     const memberTableContent = document.getElementById('memberTableContent');
 
-
+    const projects = await client.getTop10Projects();
+    console.log(projects);
 }

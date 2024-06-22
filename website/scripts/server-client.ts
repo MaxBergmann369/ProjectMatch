@@ -258,6 +258,16 @@ export class HttpClient {
 
     }
 
+    async getTop10Projects() {
+        return await fetch(`${this.baseUrl}/projects/top10`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.json() : null);
+    }
+
     async deleteData() {
         return await fetch(`${this.baseUrl}/deleteData`, {
             method: 'DELETE',
@@ -280,8 +290,8 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async deleteProject(projectId: number, userId: string) {
-        return await fetch(`${this.baseUrl}/projects/${userId}/${projectId}`, {
+    async deleteProject(projectId: number) {
+        return await fetch(`${this.baseUrl}/projects/${projectId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
@@ -290,16 +300,13 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async addProjectMember(projectId: number, userId: string) {
+    async addProjectMember(projectId: number) {
         return await fetch(`${this.baseUrl}/projects/members/${projectId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: this.bearer
-            },
-            body: JSON.stringify({
-                userId: userId
-            })
+            }
         })
             .then(response => response.text());
     }
@@ -355,7 +362,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async addView(projectId: number, userId: string) {
+    async addView(projectId: number) {
         return await fetch(`${this.baseUrl}/views`, {
             method: 'POST',
             headers: {
@@ -363,8 +370,7 @@ export class HttpClient {
                 Authorization: this.bearer
             },
             body: JSON.stringify({
-                projectId: projectId,
-                userId: userId
+                projectId: projectId
             })
         })
             .then(response => response.ok);
@@ -380,7 +386,7 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async addLike(projectId: number, userId: string) {
+    async addLike(projectId: number) {
         return await fetch(`${this.baseUrl}/likes`, {
             method: 'POST',
             headers: {
@@ -388,8 +394,7 @@ export class HttpClient {
                 Authorization: this.bearer
             },
             body: JSON.stringify({
-                projectId: projectId,
-                userId: userId
+                projectId: projectId
             })
         })
             .then(response => response.ok);
@@ -415,8 +420,8 @@ export class HttpClient {
             .then(response => response.ok);
     }
 
-    async deleteLike(projectId: number, userId: string) {
-        return await fetch(`${this.baseUrl}/likes/${projectId}/${userId}`, {
+    async deleteLike(projectId: number) {
+        return await fetch(`${this.baseUrl}/likes/${projectId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
