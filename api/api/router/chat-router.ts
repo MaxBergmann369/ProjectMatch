@@ -2,7 +2,6 @@ import express from "express";
 import {ChatUtility} from "../db/utility/chat-utility";
 import {EndPoints} from "../db/validation";
 import {SystemNotification} from "../db/system-notifications";
-import {SocketController} from "../socket/socket-controller";
 
 const chatRouter = express.Router();
 

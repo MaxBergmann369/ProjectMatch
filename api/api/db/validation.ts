@@ -180,13 +180,7 @@ export class ValMessage {
     }
 
     private static containsForbiddenWords(message: string): boolean {
-        const forbiddenWords: string[] = ["admin", "moderator", "user", "root", "guest", "login", "register", "password", "username", "firstname", "lastname", "email", "birthdate", "permissions"];
-
-        if(!checkInvalidCharsChat(message)) {
-            return true;
-        }
-
-        return forbiddenWords.some(word => message.toLowerCase().includes(word));
+        return !checkInvalidCharsChat(message);
     }
 }
 
