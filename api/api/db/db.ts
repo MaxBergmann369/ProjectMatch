@@ -492,7 +492,7 @@ export class Database {
             }),
             //get top 10 projects by memberCnt and date of creation
             new Promise<Project[]>((resolve, reject) => {
-                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM ProjectMember WHERE projectId = project.id) DESC, dateOfCreation ASC LIMIT 10`, (err, rows: Project[]) => {
+                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM ProjectMember WHERE projectId = project.id) DESC, dateOfCreation DESC LIMIT 10`, (err, rows: Project[]) => {
                     if (err) {
                         reject(err);
                     } else {
@@ -1542,12 +1542,21 @@ export class Database {
     }
 
     static async deleteProjectMember(userId: string, projectId: number): Promise<boolean> {
+        //return isAccepted
         return new Promise((resolve, reject) => {
-            db.run(`DELETE FROM ProjectMember WHERE userId = ? AND projectId = ?`, [userId, projectId], (err) => {
+            db.get(`SELECT isAccepted FROM ProjectMember WHERE userId = ? AND projectId = ?`, [userId, projectId], (err, row: ProjectMember) => {
                 if (err) {
                     reject(err);
+                } else if (!row) {
+                    reject(new Error("ProjectMember not found"));
                 } else {
-                    resolve(true);
+                    db.run(`DELETE FROM ProjectMember WHERE userId = ? AND projectId = ?`, [userId, projectId], (deleteErr) => {
+                        if (deleteErr) {
+                            reject(deleteErr);
+                        } else {
+                            resolve(row.isAccepted);
+                        }
+                    });
                 }
             });
         });
