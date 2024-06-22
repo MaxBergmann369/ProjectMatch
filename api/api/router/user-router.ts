@@ -27,7 +27,13 @@ const storage = multer.diskStorage({
         cb(null, path.join(__dirname, pfpPath));
     },
     filename: function (req, file, cb) {
-        cb(null, req.params.userId + '-' + Date.now());
+        const authHeader = req.headers.authorization;
+        const tokenUser = EndPoints.getToken(authHeader);
+        if (tokenUser === null) {
+            cb(new Error('Invalid token'), null);
+        } else {
+            cb(null, tokenUser.userId + '-' + Date.now());
+        }
     }
 });
 multer({
@@ -215,19 +221,20 @@ export function createUserEndpoints() {
         }
     });
 
-    userRouter.post('/user/:userId/image', async (req , res ) => {
+    userRouter.post('/user/image', async (req , res ) => {
         let imagePath;
 
         try {
-            const userId = req.params.userId;
-            const tokenUser = EndPoints.getToken(req.headers.authorization);
+            const authHeader = req.headers.authorization;
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
-                res.sendStatus(403);
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser.userId === null) {
+                res.sendStatus(400);
                 return;
             }
 
-            const user = await UserUtility.getUser(userId);
+            const user = await UserUtility.getUser(tokenUser.userId);
 
             if (!user) {
                 console.log("User not found");
@@ -271,7 +278,7 @@ export function createUserEndpoints() {
 
                 const filename = req.file.filename;
 
-                if (await UserUtility.updateUser(userId, user.username, user.firstname, user.lastname, filename, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department)) {
+                if (await UserUtility.updateUser(tokenUser.userId, user.username, user.firstname, user.lastname, filename, user.email, user.clazz, user.birthdate, user.biografie, user.permissions, user.department)) {
                     res.status(200).send(filename);
                 } else {
                     fs.unlinkSync(imagePath);
