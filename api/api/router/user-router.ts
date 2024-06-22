@@ -220,6 +220,12 @@ export function createUserEndpoints() {
 
         try {
             const userId = req.params.userId;
+            const tokenUser = EndPoints.getToken(req.headers.authorization);
+
+            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase()) {
+                res.sendStatus(403);
+                return;
+            }
 
             const user = await UserUtility.getUser(userId);
 

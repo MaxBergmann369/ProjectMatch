@@ -1,9 +1,10 @@
-import {User, Project, Message, DirectChat, Ability, Notification} from "./models";
+import {Ability, DirectChat, Message, Notification, Project, User} from "./models";
 import {keycloak} from "./keycloak";
+import {Image} from 'image-js';
 
 export class HttpClient {
-
-    static baseBaseUrl = "http://localhost:3000";
+    // static baseBaseUrl = "http://localhost:3000";
+    static baseBaseUrl = "https://pm.hoellerl.dev";
     static pfpUrl = `${HttpClient.baseBaseUrl}/pfp`;
     baseUrl = `${HttpClient.baseBaseUrl}/api`;
     bearer = `Bearer ${keycloak.token}`;
@@ -21,20 +22,11 @@ export class HttpClient {
     }
 
     async resizeImage(image: Blob, maxWidth: number, maxHeight: number): Promise<Blob> {
-        return new Promise((resolve, reject) => {
-            let img = document.createElement('img');
-            img.onload = () => {
-                let canvas = document.createElement('canvas');
-                let ctx = canvas.getContext('2d');
-                let ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
-                canvas.width = img.width * ratio;
-                canvas.height = img.height * ratio;
-                ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-                canvas.toBlob(resolve, 'image/jpeg', 0.95);
-            };
-            img.onerror = reject;
-            img.src = URL.createObjectURL(image);
-        });
+        const arrayBuffer = await image.arrayBuffer();
+        let img = await Image.load(arrayBuffer);
+        let ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
+        img = img.resize({ width: img.width * ratio, height: img.height * ratio });
+        return img.toBlob(image.type,0.95);
     }
 
     async uploadImage(userId: string, image: Blob): Promise<string> {
