@@ -1,16 +1,14 @@
 import { Server, Socket } from "socket.io";
 import {EndPoints} from "../db/validation";
-import {Project} from "../../models";
 import {Database} from "../db/db";
 
 export class SocketController {
     private static io: Server;
     private static userSocketMap = new Map<string, string>();
-    private static rankingData: Project[][] = [];
+    private static userProjectMap = new Map<string, number>();
 
     static async initializeSocket(server: Server) {
         SocketController.io = server;
-        SocketController.rankingData = await Database.getTop10Projects();
         server.on("connection", (socket) => this.onConnection(socket));
     }
 
@@ -23,7 +21,7 @@ export class SocketController {
                 return;
             }
 
-            this.userSocketMap.set(tokenUser.userId, socket.id);
+            SocketController.userSocketMap.set(tokenUser.userId, socket.id);
         });
 
         SocketController.io.emit('onlineUser', SocketController.io.engine.clientsCount);
@@ -39,17 +37,38 @@ export class SocketController {
     }
 
     static updateNotification(userId) {
-        const recipientSocketId = this.userSocketMap.get(userId);
+        const recipientSocketId = SocketController.userSocketMap.get(userId);
         if (recipientSocketId) {
             SocketController.io.to(recipientSocketId).emit('notification');
         }
     }
 
-    static async updateRanking(projectId: number, table: string) {
-        if(this.rankingData.some((project) => project.some((p) => p.id === projectId))) {
-            SocketController.io.emit('ranking', projectId, table);
-            SocketController.rankingData = await Database.getTop10Projects();
-        }
+    static onGetProject(userId: string, projectId: number) {
+        SocketController.userProjectMap.set(userId, projectId);
+    }
+
+    static async onLike(projectId: number) {
+        const likes = await Database.getLikesByProjectId(projectId);
+        SocketController.userProjectMap.forEach((value, key) => {
+            if (value === projectId) {
+                const recipientSocketId = SocketController.userSocketMap.get(key);
+                if (recipientSocketId) {
+                    SocketController.io.to(recipientSocketId).emit('like', likes);
+                }
+            }
+        });
+    }
+
+    static async onView(projectId: number) {
+        const views = await Database.getViewsByProjectId(projectId);
+        SocketController.userProjectMap.forEach((value, key) => {
+            if (value === projectId) {
+                const recipientSocketId = SocketController.userSocketMap.get(key);
+                if (recipientSocketId) {
+                    SocketController.io.to(recipientSocketId).emit('view', views);
+                }
+            }
+        });
     }
 
     static onDisconnect() {

@@ -3,6 +3,7 @@ import {ProjectUtility} from "../db/utility/project-utility";
 import {EndPoints} from "../db/validation";
 import {ProjectAlgo} from "../algorithm/project-recomendation";
 import {Database} from "../db/db";
+import {SocketController} from "../socket/socket-controller";
 
 const projectRouter = express.Router();
 
@@ -37,10 +38,16 @@ export function createProjectEndpoints() {
         try {
             const id = parseInt(req.params.projId);
 
-            if (isNaN(id)) {
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser.userId === null || isNaN(id)) {
                 res.sendStatus(400);
                 return;
             }
+
+            SocketController.onGetProject(tokenUser.userId, id);
 
             const project = await ProjectUtility.getProject(id);
 

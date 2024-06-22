@@ -3,6 +3,7 @@ import {initKeycloak, keycloak} from "./keycloak";
 import {HttpClient} from "./server-client";
 import {Ability, Project, User} from "./models";
 import {TokenUser} from "./tokenUser";
+import {SocketClient} from "./socket-client";
 const authenticatedPromise = initKeycloak();
 
 let client: HttpClient;
@@ -69,6 +70,18 @@ document.addEventListener("DOMContentLoaded", async() => {
     const favsElement = document.getElementById("favcount");
     viewsElement.textContent = views;
     favsElement.textContent = favs;
+
+    const socketClient = SocketClient.getInstance();
+
+    socketClient.onView(async (view: number) => {
+        const viewsElement = document.getElementById("viewcount");
+        viewsElement.textContent = view.toString();
+    });
+
+    socketClient.onLike(async (like: number) => {
+        const favsElement = document.getElementById("favcount");
+        favsElement.textContent = like.toString();
+    });
 
     if(project.ownerId === user.userId) {
         await handleProjectOwner(project);

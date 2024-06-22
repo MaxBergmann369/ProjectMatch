@@ -234,12 +234,7 @@ export class ProjectUtility {
 
             await SystemNotification.projectAccepted(userId, projectId);
 
-            if(await Database.acceptProjectMember(id, projectId)) {
-                await SocketController.updateRanking(projectId, 'member');
-                return true;
-            }
-
-            return false;
+            return await Database.acceptProjectMember(id, projectId);
         }
         catch (e) {
             return false;
@@ -287,11 +282,7 @@ export class ProjectUtility {
                 return false;
             }
 
-            if(await Database.deleteProjectMember(id, projectId)) {
-                await SocketController.updateRanking(projectId, 'member');
-            }
-
-            return true;
+            return await Database.deleteProjectMember(id, projectId);
         }
         catch (e) {
             return false;
@@ -316,7 +307,7 @@ export class ProjectUtility {
             }
 
             if(await Database.addLike(id, projectId)) {
-                await SocketController.updateRanking(projectId, 'like');
+                await SocketController.onLike(projectId);
                 return true;
             }
 
@@ -375,7 +366,7 @@ export class ProjectUtility {
             }
 
             if(await Database.deleteLike(id, projectId)) {
-                await SocketController.updateRanking(projectId, 'like');
+                await SocketController.onLike(projectId);
                 return true;
             }
 
@@ -402,7 +393,7 @@ export class ProjectUtility {
             }
 
             if(await Database.addView(id, projectId)) {
-                await SocketController.updateRanking(projectId, 'view');
+                await SocketController.onView(projectId);
                 return true;
             }
 

@@ -21,15 +21,16 @@ export async function initRanking(tokenUser: TokenUser) {
 
     const ranking = document.getElementById('rankingBtn');
 
+    window.addEventListener('click', async (event) => {
+        if (!background.contains(event.target as Node) && event.target !== background) {
+            background.style.display = 'none';
+            clicked = false;
+        }
+    });
+
     ranking.addEventListener('click', async () => {
         if(!clicked) {
             await addTableContent();
-
-            const socketClient = SocketClient.getInstance();
-
-            socketClient.onRankingUpdate(async (projectId: number, table: string) => {
-                await updateTableContent(projectId, table);
-            });
 
             background.style.display = 'flex';
             clicked = true;
@@ -47,6 +48,19 @@ function createRankingCard() {
     const background = document.createElement('div');
     background.classList.add('background');
     background.style.display = 'none';
+
+    const refresh = document.createElement('button');
+    refresh.classList.add('refresh');
+    const img = document.createElement('img');
+    img.src = "resources/refresh.svg";
+    img.alt = "Refresh";
+    refresh.appendChild(img);
+
+    refresh.addEventListener('click', async () => {
+        await addTableContent();
+    });
+
+    background.appendChild(refresh);
 
     //title
     const title = document.createElement('h1');
@@ -100,32 +114,6 @@ function createRankingCard() {
     view.appendChild(background);
 
     return background;
-}
-
-async function updateTableContent(projectId: number, table: string) {
-    let id = '';
-    let projectElement;
-
-
-    switch (table) {
-        case 'view':
-            id = `v${String(projectId)}`;
-            projectElement = document.getElementById(id);
-            projectElement.getElementsByTagName('span')[0].innerHTML = `${await client.getViews(projectId)}`;
-            break;
-        case 'like':
-            id = `l${String(projectId)}`;
-            projectElement = document.getElementById(id);
-
-            projectElement.getElementsByTagName('span')[0].innerHTML = `${await client.getLikes(projectId)}`;
-            break;
-        case 'member':
-            id = `m${String(projectId)}`;
-            projectElement = document.getElementById(id);
-            const project = await client.getProject(projectId);
-            projectElement.getElementsByTagName('span')[0].innerHTML = `${(await client.getProjectMembers(projectId)).length}/${project.maxMembers}`;
-            break;
-    }
 }
 
 async function addTableContent() {

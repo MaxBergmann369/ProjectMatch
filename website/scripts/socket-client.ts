@@ -30,7 +30,11 @@ export class SocketClient {
         this.socket.on('notification', callback);
     }
 
-    onRankingUpdate(callback: (projectId: number, table: string) => void) {
-        this.socket.on('ranking', callback);
+    onView(callback: (view: number) => void) {
+        this.socket.on('view', callback);
+    }
+
+    onLike(callback: (like: number) => void) {
+        this.socket.on('like', callback);
     }
 }
