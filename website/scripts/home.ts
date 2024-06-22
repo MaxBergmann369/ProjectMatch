@@ -5,6 +5,7 @@ import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 import "./general";
 import {SocketClient} from "./socket-client";
+import {initRanking} from "./ranking";
 // this tells webpack to include the general.ts file in the bundle
 
 const authenticatedPromise = initKeycloak();
@@ -35,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.log("User is authenticated");
     const user = new TokenUser(keycloak.tokenParsed);
 
+    await initRanking(user);
 
     const user1: User | null = await client.getUser(user.userId);
 
