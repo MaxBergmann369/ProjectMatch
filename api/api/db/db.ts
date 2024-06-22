@@ -448,6 +448,73 @@ export class Database {
         });
     }
 
+    static async getTop10Projects(): Promise<Project[][]> {
+        const promises = [
+            //get top 10 projects by views
+            new Promise<Project[]>((resolve, reject) => {
+                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM View WHERE projectId = Project.id) DESC LIMIT 10`, (err, rows: Project[]) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        const projects: Project[] = rows.map(row => ({
+                            id: row.id,
+                            name: row.name,
+                            ownerId: row.ownerId,
+                            thumbnail: row.thumbnail,
+                            description: row.description,
+                            dateOfCreation: new Date(row.dateOfCreation),
+                            links: row.links,
+                            maxMembers: row.maxMembers
+                        }));
+                        resolve(projects);
+                    }
+                });
+            }),
+            //get top 10 projects by likes
+            new Promise<Project[]>((resolve, reject) => {
+                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM Like WHERE projectId = Project.id) DESC LIMIT 10`, (err, rows: Project[]) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        const projects: Project[] = rows.map(row => ({
+                            id: row.id,
+                            name: row.name,
+                            ownerId: row.ownerId,
+                            thumbnail: row.thumbnail,
+                            description: row.description,
+                            dateOfCreation: new Date(row.dateOfCreation),
+                            links: row.links,
+                            maxMembers: row.maxMembers
+                        }));
+                        resolve(projects);
+                    }
+                });
+            }),
+            //get top 10 projects by memberCnt and date of creation
+            new Promise<Project[]>((resolve, reject) => {
+                db.all(`SELECT * FROM Project ORDER BY maxMembers DESC, dateOfCreation DESC LIMIT 10`, (err, rows: Project[]) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        const projects: Project[] = rows.map(row => ({
+                            id: row.id,
+                            name: row.name,
+                            ownerId: row.ownerId,
+                            thumbnail: row.thumbnail,
+                            description: row.description,
+                            dateOfCreation: new Date(row.dateOfCreation),
+                            links: row.links,
+                            maxMembers: row.maxMembers
+                        }));
+                        resolve(projects);
+                    }
+                });
+            })
+        ];
+
+        return Promise.all(promises);
+    }
+
     static async isUserOwnerOfProject(userId: string, projectId: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.get(`SELECT * FROM Project WHERE id = ? AND ownerId = ?`, [projectId, userId], (err, row: Project) => {

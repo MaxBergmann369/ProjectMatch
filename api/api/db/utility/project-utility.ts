@@ -207,11 +207,12 @@ export class ProjectUtility {
         }
     }
 
-    static async projectMemberAccepted(projectId: number, userId: string): Promise<boolean> {
+    static async projectMemberAccepted(projectId: number, ownerId: string, userId: string): Promise<boolean> {
         try {
+            const owId = ownerId.toLowerCase();
             const id = userId.toLowerCase();
 
-            if(!ValUser.isUserIdValid(id) || projectId < 1) {
+            if(!ValUser.isUserIdValid(id) || !ValUser.isUserIdValid(owId) || projectId < 1) {
                 return false;
             }
 
@@ -221,7 +222,7 @@ export class ProjectUtility {
                 return false;
             }
 
-            if(await this.isUserOwnerOfProject(id, projectId)) {
+            if(!(await this.isUserOwnerOfProject(owId, projectId))) {
                 return false;
             }
 
@@ -272,15 +273,16 @@ export class ProjectUtility {
         }
     }
 
-    static async deleteProjectMember(projectId: number, userId: string): Promise<boolean> {
+    static async deleteProjectMember(projectId: number, ownerId:string, userId: string): Promise<boolean> {
         try {
+            const owId = ownerId.toLowerCase();
             const id = userId.toLowerCase();
 
             if(!ValUser.isUserIdValid(id)) {
                 return false;
             }
 
-            if(await this.isUserOwnerOfProject(id, projectId)) {
+            if(!(await this.isUserOwnerOfProject(owId, projectId))) {
                 return false;
             }
 
@@ -447,7 +449,7 @@ export class ProjectUtility {
 
     static async deleteAbilityFromProject(projectId: number, abilityId: number, userId:string): Promise<boolean> {
         try {
-            if (!await ProjectUtility.isUserOwnerOfProject(userId, projectId)){
+            if (!(await ProjectUtility.isUserOwnerOfProject(userId, projectId))){
                 return false;
             }
             return await Database.deleteProjectAbility(projectId, abilityId);
