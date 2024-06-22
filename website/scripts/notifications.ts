@@ -21,14 +21,20 @@ export async function initNotifications(tokenUser: TokenUser) {
 
     const socketClient = SocketClient.getInstance();
 
-    socketClient.onNotification(async () => {
-        await renderNotificationIcons();
+    socketClient.onNotification(() => {
+        renderNotificationIcons().then(() => {
+            addEventListener();
+        });
     });
 
     socketClient.onMessage(async () => {
         await renderChatNotificationIcon();
     });
 
+    addEventListener();
+}
+
+function addEventListener() {
     const notifications = document.getElementById('notifications');
     const notificationBox = document.getElementById('notification-box');
 
@@ -40,6 +46,7 @@ export async function initNotifications(tokenUser: TokenUser) {
     });
 
     notifications.addEventListener('click', async () => {
+        console.log(clicked);
         if(clicked) {
             notificationBox.style.display = 'none';
             clicked = false;

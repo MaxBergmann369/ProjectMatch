@@ -4,6 +4,7 @@ import {Project, User} from "./models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 import "./general";
+import {SocketClient} from "./socket-client";
 // this tells webpack to include the home.ts file in the bundle
 
 let user: TokenUser = null;
@@ -23,6 +24,13 @@ export async function initRanking(tokenUser: TokenUser) {
     ranking.addEventListener('click', async () => {
         if(!clicked) {
             await addTableContent();
+
+            const socketClient = SocketClient.getInstance();
+
+            socketClient.onRankingUpdate(async (projectId: number, table: string) => {
+                await updateTableContent(projectId, table);
+            });
+
             background.style.display = 'flex';
             clicked = true;
         }
@@ -94,6 +102,32 @@ function createRankingCard() {
     return background;
 }
 
+async function updateTableContent(projectId: number, table: string) {
+    let id = '';
+    let projectElement;
+
+
+    switch (table) {
+        case 'view':
+            id = `v${String(projectId)}`;
+            projectElement = document.getElementById(id);
+            projectElement.getElementsByTagName('span')[0].innerHTML = `${await client.getViews(projectId)}`;
+            break;
+        case 'like':
+            id = `l${String(projectId)}`;
+            projectElement = document.getElementById(id);
+
+            projectElement.getElementsByTagName('span')[0].innerHTML = `${await client.getLikes(projectId)}`;
+            break;
+        case 'member':
+            id = `m${String(projectId)}`;
+            projectElement = document.getElementById(id);
+            const project = await client.getProject(projectId);
+            projectElement.getElementsByTagName('span')[0].innerHTML = `${(await client.getProjectMembers(projectId)).length}/${project.maxMembers}`;
+            break;
+    }
+}
+
 async function addTableContent() {
     const viewTableContent = document.getElementById('viewTableContent');
     const likeTableContent = document.getElementById('likeTableContent');
@@ -113,7 +147,7 @@ async function addTableContent() {
         const project = viewProjects[i];
         const projectDiv = document.createElement('div');
         projectDiv.classList.add('project');
-        projectDiv.id = String(project.id);
+        projectDiv.id = `v${String(project.id)}`;
 
         const name = document.createElement('h3');
         name.innerHTML = `${i+1}.&nbsp${project.name}`;
@@ -134,7 +168,7 @@ async function addTableContent() {
         const project = likeProjects[i];
         const projectDiv = document.createElement('div');
         projectDiv.classList.add('project');
-        projectDiv.id = String(project.id);
+        projectDiv.id = `l${String(project.id)}`;
 
         const name = document.createElement('h3');
         name.innerHTML = `${i+1}.&nbsp${project.name}`;
@@ -155,7 +189,7 @@ async function addTableContent() {
         const project = memberProjects[i];
         const projectDiv = document.createElement('div');
         projectDiv.classList.add('project');
-        projectDiv.id = String(project.id);
+        projectDiv.id = `m${String(project.id)}`;
 
         const name = document.createElement('h3');
         name.innerHTML = `${i+1}.&nbsp${project.name}`;

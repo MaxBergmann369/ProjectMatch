@@ -1,12 +1,16 @@
 import { Server, Socket } from "socket.io";
 import {EndPoints} from "../db/validation";
+import {Project} from "../../models";
+import {Database} from "../db/db";
 
 export class SocketController {
     private static io: Server;
     private static userSocketMap = new Map<string, string>();
+    private static rankingData: Project[][] = [];
 
-    static initializeSocket(server: Server) {
+    static async initializeSocket(server: Server) {
         SocketController.io = server;
+        SocketController.rankingData = await Database.getTop10Projects();
         server.on("connection", (socket) => this.onConnection(socket));
     }
 
@@ -28,16 +32,23 @@ export class SocketController {
     }
 
     static addMessage(chatId, userId) {
-        const recipientSocketId = this.userSocketMap.get(userId);
+        const recipientSocketId = SocketController.userSocketMap.get(userId);
         if (recipientSocketId) {
-            this.io.to(recipientSocketId).emit('message', chatId);
+            SocketController.io.to(recipientSocketId).emit('message', chatId);
         }
     }
 
     static updateNotification(userId) {
         const recipientSocketId = this.userSocketMap.get(userId);
         if (recipientSocketId) {
-            this.io.to(recipientSocketId).emit('notification');
+            SocketController.io.to(recipientSocketId).emit('notification');
+        }
+    }
+
+    static async updateRanking(projectId: number, table: string) {
+        if(this.rankingData.some((project) => project.some((p) => p.id === projectId))) {
+            SocketController.io.emit('ranking', projectId, table);
+            SocketController.rankingData = await Database.getTop10Projects();
         }
     }
 

@@ -29,4 +29,8 @@ export class SocketClient {
     onNotification(callback: () => void) {
         this.socket.on('notification', callback);
     }
+
+    onRankingUpdate(callback: (projectId: number, table: string) => void) {
+        this.socket.on('ranking', callback);
+    }
 }

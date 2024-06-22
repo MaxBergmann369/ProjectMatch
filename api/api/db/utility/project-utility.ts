@@ -2,6 +2,7 @@ import {Database} from "../db";
 import {ValProject, ValUser} from "../validation";
 import {Ability, Project, User, View} from "../../../models";
 import {SystemNotification} from "../system-notifications";
+import {SocketController} from "../../socket/socket-controller";
 
 export class ProjectUtility {
     /* region Base */
@@ -29,7 +30,7 @@ export class ProjectUtility {
             description = description.replace(/</g, "&lt;");
             description = description.replace(/>/g, "&gt;");
 
-            const projectId:number = await Database.addProject(name, owId, thumbnail, description, date.toDateString(), links, maxMembers);
+            const projectId:number = await Database.addProject(name, owId, thumbnail, description, date.toUTCString(), links, maxMembers);
 
             if (projectId === null) {
                 return -1;
@@ -233,7 +234,12 @@ export class ProjectUtility {
 
             await SystemNotification.projectAccepted(userId, projectId);
 
-            return Database.acceptProjectMember(id, projectId);
+            if(await Database.acceptProjectMember(id, projectId)) {
+                await SocketController.updateRanking(projectId, 'member');
+                return true;
+            }
+
+            return false;
         }
         catch (e) {
             return false;
@@ -281,7 +287,11 @@ export class ProjectUtility {
                 return false;
             }
 
-            return await Database.deleteProjectMember(id, projectId);
+            if(await Database.deleteProjectMember(id, projectId)) {
+                await SocketController.updateRanking(projectId, 'member');
+            }
+
+            return true;
         }
         catch (e) {
             return false;
@@ -305,7 +315,12 @@ export class ProjectUtility {
                 return false;
             }
 
-            return await Database.addLike(id, projectId);
+            if(await Database.addLike(id, projectId)) {
+                await SocketController.updateRanking(projectId, 'like');
+                return true;
+            }
+
+            return false;
         }
         catch (e) {
             return false;
@@ -359,7 +374,12 @@ export class ProjectUtility {
                 return false;
             }
 
-            return await Database.deleteLike(id, projectId);
+            if(await Database.deleteLike(id, projectId)) {
+                await SocketController.updateRanking(projectId, 'like');
+                return true;
+            }
+
+            return false;
         }
         catch (e) {
             return false;
@@ -381,7 +401,12 @@ export class ProjectUtility {
                 return false;
             }
 
-            return await Database.addView(id, projectId);
+            if(await Database.addView(id, projectId)) {
+                await SocketController.updateRanking(projectId, 'view');
+                return true;
+            }
+
+            return false;
         }
         catch (e) {
             return false;
