@@ -16,11 +16,12 @@ export async function initRanking(tokenUser: TokenUser) {
 
     let background: HTMLDivElement;
 
+    background = createRankingCard();
+
     const ranking = document.getElementById('rankingBtn');
 
     ranking.addEventListener('click', async () => {
         if(!clicked) {
-            background = createRankingCard();
             await addTableContent();
             background.style.display = 'flex';
             clicked = true;
@@ -98,6 +99,78 @@ async function addTableContent() {
     const likeTableContent = document.getElementById('likeTableContent');
     const memberTableContent = document.getElementById('memberTableContent');
 
-    const projects = await client.getTop10Projects();
-    console.log(projects);
+    viewTableContent.innerHTML = '';
+    likeTableContent.innerHTML = '';
+    memberTableContent.innerHTML = '';
+
+    const projects: Project[][] = await client.getTop10Projects();
+
+    const viewProjects = projects[0];
+    const likeProjects = projects[1];
+    const memberProjects = projects[2];
+
+    for (let i = 0; i < viewProjects.length; i++) {
+        const project = viewProjects[i];
+        const projectDiv = document.createElement('div');
+        projectDiv.classList.add('project');
+        projectDiv.id = String(project.id);
+
+        const name = document.createElement('h3');
+        name.innerHTML = `${i+1}.&nbsp${project.name}`;
+        projectDiv.appendChild(name);
+
+        const views = document.createElement('span');
+        const img = document.createElement('img');
+        img.src = "resources/project/detail/view.svg";
+        img.alt = "Views";
+        views.innerHTML = `${await client.getViews(project.id)}`;
+        projectDiv.appendChild(views);
+        projectDiv.appendChild(img);
+
+        viewTableContent.appendChild(projectDiv);
+    }
+
+    for (let i = 0; i < likeProjects.length; i++) {
+        const project = likeProjects[i];
+        const projectDiv = document.createElement('div');
+        projectDiv.classList.add('project');
+        projectDiv.id = String(project.id);
+
+        const name = document.createElement('h3');
+        name.innerHTML = `${i+1}.&nbsp${project.name}`;
+        projectDiv.appendChild(name);
+
+        const likes = document.createElement('span');
+        const img = document.createElement('img');
+        img.src = "resources/project/detail/star.svg";
+        img.alt = "Likes";
+        likes.innerHTML = `${await client.getLikes(project.id)}`;
+        projectDiv.appendChild(likes);
+        projectDiv.appendChild(img);
+
+        likeTableContent.appendChild(projectDiv);
+    }
+
+    for (let i = 0; i < memberProjects.length; i++) {
+        const project = memberProjects[i];
+        const projectDiv = document.createElement('div');
+        projectDiv.classList.add('project');
+        projectDiv.id = String(project.id);
+
+        const name = document.createElement('h3');
+        name.innerHTML = `${i+1}.&nbsp${project.name}`;
+        projectDiv.appendChild(name);
+
+        const members = document.createElement('span');
+        const img = document.createElement('img');
+        img.src = "resources/project/detail/user.svg";
+        img.alt = "Members";
+        members.innerHTML = `${(await client.getProjectMembers(project.id)).length}/${project.maxMembers}`;
+        projectDiv.appendChild(members);
+        projectDiv.appendChild(img);
+
+        memberTableContent.appendChild(projectDiv);
+    }
+
+
 }

@@ -12,17 +12,14 @@ export class ProjectUtility {
             const date = new Date(Date.now());
 
             if(!ValProject.isValid(name, owId, thumbnail, description, date, links, maxMembers) || await this.getAmountOfProjects(ownerId) >= 50){
-                console.log("ProjectUtility: addProject: Project is not valid");
                 return -1;
             }
 
             if(!await ValUser.isUserValid(owId)) {
-                console.log("ProjectUtility: addProject: User is not valid");
                 return -1;
             }
 
             if(await this.alreadyProjectWithSameName(owId, name, 0)) {
-                console.log("ProjectUtility: addProject: Project with same name already exists");
                 return -1;
             }
 
@@ -35,11 +32,9 @@ export class ProjectUtility {
             const projectId:number = await Database.addProject(name, owId, thumbnail, description, date.toDateString(), links, maxMembers);
 
             if (projectId === null) {
-                console.log("ProjectUtility: addProject: Project was not created");
                 return -1;
             }
             if (!await Database.addProjectMember(owId, projectId, true)){
-                console.log("ProjectUtility: addProject: Owner was not added as member");
                 return -1;
             }
             return projectId;
