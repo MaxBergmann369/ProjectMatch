@@ -3,8 +3,8 @@ import {keycloak} from "./keycloak";
 import {Image} from 'image-js';
 
 export class HttpClient {
-    // static baseBaseUrl = "http://localhost:3000";
-    static baseBaseUrl = "https://pm.hoellerl.dev";
+    static baseBaseUrl = "http://localhost:3000";
+    // static baseBaseUrl = "https://pm.hoellerl.dev";
     static pfpUrl = `${HttpClient.baseBaseUrl}/pfp`;
     baseUrl = `${HttpClient.baseBaseUrl}/api`;
     bearer = `Bearer ${keycloak.token}`;
