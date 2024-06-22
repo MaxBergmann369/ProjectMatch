@@ -27,7 +27,13 @@ const storage = multer.diskStorage({
         cb(null, path.join(__dirname, pfpPath));
     },
     filename: function (req, file, cb) {
-        cb(null, req.params.userId + '-' + Date.now());
+        const authHeader = req.headers.authorization;
+        const tokenUser = EndPoints.getToken(authHeader);
+        if (tokenUser === null) {
+            cb(new Error('Invalid token'), null);
+        } else {
+            cb(null, tokenUser.userId + '-' + Date.now());
+        }
     }
 });
 multer({
@@ -219,7 +225,6 @@ export function createUserEndpoints() {
         let imagePath;
 
         try {
-
             const authHeader = req.headers.authorization;
 
             const tokenUser = EndPoints.getToken(authHeader);
