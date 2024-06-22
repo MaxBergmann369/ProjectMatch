@@ -492,7 +492,7 @@ export class Database {
             }),
             //get top 10 projects by memberCnt and date of creation
             new Promise<Project[]>((resolve, reject) => {
-                db.all(`SELECT * FROM Project ORDER BY maxMembers DESC, dateOfCreation DESC LIMIT 10`, (err, rows: Project[]) => {
+                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM ProjectMember WHERE projectId = project.id) DESC, dateOfCreation ASC LIMIT 10`, (err, rows: Project[]) => {
                     if (err) {
                         reject(err);
                     } else {
