@@ -159,6 +159,8 @@ a:hover{
   background-color: #ececec;
   label{
     user-select: none;
+    display: inline-block;
+    width: 90%;
   }
   *{
     cursor: pointer;
