@@ -171,7 +171,8 @@
 #ability-list {
   display: flex;
   flex-direction: row;
-  gap: 1rem;
+  padding: 1.5rem 3rem;
+  gap: 5rem;
   justify-content: center;
   flex-wrap: wrap;
   * {
@@ -294,27 +295,6 @@
 
 }
 
-#ability-list{
-  display: flex;
-  flex-direction: row;
-  gap: 5rem;
-  padding: 1.5rem 3rem;
-  justify-content: center;
-    flex-wrap: wrap;
-
-  *{
-    background: #ededed;
-    border-radius: var(--rounded);
-  }
-  & > li{
-    & > span{
-      font-weight: bold;
-      font-size: 1.5rem;
-    }
-
-    list-style-type: none;
-  padding: 2rem 3rem;}
-}
 
 #projectTabs{
     display: flex;
@@ -357,5 +337,9 @@
 @media (max-width: 1024px) and (orientation: portrait){
   body{
     margin: 1rem !important;
+  }
+
+  #abilitiesEdit{
+    zoom: 1.3;
   }
 }
