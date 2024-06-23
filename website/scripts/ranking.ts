@@ -9,7 +9,6 @@ import {SocketClient} from "./socket-client";
 
 let user: TokenUser = null;
 let client : HttpClient = null;
-let clicked: boolean = false;
 
 export async function initRanking(tokenUser: TokenUser) {
     user = tokenUser;
@@ -24,20 +23,17 @@ export async function initRanking(tokenUser: TokenUser) {
     window.addEventListener('click', async (event) => {
         if (!background.contains(event.target as Node) && event.target !== background) {
             background.style.display = 'none';
-            clicked = false;
         }
     });
 
     ranking.addEventListener('click', async () => {
-        if(!clicked) {
+        if(background.style.display === 'none' || background.style.display === '') {
             await addTableContent();
 
             background.style.display = 'flex';
-            clicked = true;
         }
         else {
             background.style.display = 'none';
-            clicked = false;
         }
     });
 }
