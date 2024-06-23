@@ -201,7 +201,7 @@ function loadMembers(projectMembers:User[],project: Project, maxMembers: number,
             });
 
             const img3 = document.createElement("img");
-            img3.src = "resources/cross.svg";
+            img3.src = "resources/x.svg";
             img3.alt = "Owner";
             img3.style.width = "30px";
             img3.style.height = "30px";

@@ -136,7 +136,11 @@ async function loadChatProfileButtons() {
 
             if(!isNaN(id)) {
                 chatId = id;
-
+                // set chatId as param so the chat persists on reload
+                const url = new URL(window.location.toString())
+                url.searchParams.set("chat", id.toString());
+                history.replaceState(null, '', url);
+                
                 const layerUp = document.getElementById("layer-up");
 
                 if(messageAmount <= maxRenderAmount) {
