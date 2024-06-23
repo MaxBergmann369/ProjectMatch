@@ -6,7 +6,6 @@ import {keycloak} from "./keycloak";
 
 let client: HttpClient = null;
 let user: TokenUser = null;
-let clicked = false;
 
 let notificationsLoaded: Notification[] = [];
 
@@ -41,21 +40,17 @@ function addEventListener() {
     window.addEventListener('click', async (event) => {
         if (event.target !== notifications && event.target !== notificationBox) {
             notificationBox.style.display = 'none';
-            clicked = false;
         }
     });
 
     notifications.addEventListener('click', async () => {
-        console.log(clicked);
-        if(clicked) {
-            notificationBox.style.display = 'none';
-            clicked = false;
-        }
-        else {
-            notificationBox.style.display = 'block';
+        if (notificationBox.style.display === 'none' || notificationBox.style.display === '') {
+            await loadNotifications();
             await renderNotifications(notificationBox);
             await addButtonListeners();
-            clicked = true;
+            notificationBox.style.display = 'block';
+        } else {
+            notificationBox.style.display = 'none';
         }
     });
 }
