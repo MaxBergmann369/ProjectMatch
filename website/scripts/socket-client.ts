@@ -1,5 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import {keycloak} from "./keycloak";
+import {HttpClient} from "./server-client";
 
 export class SocketClient {
     private static instance: SocketClient;
@@ -7,7 +8,7 @@ export class SocketClient {
     private bearer = `Bearer ${keycloak.token}`;
 
     private constructor() {
-        this.socket = io("http://localhost:3000");
+        this.socket = io(HttpClient.baseUrl);
         this.socket.emit('register', this.bearer);
     }
 
