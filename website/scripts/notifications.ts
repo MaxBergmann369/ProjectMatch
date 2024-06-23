@@ -125,7 +125,7 @@ export async function renderChatNotificationIcon() {
     const icon = document.getElementById('chat-icon');
 
     if (unread && chat !== null && icon === null) {
-        chat.innerHTML += '<img src="./resources/icons/badge-11.ico" id="chat-icon" class="chat-notification-icon" alt="new Notifaction">';
+        chat.innerHTML += '<img src="./resources/icons/badge-11.ico" id="chat-icon" class="notification-icon" alt="new Notifaction">';
     }
     else {
         if (icon !== null) {
