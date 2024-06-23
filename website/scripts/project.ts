@@ -248,6 +248,11 @@ function loadProjectAbilities(projectAbilites:Ability[]){
 function loadLinks(urls:string[]){
     const links = document.getElementById("links");
     links.innerHTML = "";
+    console.log(urls)
+    if (urls.every((u) => u === "") || urls.length === 0){
+        links.innerText = "There are no links for this project.";
+        return;
+    }
     for (const url of urls) {
         const a = document.createElement("a");
         a.textContent = url;
