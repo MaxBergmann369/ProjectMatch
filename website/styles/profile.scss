@@ -197,7 +197,6 @@
 
 #projectList {
   overflow-y: auto;
-  max-height: 28rem;
 }
 
 
@@ -259,9 +258,9 @@
   flex:2;
   position: relative;
   #create{
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
+    position: sticky;
+    bottom: 0;
+    float: right;
     background: #bababa;
     border-radius: var(--rounded);
     padding: 0.5rem 1rem;

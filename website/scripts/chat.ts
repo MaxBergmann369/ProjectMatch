@@ -57,7 +57,8 @@ async function addEventListener() {
 
     const addBtn = document.getElementById("addChat");
 
-    addBtn.addEventListener("click", async () => {
+    addBtn.addEventListener("submit", async (e) => {
+        e.preventDefault();
         const input = document.getElementById("input-user") as HTMLInputElement;
         let userFullName = input.value;
 

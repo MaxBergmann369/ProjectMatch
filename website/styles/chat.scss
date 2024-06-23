@@ -5,10 +5,8 @@
 
 
 body {
-  height: 100vh;
   overflow-y: hidden;
   overflow-x: hidden;
-  padding: 3%;
 }
 
 .delete {
@@ -20,24 +18,58 @@ body {
 .side-bar {
   border: 2px solid black;
   border-radius: var(--rounded);
+  //background: #ededed; // TODO: does that look good?
   padding: 1rem;
   width: 20%;
-  height: 75%;
+  height: 70vh;
   overflow-y: hidden;
   overflow-x: hidden;
   float: left;
+  position: relative;
 }
 
 #user-list {
   display: none;
-  width: 10rem;
-  margin-left: 0.5rem;
+  border-radius: 1rem;
+  width: 80%;
   min-height: 1.5rem;
+  max-height: 20rem;
+    overflow-y: auto;
+  overflow-x: hidden;
   background: white;
   border: 1px solid black;
+  position: relative;
   //float: left;
-  position: absolute;
+  div{
+    background: #ededed;
+    cursor: pointer;
+    //border-radius: var(--rounded);
+    width: 100%;
+    border-bottom: 1px solid black;
+    padding: 0.5rem 0 0.5rem 1rem;
+  }
+
 }
+
+//.addedUser{
+//    display: flex;
+//    flex-direction: row;
+//    gap: 1rem;
+//    align-items: center;
+//    padding: 0.5rem;
+//    border-radius: var(--rounded);
+//    cursor: pointer;
+//    &:hover{
+//        background: #d1d1d1;
+//    }
+//  img{
+//    border-radius: 50%;
+//    height: 2rem;
+//    aspect-ratio: 1;
+//  }
+//
+//
+//}
 
 #messageWindow {
   padding: 1rem;
@@ -49,9 +81,21 @@ body {
 }
 
 .add-chat {
-  position: relative;
-  top: 10%;
+  position: absolute;
   width: 100%;
+  bottom: 1rem;
+  left:0;
+  display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+  #addChat{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+  }
 }
 
 #chat-list {
@@ -100,12 +144,12 @@ body {
   background-size: cover;
   display: flex;
   flex-direction: column;
-  height: 75%;
+  height: 70vh;
   width: 79%;
   justify-content: space-between;
   border: 2px solid black;
   border-radius: var(--rounded);
-  padding-bottom: 1rem;
+  padding: 1rem;
   overflow: hidden;
 }
 

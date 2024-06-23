@@ -226,8 +226,18 @@ export class Card {
         document.removeEventListener('touchend', this.handleTouchEnd);
         document.removeEventListener('touchmove', this.handleTouchMove);
         if (animation) {
-            this.element.style.transition = 'transform 1s';
-            this.element.style.transform = `translate(${direction * window.innerWidth}px, ${this.offsetY}px) rotate(${90 * direction}deg)`;
+            // media query 70rem
+            if (window.matchMedia('(max-width: 70rem)').matches) {
+                this.element.style.transition = 'transform 1.3s';
+
+                this.element.style.transform = `translate(${direction * (window.innerWidth +200)}px, ${this.offsetY }px) rotate(${90 * direction}deg)`;
+            }
+            else{
+                this.element.style.transition = 'transform 1s';
+
+                this.element.style.transform = `translate(${direction * window.innerWidth}px, ${this.offsetY }px) rotate(${90 * direction}deg)`;
+
+            }
             this.element.classList.add('dismissing');
             setTimeout(() => {
                 this.element.remove();

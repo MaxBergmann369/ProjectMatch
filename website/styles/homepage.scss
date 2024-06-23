@@ -27,41 +27,6 @@
   font-family: 'Carlito', sans-serif;
 }
 
-.topRow {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  position: absolute;
-  width: 100%;
-  height: 15%;
-  h1{
-    padding-left: 1rem;
-  }
-  .topRight {
-    display: flex;
-    flex-flow: row;
-    align-items: center;
-    padding-right: 1rem;
-    gap: 1rem;
-  }
-}
-
-.btn {
-  color: white;
-  border: 2px solid white;
-  font-size: 1.5rem;
-  border-radius: var(--rounded);
-  padding: 0.5rem 1rem;
-  transition: 0.3s;
-  background: black;
-  &:hover {
-    background: white;
-    color: black;
-  }
-  &:active {
-    transform: scale(0.95) translateY(0.1rem);
-  }
-}
 
 #onlineUser {
   position: absolute;
@@ -274,6 +239,8 @@ body {
     //padding: 0.5rem 1rem;
   }
   .tags {
+    max-height: 6rem;
+    overflow: hidden;
     span{
       // tags
       border-radius: var(--rounded);
@@ -294,12 +261,8 @@ body {
   .title{
     display: flex;
     flex-direction: row;
-
     justify-content: space-between;
-    //.active{
-    //  //filter: sepia(1) saturate(5);
-    //  fill: yellow;
-    //}
+
     span{
       height: 100%;
         display: flex;
@@ -413,7 +376,7 @@ body {
   }
 
   100% {
-    transform: translateZ(-30px) rotateY(180deg);
+    transform: translateZ(-3rem) rotateY(180deg);
   }
 }
 
@@ -421,4 +384,43 @@ body {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+}
+
+@media (max-width: 1024px) and (orientation: portrait){
+  :root{
+    --rounded: 4rem;
+  }
+  #swiper{
+      height: 55vh;
+
+  }
+  .card{
+      padding: 2rem 4rem;
+      .title{
+          font-size: 2rem;
+        span svg{
+          width: 2.5rem;
+          height: 2.5rem;
+        }
+      }
+      .owner{
+          font-size: 2rem;
+          height: 6rem;
+      }
+      .desc{
+          font-size: 2rem;
+          height: 35rem;
+      }
+      .tags{
+          font-size: 2rem;
+          max-height: 8rem;
+
+      }
+  }
+  #like,#dislike{
+    display: none;
+  }
+  .center{
+    justify-content: center;
+  }
 }
