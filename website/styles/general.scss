@@ -112,9 +112,9 @@ nav {
     border-radius: 1.3rem;
     padding: 1rem 1.3rem;
     .navButton{
-      img{
+      img:not(.notification-icon){
+        width: 3vh;
         height: 3vh;
-        aspect-ratio: 1;
       }
       padding: 1rem;
       margin: 0 1.3rem;
