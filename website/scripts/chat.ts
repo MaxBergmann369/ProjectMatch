@@ -204,7 +204,6 @@ async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
 
         const userDiv = document.createElement("div");
         const pfp = document.createElement("img");
-        const notif = document.createElement("img");
         const name = document.createElement("p");
         const fullname = `${currUser.firstname} ${currUser.lastname}`;
         name.textContent = fullname;
@@ -217,16 +216,21 @@ async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
 
         }
         const badgeNum = unreadMessages <= 10? unreadMessages : 10;
-        notif.src = `resources/icons/badge-${badgeNum}.ico`;
-        notif.alt = `${unreadMessages} new messages`;
-        notif.id = "badge";
+
         userDiv.appendChild(pfp);
         userDiv.appendChild(name);
-        if (badgeNum === 0){
-            userDiv.appendChild(document.createElement("b"));
+        if (badgeNum !== 0){
+            const notif = document.createElement("img");
+
+            notif.src = `resources/icons/badge-${badgeNum}.ico`;
+            notif.alt = `${unreadMessages} new messages`;
+            notif.id = "badge";
+            userDiv.appendChild(notif);
+
         }
         else{
-            userDiv.appendChild(notif);
+            userDiv.appendChild(document.createElement("b"));
+
 
         }
         userDiv.classList.add("chat");

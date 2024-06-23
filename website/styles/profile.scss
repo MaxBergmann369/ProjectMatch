@@ -257,11 +257,11 @@
 #projects{
   min-width: 25rem;
   flex:2;
-  transform: translate(0); // this basically is the same as position: relative but for position:fixed children
+  position: relative;
   #create{
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
+    position: sticky;
+    bottom: 0;
+    float: right;
     background: #bababa;
     border-radius: var(--rounded);
     padding: 0.5rem 1rem;
