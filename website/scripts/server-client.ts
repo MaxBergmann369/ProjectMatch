@@ -576,8 +576,8 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async deleteMessage(messageId: number, userId: string) {
-        return await fetch(`${this.baseUrl}/messages/${userId}/${messageId}`, {
+    async deleteMessage(messageId: number) {
+        return await fetch(`${this.baseUrl}/messages/${messageId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer

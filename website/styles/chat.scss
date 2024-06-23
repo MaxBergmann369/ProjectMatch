@@ -11,6 +11,12 @@ body {
   padding: 3%;
 }
 
+.delete {
+  cursor: pointer;
+  width: 1rem;
+  height: 1rem;
+}
+
 .side-bar {
   border: 2px solid black;
   border-radius: var(--rounded);

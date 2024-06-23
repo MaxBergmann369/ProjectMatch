@@ -98,6 +98,24 @@ async function addEventListener() {
     await searchForChat();
 }
 
+async function loadDeleteBtn() {
+    const deleteBtns = document.getElementsByClassName("delete");
+
+    for(const deleteBtn of deleteBtns) {
+        deleteBtn.addEventListener("click", async (event) => {
+            const element = event.target as HTMLElement;
+            const id = parseInt(element.id);
+
+            const confirmDelete = confirm("Are you sure you want to delete this message?");
+
+            if(confirmDelete) {
+                await client.deleteMessage(id);
+                await renderChatMessages(chatId);
+            }
+        });
+    }
+}
+
 async function loadChatProfileButtons() {
     const chatProfiles = document.getElementsByClassName("chat");
 
@@ -285,7 +303,7 @@ async function loadChatMessages(id: number) {
             recentMessages = [];
         }
 
-        const displayMessage = `${message.userId};${time};${username};${message.message}`;
+        const displayMessage = `${message.userId};${time};${username};${message.message};${message.id}`;
 
         recentMessages.push(displayMessage);
     }
@@ -324,10 +342,11 @@ async function renderChatMessages(id : number, scrollDown: boolean = false) {
             const time: string = data[1];
             const username: string = data[2];
             let message: string = data[3];
+            const id: string = data[4];
             message = message.replace(/</g, "&lt;");
             message = message.replace(/>/g, "&gt;");
             if (userId === user.userId) {
-                html += `<div class="own-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
+                html += `<div class="own-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><div><span>${message}</span><img id=${id} class="delete" src="./resources/trash.svg" alt="delete"></div></div></div>`;
             } else {
                 html += `<div class="other-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
             }
@@ -335,6 +354,8 @@ async function renderChatMessages(id : number, scrollDown: boolean = false) {
     }
 
     chat.innerHTML = html;
+
+    await loadDeleteBtn();
 
     const layerDown = document.getElementById("layer-down");
 

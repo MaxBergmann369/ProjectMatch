@@ -1,10 +1,7 @@
-import { Card } from './card';
-import {initKeycloak, keycloak} from "./keycloak";
-import {Project, User} from "./models";
+import {Project} from "./models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 import "./general";
-import {SocketClient} from "./socket-client";
 // this tells webpack to include the home.ts file in the bundle
 
 let user: TokenUser = null;

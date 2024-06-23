@@ -279,21 +279,20 @@ export function createChatEndpoints() {
         }
     });
 
-    chatRouter.delete('/messages/:userId/:messageId', async (req, res) => {
+    chatRouter.delete('/messages/:messageId', async (req, res) => {
         try {
-            const userId = req.params.userId;
             const messageId = parseInt(req.params.messageId);
 
             const authHeader = req.headers.authorization;
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null || tokenUser.userId.toLowerCase() !== userId.toLowerCase() || isNaN(messageId)) {
+            if (tokenUser.userId === null || isNaN(messageId)) {
                 res.sendStatus(400);
                 return;
             }
 
-            if(await ChatUtility.deleteMessage(userId, messageId)) {
+            if(await ChatUtility.deleteMessage(tokenUser.userId, messageId)) {
                 res.sendStatus(200);
             } else {
                 res.sendStatus(400);
