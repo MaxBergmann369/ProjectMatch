@@ -79,6 +79,10 @@
         #badge{
           height: 1.2rem;
         }
+
+        &.active{
+          background-color: lightblue;
+        }
       }
 
     }

@@ -140,7 +140,8 @@ async function loadChatProfileButtons() {
                 const url = new URL(window.location.toString())
                 url.searchParams.set("chat", id.toString());
                 history.replaceState(null, '', url);
-                
+                document.querySelectorAll(".active").forEach(el => el.classList.remove("active"));
+                document.getElementById(id.toString()).classList.add("active");
                 const layerUp = document.getElementById("layer-up");
 
                 if(messageAmount <= maxRenderAmount) {
