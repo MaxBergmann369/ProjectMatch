@@ -107,17 +107,20 @@ nav {
 }
 
 @media (max-width: 1024px) and (orientation: portrait){
+  :root{
+    font-size: 2rem;
+  }
   nav{
-    top: 2rem;
-    border-radius: 1.3rem;
-    padding: 1rem 1.3rem;
+    //top: 2rem;
+    //border-radius: 1.3rem;
+    //padding: 1rem 1.3rem;
     .navButton{
       img:not(.notification-icon){
         width: 3vh;
         height: 3vh;
       }
-      padding: 1rem;
-      margin: 0 1.3rem;
+      //padding: 1rem;
+      //margin: 0 1.3rem;
     }
   }
 }

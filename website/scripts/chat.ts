@@ -12,7 +12,7 @@ const maxRenderAmount: number = 50;
 
 let client: HttpClient;
 let user: User | null = null;
-let chats: [DirectChat[], string[]] = [[], []];
+let chats: [DirectChat[], User[]] = [[], []];
 let chatId: number = -1;
 let layer: number = 0;
 let messageAmount: number = 0;
@@ -148,7 +148,7 @@ async function loadChatProfileButtons() {
                 }
 
                 await renderChatMessages(id);
-                await renderChatProfiles(true);
+                // await renderChatProfiles(true);
                 await renderChatNotificationIcon();
             }
         });
@@ -172,34 +172,67 @@ async function addUserButtons() {
     }
 }
 
-async function renderChatProfiles(load: boolean = true) {
-    if(load) {
+async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
+    const list = document.getElementById("chat-list");
+    list.innerHTML = "";
+    let len:number;
+    if(!sortedChats) {
         chats[0] = await client.getDirectChats(user.userId);
         chats[1] = [];
+        len = chats[0].length;
+    }
+    else{
+        len = sortedChats[0].length;
     }
 
-    const list = document.getElementById("chat-list");
-    let chatElement: string = "";
 
-    for(let i = 0; i < chats[0].length; i++) {
+
+    for(let i = 0; i < len; i++) {
         const userId = chats[0][i].userId === user.userId ? chats[0][i].otherUserId : chats[0][i].userId;
 
-        let fullName: string;
+        let currUser: User;
         let unreadMessages: number = 0;
 
-        if(load) {
+        if(!sortedChats) {
             unreadMessages = await client.getUnreadMessages(chats[0][i].id, user.userId);
-            fullName = await client.getFullNameByUserId(userId);
-            chats[1].push(fullName);
+            currUser = await client.getUser(userId);
+            chats[1].push(currUser);
         }
         else {
-            fullName = chats[1][i];
+            currUser = sortedChats[1][i];
         }
 
-        chatElement += `<div class="chat" id="${chats[0][i].id}">${fullName} ${unreadMessages}</div>`;
-    }
+        const userDiv = document.createElement("div");
+        const pfp = document.createElement("img");
+        const notif = document.createElement("img");
+        const name = document.createElement("p");
+        const fullname = `${currUser.firstname} ${currUser.lastname}`;
+        name.textContent = fullname;
+        pfp.alt = `${fullname}'s profile picture`;
+        pfp.id = "pfp";
+        if (currUser.pfp == null) {
+            pfp.src = "resources/profile/pfp/default.jpg";
+        }else{
+            pfp.src = `${HttpClient.pfpUrl}/${currUser.pfp}`;
 
-    list.innerHTML = chatElement;
+        }
+        const badgeNum = unreadMessages <= 10? unreadMessages : 10;
+        notif.src = `resources/icons/badge-${badgeNum}.ico`;
+        notif.alt = `${unreadMessages} new messages`;
+        notif.id = "badge";
+        userDiv.appendChild(pfp);
+        userDiv.appendChild(name);
+        if (badgeNum === 0){
+            userDiv.appendChild(document.createElement("b"));
+        }
+        else{
+            userDiv.appendChild(notif);
+
+        }
+        userDiv.classList.add("chat");
+        userDiv.id = chats[0][i].id.toString();
+        list.appendChild(userDiv);
+    }
 
     await loadChatProfileButtons();
 }
@@ -432,31 +465,36 @@ async function loadUsernames() {
 
 async function searchForChat() {
     const input = document.getElementById("input-chat") as HTMLInputElement;
-
+    let prev = "";
+    let sortedChats = chats;
     input.addEventListener("input", async () => {
         const search = input.value.toLowerCase();
-
+        prev = search;
         if(search === "") {
             searching = false;
+            sortedChats = chats;
             await renderChatProfiles();
             return;
         }
-
-        searching = true;
-
-        //sort the chats by the search input
-        const sortedChats: [DirectChat[], string[]] = [[], []];
-
-        for(let i = 0; i < chats[0].length; i++) {
-            if(chats[1][i].toLowerCase().startsWith(search)) {
-                sortedChats[0].push(chats[0][i]);
-                sortedChats[1].push(chats[1][i]);
-            }
+        if (search.length < prev.length){
+            sortedChats = chats;
         }
 
-        chats = sortedChats;
+        searching = true;
+        //sort the chats by the search input
+        const newSortedChats: [DirectChat[], User[]] = [[], []];
 
-        await renderChatProfiles(false);
+        for(let i = 0; i < sortedChats[0].length; i++) {
+            const currUser = sortedChats[1][i];
+            if(currUser.firstname.toLowerCase().startsWith(search) || currUser.lastname.toLowerCase().startsWith(search) || `${currUser.firstname.toLowerCase()} ${currUser.lastname.toLowerCase()}`.startsWith(search)) {
+                newSortedChats[0].push(sortedChats[0][i]);
+                newSortedChats[1].push(currUser);
+            }
+        }
+        sortedChats = newSortedChats;
+        // chats = sortedChats;
+
+        await renderChatProfiles(newSortedChats);
     });
 }
 

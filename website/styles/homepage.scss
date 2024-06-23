@@ -388,35 +388,16 @@ body {
 }
 
 @media (max-width: 1024px) and (orientation: portrait){
-  :root{
-    --rounded: 4rem;
-  }
+  //:root{
+  //  --rounded: 4rem;
+  //}
   #swiper{
       height: 55vh;
 
   }
-  .card{
-      padding: 2rem 4rem;
-      .title{
-          font-size: 2rem;
-        span svg{
-          width: 2.5rem;
-          height: 2.5rem;
-        }
-      }
-      .owner{
-          font-size: 2rem;
-          height: 6rem;
-      }
-      .desc{
-          font-size: 2rem;
-          height: 35rem;
-      }
-      .tags{
-          font-size: 2rem;
-          max-height: 8rem;
-
-      }
+  svg{
+    width:  1.5rem;
+    height: 1.5rem;
   }
   #like,#dislike{
     display: none;

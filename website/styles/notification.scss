@@ -77,11 +77,14 @@
 }
 @media (max-width: 1024px) and (orientation: portrait){
   #notification-box{
-    left: unset;
-    right: -2rem;
+    left: 0;
+    width: 90vw;
   }
   .notification-icon{
     width: 2vh;
     height: 2vh;
+  }
+  #notification-btn{
+    position: unset;
   }
 }
