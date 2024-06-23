@@ -190,5 +190,18 @@ async function addTableContent() {
         memberTableContent.appendChild(projectDiv);
     }
 
+    addButtons();
+}
 
+function addButtons() {
+    const projects = document.getElementsByClassName('project');
+
+    for(const project of projects) {
+        project.addEventListener('click', async () => {
+            const id = project.id.slice(1);
+            const projectId = parseInt(id);
+
+            location.href = `project.html?id=${projectId}`;
+        });
+    }
 }
