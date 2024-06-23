@@ -110,6 +110,21 @@ function handleProjectOwner(project: Project) {
 
         switched = !switched;
     });
+
+    const deleteBtn = document.getElementById("deleteProject");
+    deleteBtn.style.display = "block";
+    const img = document.createElement("img");
+    img.src = "./resources/trash.svg";
+    img.alt = "Delete";
+    deleteBtn.appendChild(img);
+
+    deleteBtn.addEventListener("click", async () => {
+        const confirmation = confirm("Are you sure you want to delete this project?");
+        if(confirmation) {
+            await client.deleteProject(project.id);
+            location.href = "home.html";
+        }
+    });
 }
 
 function loadMembers(projectMembers:User[],project: Project, maxMembers: number, request:boolean=false) {

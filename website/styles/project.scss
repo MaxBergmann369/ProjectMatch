@@ -26,6 +26,7 @@
 }
 
 #project-details{
+  position: relative;
   h1{
     text-align: center;
   }
@@ -60,6 +61,16 @@
 #project-members{
   position: relative;
   flex: 2;
+}
+
+#deleteProject {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  cursor: pointer;
+  display: none;
+  border: none;
+  background: none;
 }
 
 #membersCnt {
