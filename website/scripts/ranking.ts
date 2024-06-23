@@ -132,7 +132,8 @@ async function addTableContent() {
     const memberProjects = projects[2];
 
     for (let i = 0; i < viewProjects.length; i++) {
-        const project = viewProjects[i];
+        const project = viewProjects[i][0];
+        const view = viewProjects[i][1];
         const projectDiv = document.createElement('div');
         projectDiv.classList.add('project');
         projectDiv.id = `v${String(project.id)}`;
@@ -145,7 +146,7 @@ async function addTableContent() {
         const img = document.createElement('img');
         img.src = "resources/project/detail/view.svg";
         img.alt = "Views";
-        views.innerHTML = `${await client.getViews(project.id)}`;
+        views.innerHTML = `${view}`;
         projectDiv.appendChild(views);
         projectDiv.appendChild(img);
 
@@ -153,7 +154,8 @@ async function addTableContent() {
     }
 
     for (let i = 0; i < likeProjects.length; i++) {
-        const project = likeProjects[i];
+        const project = likeProjects[i][0];
+        const like = likeProjects[i][1];
         const projectDiv = document.createElement('div');
         projectDiv.classList.add('project');
         projectDiv.id = `l${String(project.id)}`;
@@ -166,7 +168,7 @@ async function addTableContent() {
         const img = document.createElement('img');
         img.src = "resources/project/detail/star.svg";
         img.alt = "Likes";
-        likes.innerHTML = `${await client.getLikes(project.id)}`;
+        likes.innerHTML = `${like}`;
         projectDiv.appendChild(likes);
         projectDiv.appendChild(img);
 
@@ -174,7 +176,8 @@ async function addTableContent() {
     }
 
     for (let i = 0; i < memberProjects.length; i++) {
-        const project = memberProjects[i];
+        const project = memberProjects[i][0];
+        const member = memberProjects[i][1];
         const projectDiv = document.createElement('div');
         projectDiv.classList.add('project');
         projectDiv.id = `m${String(project.id)}`;
@@ -187,7 +190,7 @@ async function addTableContent() {
         const img = document.createElement('img');
         img.src = "resources/project/detail/user.svg";
         img.alt = "Members";
-        members.innerHTML = `${(await client.getProjectMembers(project.id)).length}/${project.maxMembers}`;
+        members.innerHTML = `${member}/${project.maxMembers}`;
         projectDiv.appendChild(members);
         projectDiv.appendChild(img);
 

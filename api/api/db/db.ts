@@ -448,15 +448,15 @@ export class Database {
         });
     }
 
-    static async getTop10Projects(): Promise<Project[][]> {
+    static async getTop10Projects(): Promise<[Project, number][][]> {
         const promises = [
             //get top 10 projects by views
-            new Promise<Project[]>((resolve, reject) => {
-                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM View WHERE projectId = Project.id) DESC LIMIT 10`, (err, rows: Project[]) => {
+            new Promise<[Project, number][]>((resolve, reject) => {
+                db.all(`SELECT *, (SELECT COUNT(*) FROM View WHERE projectId = Project.id) as viewCount FROM Project ORDER BY viewCount DESC LIMIT 10`, (err, rows: any[]) => {
                     if (err) {
                         reject(err);
                     } else {
-                        const projects: Project[] = rows.map(row => ({
+                        const projects: [Project, number][] = rows.map(row => [{
                             id: row.id,
                             name: row.name,
                             ownerId: row.ownerId,
@@ -465,18 +465,18 @@ export class Database {
                             dateOfCreation: new Date(row.dateOfCreation),
                             links: row.links,
                             maxMembers: row.maxMembers
-                        }));
+                        }, row.viewCount]);
                         resolve(projects);
                     }
                 });
             }),
             //get top 10 projects by likes
-            new Promise<Project[]>((resolve, reject) => {
-                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM Like WHERE projectId = Project.id) DESC LIMIT 10`, (err, rows: Project[]) => {
+            new Promise<[Project, number][]>((resolve, reject) => {
+                db.all(`SELECT *, (SELECT COUNT(*) FROM Like WHERE projectId = Project.id) as likeCount FROM Project ORDER BY likeCount DESC LIMIT 10`, (err, rows: any[]) => {
                     if (err) {
                         reject(err);
                     } else {
-                        const projects: Project[] = rows.map(row => ({
+                        const projects: [Project, number][] = rows.map(row => [{
                             id: row.id,
                             name: row.name,
                             ownerId: row.ownerId,
@@ -485,18 +485,18 @@ export class Database {
                             dateOfCreation: new Date(row.dateOfCreation),
                             links: row.links,
                             maxMembers: row.maxMembers
-                        }));
+                        }, row.likeCount]);
                         resolve(projects);
                     }
                 });
             }),
             //get top 10 projects by memberCnt and date of creation
-            new Promise<Project[]>((resolve, reject) => {
-                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM ProjectMember WHERE projectId = project.id) DESC, dateOfCreation DESC LIMIT 10`, (err, rows: Project[]) => {
+            new Promise<[Project, number][]>((resolve, reject) => {
+                db.all(`SELECT *, (SELECT COUNT(*) FROM ProjectMember WHERE projectId = project.id) as memberCount FROM Project ORDER BY memberCount DESC LIMIT 10`, (err, rows: any[]) => {
                     if (err) {
                         reject(err);
                     } else {
-                        const projects: Project[] = rows.map(row => ({
+                        const projects: [Project, number][] = rows.map(row => [{
                             id: row.id,
                             name: row.name,
                             ownerId: row.ownerId,
@@ -505,7 +505,7 @@ export class Database {
                             dateOfCreation: new Date(row.dateOfCreation),
                             links: row.links,
                             maxMembers: row.maxMembers
-                        }));
+                        }, row.memberCount]);
                         resolve(projects);
                     }
                 });
