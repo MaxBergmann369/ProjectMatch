@@ -300,7 +300,7 @@ export class HttpClient {
                 Authorization: this.bearer
             }
         })
-            .then(response => response.text());
+            .then(response => response.ok);
     }
 
     async getProjectMembers(projectId: number, isAccepted: boolean=true) : Promise<User[] | null> {

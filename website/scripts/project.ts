@@ -86,6 +86,23 @@ document.addEventListener("DOMContentLoaded", async() => {
     if(project.ownerId === user.userId) {
         await handleProjectOwner(project);
     }
+    else if(projectMembers.length < project.maxMembers && !projectMembers.find(value => value.userId === user.userId)) {
+        const joinBtn = document.getElementById("deleteProject");
+        joinBtn.style.display = "block";
+        const img = document.createElement("img");
+        img.src = "./resources/project/detail/user-plus.svg";
+        img.alt = "Join Project";
+        joinBtn.appendChild(img);
+
+        joinBtn.addEventListener("click", async () => {
+            if(await client.addProjectMember(project.id)) {
+                alert("A request has been sent to the project owner.");
+            }
+            else {
+                alert("You have already sent a request to join this project.");
+            }
+        });
+    }
 });
 
 let switched: boolean = false;
