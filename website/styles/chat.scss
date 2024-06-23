@@ -151,6 +151,19 @@
   display: none;
 }
 
+button{
+  font-size: 1rem;
+}
+
+#sendMessage{
+  height: 2.3rem;
+  width:  2.3rem;
+  img{
+    height: 100%;
+    width:  100%;
+  }
+}
+
 #credits {
   font-size: 0.7rem;
   //position: sticky;
@@ -241,5 +254,17 @@
   justify-content: flex-end;
   .msg-content{
     background: #d1d1d1;
+  }
+}
+input{
+  font-size: 1rem;
+}
+
+@media (max-width: 1024px) and (orientation: portrait){
+  body{
+    margin: 0 1rem !important;
+  }
+  input{
+    font-size: 1.3rem;
   }
 }

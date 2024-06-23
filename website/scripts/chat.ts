@@ -473,8 +473,8 @@ async function searchForChat() {
     let sortedChats = chats;
     input.addEventListener("input", async () => {
         const search = input.value.toLowerCase();
-        prev = search;
         if(search === "") {
+            prev = search;
             searching = false;
             sortedChats = chats;
             await renderChatProfiles();
@@ -483,6 +483,7 @@ async function searchForChat() {
         if (search.length < prev.length){
             sortedChats = chats;
         }
+        prev = search;
 
         searching = true;
         //sort the chats by the search input
