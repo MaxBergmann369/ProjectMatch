@@ -228,7 +228,7 @@ async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
         userDiv.appendChild(name);
             const notif = document.createElement("img");
 
-        notif.src = badgeNum === 0?"" :`resources/icons/badge-${badgeNum}.ico`;
+        notif.src = `resources/icons/badge-${badgeNum}.ico`;
         notif.alt = `${unreadMessages} new messages`;
         notif.classList.add("badge");
         userDiv.appendChild(notif);
