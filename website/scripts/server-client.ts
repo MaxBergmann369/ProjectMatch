@@ -327,6 +327,16 @@ export class HttpClient {
             .then(response => response.json());
     }
 
+    async getProjectMembersCnt(projectId: number, isAccepted: boolean=true) : Promise<number> {
+        return await fetch(`${this.apiUrl}/projects/membersCnt/${projectId}/${isAccepted}`, {
+            method: 'GET',
+            headers: {
+                Authorization: this.bearer
+            }
+        })
+            .then(response => response.ok? response.json() : 0);
+    }
+
     async getProjectsWhereUserIsMember(userId: string, isAccepted:boolean=true):Promise<Project[] | null> {
         return await fetch(`${this.apiUrl}/users/members/${userId}/${isAccepted}`, {
             method: 'GET',

@@ -42,14 +42,33 @@ async function loadProjectUI(client: HttpClient, id: string) {
     const projects = await client.getProjectsWhereUserIsMember(id);
     const projectList = document.getElementById("projectList");
 
-    function addProjectsToList(projects: Project[]) {
+    async function addProjectsToList(projects: Project[]) {
         projectList.innerHTML = "";
         for (const project of projects) {
-            const a = document.createElement("a");
-            a.classList.add("project");
-            a.href = `project.html?id=${project.id}`;
-            a.textContent = project.name;
-            projectList.appendChild(a);
+            const div = document.createElement("div");
+            div.classList.add("project");
+            const spanName = document.createElement("span");
+            spanName.classList.add("name");
+            spanName.textContent = project.name;
+            div.appendChild(spanName);
+
+            if(project.ownerId === id) {
+                const img = document.createElement("img");
+                img.src = "./resources/crown.svg";
+                div.appendChild(img);
+            }
+
+            const spanMembers = document.createElement("span");
+            const members = await client.getProjectMembersCnt(project.id, true);
+
+            spanMembers.textContent = `${members}/${project.maxMembers} Members`;
+            div.appendChild(spanMembers);
+
+            div.addEventListener("click", function () {
+                location.href = `project.html?id=${project.id}`;
+            });
+
+            projectList.appendChild(div);
         }
     }
     addProjectsToList(projects);
