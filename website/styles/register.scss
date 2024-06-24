@@ -6,7 +6,16 @@ form{
 
 h1{
     text-align: center;
+}
 
+body, input, button{
+  font-size: 1.2rem;
+}
+
+button{
+  padding: 0.7rem;
+  width: fit-content;
+  align-self: center;
 }
 
 #abilities{
@@ -21,15 +30,25 @@ h1{
   background-color: #ececec;
   label{
     user-select: none;
+    display: inline-block;
+    width: 90%;
   }
   *{
     cursor: pointer;
   }
 }
 
+input[type="checkbox"]{
+  zoom: 1.2;
+}
+
 .children {
   display: none;
 }
 
-
+@media (max-width: 1024px) and (orientation: portrait){
+  body{
+    margin: 1rem !important;
+  }
+}
 

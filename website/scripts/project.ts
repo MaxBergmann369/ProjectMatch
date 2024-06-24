@@ -86,6 +86,23 @@ document.addEventListener("DOMContentLoaded", async() => {
     if(project.ownerId === user.userId) {
         await handleProjectOwner(project);
     }
+    else if(projectMembers.length < project.maxMembers && !projectMembers.find(value => value.userId === user.userId)) {
+        const joinBtn = document.getElementById("deleteProject");
+        joinBtn.style.display = "block";
+        const img = document.createElement("img");
+        img.src = "./resources/project/detail/user-plus.svg";
+        img.alt = "Join Project";
+        joinBtn.appendChild(img);
+
+        joinBtn.addEventListener("click", async () => {
+            if(await client.addProjectMember(project.id)) {
+                alert("A request has been sent to the project owner.");
+            }
+            else {
+                alert("You have already sent a request to join this project.");
+            }
+        });
+    }
 });
 
 let switched: boolean = false;
@@ -109,6 +126,21 @@ function handleProjectOwner(project: Project) {
         }
 
         switched = !switched;
+    });
+
+    const deleteBtn = document.getElementById("deleteProject");
+    deleteBtn.style.display = "block";
+    const img = document.createElement("img");
+    img.src = "./resources/trash.svg";
+    img.alt = "Delete";
+    deleteBtn.appendChild(img);
+
+    deleteBtn.addEventListener("click", async () => {
+        const confirmation = confirm("Are you sure you want to delete this project?");
+        if(confirmation) {
+            await client.deleteProject(project.id);
+            location.href = "home.html";
+        }
     });
 }
 
@@ -186,7 +218,7 @@ function loadMembers(projectMembers:User[],project: Project, maxMembers: number,
             });
 
             const img3 = document.createElement("img");
-            img3.src = "resources/cross.svg";
+            img3.src = "resources/x.svg";
             img3.alt = "Owner";
             img3.style.width = "30px";
             img3.style.height = "30px";
@@ -216,6 +248,11 @@ function loadProjectAbilities(projectAbilites:Ability[]){
 function loadLinks(urls:string[]){
     const links = document.getElementById("links");
     links.innerHTML = "";
+    console.log(urls)
+    if (urls.every((u) => u === "") || urls.length === 0){
+        links.innerText = "There are no links for this project.";
+        return;
+    }
     for (const url of urls) {
         const a = document.createElement("a");
         a.textContent = url;

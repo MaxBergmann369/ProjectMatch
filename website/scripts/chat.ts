@@ -12,7 +12,7 @@ const maxRenderAmount: number = 50;
 
 let client: HttpClient;
 let user: User | null = null;
-let chats: [DirectChat[], string[]] = [[], []];
+let chats: [DirectChat[], User[]] = [[], []];
 let chatId: number = -1;
 let layer: number = 0;
 let messageAmount: number = 0;
@@ -57,7 +57,8 @@ async function addEventListener() {
 
     const addBtn = document.getElementById("addChat");
 
-    addBtn.addEventListener("click", async () => {
+    addBtn.addEventListener("submit", async (e) => {
+        e.preventDefault();
         const input = document.getElementById("input-user") as HTMLInputElement;
         let userFullName = input.value;
 
@@ -98,6 +99,24 @@ async function addEventListener() {
     await searchForChat();
 }
 
+async function loadDeleteBtn() {
+    const deleteBtns = document.getElementsByClassName("delete");
+
+    for(const deleteBtn of deleteBtns) {
+        deleteBtn.addEventListener("click", async (event) => {
+            const element = event.target as HTMLElement;
+            const id = parseInt(element.id);
+
+            const confirmDelete = confirm("Are you sure you want to delete this message?");
+
+            if(confirmDelete) {
+                await client.deleteMessage(id);
+                await renderChatMessages(chatId);
+            }
+        });
+    }
+}
+
 async function loadChatProfileButtons() {
     const chatProfiles = document.getElementsByClassName("chat");
 
@@ -117,7 +136,12 @@ async function loadChatProfileButtons() {
 
             if(!isNaN(id)) {
                 chatId = id;
-
+                // set chatId as param so the chat persists on reload
+                const url = new URL(window.location.toString())
+                url.searchParams.set("chat", id.toString());
+                history.replaceState(null, '', url);
+                document.querySelectorAll(".active").forEach(el => el.classList.remove("active"));
+                document.getElementById(id.toString()).classList.add("active");
                 const layerUp = document.getElementById("layer-up");
 
                 if(messageAmount <= maxRenderAmount) {
@@ -125,7 +149,19 @@ async function loadChatProfileButtons() {
                 }
 
                 await renderChatMessages(id);
-                await renderChatProfiles(true);
+                scrollToBottom();
+
+                //update the notification icon
+                const otherUserId = chats[0].find(chat => chat.id === id)?.otherUserId;
+                const unreadMessages = await client.getUnreadMessages(id, otherUserId);
+
+                console.log(unreadMessages);
+
+                if(unreadMessages >= 0) {
+                    const div = document.getElementById(id.toString());
+                    (div.getElementsByClassName("badge")[0] as HTMLImageElement).src = `resources/icons/badge-${unreadMessages <= 10? unreadMessages : 10}.ico`;
+                }
+
                 await renderChatNotificationIcon();
             }
         });
@@ -149,34 +185,63 @@ async function addUserButtons() {
     }
 }
 
-async function renderChatProfiles(load: boolean = true) {
-    if(load) {
+async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
+    const list = document.getElementById("chat-list");
+    list.innerHTML = "";
+    let len:number;
+    if(!sortedChats) {
         chats[0] = await client.getDirectChats(user.userId);
         chats[1] = [];
+        len = chats[0].length;
+    }
+    else{
+        len = sortedChats[0].length;
     }
 
-    const list = document.getElementById("chat-list");
-    let chatElement: string = "";
+    const userIds = chats[0].map(chat => chat.userId === user.userId ? chat.otherUserId : chat.userId);
 
-    for(let i = 0; i < chats[0].length; i++) {
-        const userId = chats[0][i].userId === user.userId ? chats[0][i].otherUserId : chats[0][i].userId;
+    const profiles = await client.getChatProfiles(userIds);
 
-        let fullName: string;
+    for(let i = 0; i < len; i++) {
+        let currUser: User;
         let unreadMessages: number = 0;
 
-        if(load) {
-            unreadMessages = await client.getUnreadMessages(chats[0][i].id, user.userId);
-            fullName = await client.getFullNameByUserId(userId);
-            chats[1].push(fullName);
+        if(!sortedChats) {
+            unreadMessages = profiles[i][1];
+            currUser = profiles[i][0];
+            chats[1].push(currUser);
         }
         else {
-            fullName = chats[1][i];
+            currUser = sortedChats[1][i];
         }
 
-        chatElement += `<div class="chat" id="${chats[0][i].id}">${fullName} ${unreadMessages}</div>`;
-    }
+        const userDiv = document.createElement("div");
+        const pfp = document.createElement("img");
+        const name = document.createElement("p");
+        const fullname = `${currUser.firstname} ${currUser.lastname}`;
+        name.textContent = fullname;
+        pfp.alt = `${fullname}'s profile picture`;
+        pfp.classList.add("pfp");
+        if (currUser.pfp == null) {
+            pfp.src = "resources/profile/pfp/default.jpg";
+        }else{
+            pfp.src = `${HttpClient.pfpUrl}/${currUser.pfp}`;
 
-    list.innerHTML = chatElement;
+        }
+        const badgeNum = unreadMessages <= 10? unreadMessages : 10;
+
+        userDiv.appendChild(pfp);
+        userDiv.appendChild(name);
+            const notif = document.createElement("img");
+
+        notif.src = `resources/icons/badge-${badgeNum}.ico`;
+        notif.alt = `${unreadMessages} new messages`;
+        notif.classList.add("badge");
+        userDiv.appendChild(notif);
+        userDiv.classList.add("chat");
+        userDiv.id = chats[0][i].id.toString();
+        list.appendChild(userDiv);
+    }
 
     await loadChatProfileButtons();
 }
@@ -285,7 +350,7 @@ async function loadChatMessages(id: number) {
             recentMessages = [];
         }
 
-        const displayMessage = `${message.userId};${time};${username};${message.message}`;
+        const displayMessage = `${message.userId};${time};${username};${message.message};${message.id}`;
 
         recentMessages.push(displayMessage);
     }
@@ -324,10 +389,11 @@ async function renderChatMessages(id : number, scrollDown: boolean = false) {
             const time: string = data[1];
             const username: string = data[2];
             let message: string = data[3];
+            const id: string = data[4];
             message = message.replace(/</g, "&lt;");
             message = message.replace(/>/g, "&gt;");
             if (userId === user.userId) {
-                html += `<div class="own-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
+                html += `<div class="own-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><div><span>${message}</span><img id=${id} class="delete" src="./resources/trash.svg" alt="delete"></div></div></div>`;
             } else {
                 html += `<div class="other-message message"><div class="msg-content"><div><b class="username">${username}:</b><span class="time">${time}</span></div><span>${message}</span></div></div>`;
             }
@@ -335,6 +401,8 @@ async function renderChatMessages(id : number, scrollDown: boolean = false) {
     }
 
     chat.innerHTML = html;
+
+    await loadDeleteBtn();
 
     const layerDown = document.getElementById("layer-down");
 
@@ -403,31 +471,37 @@ async function loadUsernames() {
 
 async function searchForChat() {
     const input = document.getElementById("input-chat") as HTMLInputElement;
-
+    let prev = "";
+    let sortedChats = chats;
     input.addEventListener("input", async () => {
         const search = input.value.toLowerCase();
-
         if(search === "") {
+            prev = search;
             searching = false;
+            sortedChats = chats;
             await renderChatProfiles();
             return;
         }
+        if (search.length < prev.length){
+            sortedChats = chats;
+        }
+        prev = search;
 
         searching = true;
-
         //sort the chats by the search input
-        const sortedChats: [DirectChat[], string[]] = [[], []];
+        const newSortedChats: [DirectChat[], User[]] = [[], []];
 
-        for(let i = 0; i < chats[0].length; i++) {
-            if(chats[1][i].toLowerCase().startsWith(search)) {
-                sortedChats[0].push(chats[0][i]);
-                sortedChats[1].push(chats[1][i]);
+        for(let i = 0; i < sortedChats[0].length; i++) {
+            const currUser = sortedChats[1][i];
+            if(currUser.firstname.toLowerCase().startsWith(search) || currUser.lastname.toLowerCase().startsWith(search) || `${currUser.firstname.toLowerCase()} ${currUser.lastname.toLowerCase()}`.startsWith(search)) {
+                newSortedChats[0].push(sortedChats[0][i]);
+                newSortedChats[1].push(currUser);
             }
         }
+        sortedChats = newSortedChats;
+        // chats = sortedChats;
 
-        chats = sortedChats;
-
-        await renderChatProfiles(false);
+        await renderChatProfiles(newSortedChats);
     });
 }
 

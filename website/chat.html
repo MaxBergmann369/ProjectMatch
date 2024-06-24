@@ -8,16 +8,19 @@
     <script src="scripts/dist/chat.bundle.js"></script>
 </head>
 <body>
-<a target="_blank" id="credits" href="https://www.vecteezy.com/free-vector/pattern">Pattern Vectors by Vecteezy</a>
 <div id="chat" class="main">
-    <div class="side-bar">
-        <input type="text" id="input-chat" placeholder="Search" maxlength="40">
-        <div id="chat-list">
+    <div id="side-bar">
+        <div id="chat-list-and-search">
+            <input type="text" id="input-chat" placeholder="Search" maxlength="40">
+            <div id="chat-list">
+            </div>
         </div>
-        <div id="user-list"></div>
         <div class="add-chat">
+            <div id="user-list"></div>
+            <form id="addChat">
             <input type="text" id="input-user" placeholder="Add" maxlength="40">
-            <button id="addChat">+</button>
+            <button type="submit" class="input">+</button>
+            </form>
         </div>
     </div>
 <div id="chatandinput">
@@ -34,5 +37,7 @@
 </form>
 </div>
 </div>
+<a target="_blank" id="credits" href="https://www.vecteezy.com/free-vector/pattern">Pattern Vectors by Vecteezy</a>
+
 </body>
 </html>

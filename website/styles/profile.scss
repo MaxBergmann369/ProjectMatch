@@ -171,7 +171,8 @@
 #ability-list {
   display: flex;
   flex-direction: row;
-  gap: 1rem;
+  padding: 1.5rem 3rem;
+  gap: 5rem;
   justify-content: center;
   flex-wrap: wrap;
   * {
@@ -197,7 +198,7 @@
 
 #projectList {
   overflow-y: auto;
-  max-height: 28rem;
+  min-height: 80%;
 }
 
 
@@ -259,9 +260,9 @@
   flex:2;
   position: relative;
   #create{
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
+    position: sticky;
+    bottom: 0;
+    float: right;
     background: #bababa;
     border-radius: var(--rounded);
     padding: 0.5rem 1rem;
@@ -295,27 +296,6 @@
 
 }
 
-#ability-list{
-  display: flex;
-  flex-direction: row;
-  gap: 5rem;
-  padding: 1.5rem 3rem;
-  justify-content: center;
-    flex-wrap: wrap;
-
-  *{
-    background: #ededed;
-    border-radius: var(--rounded);
-  }
-  & > li{
-    & > span{
-      font-weight: bold;
-      font-size: 1.5rem;
-    }
-
-    list-style-type: none;
-  padding: 2rem 3rem;}
-}
 
 #projectTabs{
     display: flex;
@@ -325,6 +305,7 @@
     button{
       border-radius: var(--rounded);
       text-transform: uppercase;
+      font-size: 1rem;
         padding: 1rem 1.5rem;
         background: #bababa;
         color: black;
@@ -345,9 +326,25 @@
   padding: 5px;
   background-color: #d6d6d6;
   label{
-    user-select: none;
+  user-select: none;
+  display: inline-block;
+  width: 90%;
   }
   *{
     cursor: pointer;
+  }
+}
+
+@media (max-width: 1024px) and (orientation: portrait){
+  body{
+    margin: 1rem !important;
+  }
+
+  #abilitiesEdit{
+    zoom: 1.3;
+  }
+
+  .container{
+    padding: 1rem;
   }
 }

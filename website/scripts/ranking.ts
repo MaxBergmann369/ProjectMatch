@@ -1,15 +1,11 @@
-import { Card } from './card';
-import {initKeycloak, keycloak} from "./keycloak";
-import {Project, User} from "./models";
+import {Project} from "./models";
 import {TokenUser} from "./tokenUser";
 import {HttpClient} from "./server-client";
 import "./general";
-import {SocketClient} from "./socket-client";
 // this tells webpack to include the home.ts file in the bundle
 
 let user: TokenUser = null;
 let client : HttpClient = null;
-let clicked: boolean = false;
 
 export async function initRanking(tokenUser: TokenUser) {
     user = tokenUser;
@@ -24,20 +20,17 @@ export async function initRanking(tokenUser: TokenUser) {
     window.addEventListener('click', async (event) => {
         if (!background.contains(event.target as Node) && event.target !== background) {
             background.style.display = 'none';
-            clicked = false;
         }
     });
 
     ranking.addEventListener('click', async () => {
-        if(!clicked) {
+        if(background.style.display === 'none' || background.style.display === '') {
             await addTableContent();
 
             background.style.display = 'flex';
-            clicked = true;
         }
         else {
             background.style.display = 'none';
-            clicked = false;
         }
     });
 }
@@ -132,7 +125,8 @@ async function addTableContent() {
     const memberProjects = projects[2];
 
     for (let i = 0; i < viewProjects.length; i++) {
-        const project = viewProjects[i];
+        const project = viewProjects[i][0];
+        const view = viewProjects[i][1];
         const projectDiv = document.createElement('div');
         projectDiv.classList.add('project');
         projectDiv.id = `v${String(project.id)}`;
@@ -145,7 +139,7 @@ async function addTableContent() {
         const img = document.createElement('img');
         img.src = "resources/project/detail/view.svg";
         img.alt = "Views";
-        views.innerHTML = `${await client.getViews(project.id)}`;
+        views.innerHTML = `${view}`;
         projectDiv.appendChild(views);
         projectDiv.appendChild(img);
 
@@ -153,7 +147,8 @@ async function addTableContent() {
     }
 
     for (let i = 0; i < likeProjects.length; i++) {
-        const project = likeProjects[i];
+        const project = likeProjects[i][0];
+        const like = likeProjects[i][1];
         const projectDiv = document.createElement('div');
         projectDiv.classList.add('project');
         projectDiv.id = `l${String(project.id)}`;
@@ -166,7 +161,7 @@ async function addTableContent() {
         const img = document.createElement('img');
         img.src = "resources/project/detail/star.svg";
         img.alt = "Likes";
-        likes.innerHTML = `${await client.getLikes(project.id)}`;
+        likes.innerHTML = `${like}`;
         projectDiv.appendChild(likes);
         projectDiv.appendChild(img);
 
@@ -174,7 +169,8 @@ async function addTableContent() {
     }
 
     for (let i = 0; i < memberProjects.length; i++) {
-        const project = memberProjects[i];
+        const project = memberProjects[i][0];
+        const member = memberProjects[i][1];
         const projectDiv = document.createElement('div');
         projectDiv.classList.add('project');
         projectDiv.id = `m${String(project.id)}`;
@@ -187,12 +183,25 @@ async function addTableContent() {
         const img = document.createElement('img');
         img.src = "resources/project/detail/user.svg";
         img.alt = "Members";
-        members.innerHTML = `${(await client.getProjectMembers(project.id)).length}/${project.maxMembers}`;
+        members.innerHTML = `${member}/${project.maxMembers}`;
         projectDiv.appendChild(members);
         projectDiv.appendChild(img);
 
         memberTableContent.appendChild(projectDiv);
     }
 
+    addButtons();
+}
 
+function addButtons() {
+    const projects = document.getElementsByClassName('project');
+
+    for(const project of projects) {
+        project.addEventListener('click', async () => {
+            const id = project.id.slice(1);
+            const projectId = parseInt(id);
+
+            location.href = `project.html?id=${projectId}`;
+        });
+    }
 }

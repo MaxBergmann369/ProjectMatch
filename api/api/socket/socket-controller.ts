@@ -17,16 +17,15 @@ export class SocketController {
 
             const tokenUser = EndPoints.getToken(authHeader);
 
-            if (tokenUser === null) {
+            if (tokenUser === null || tokenUser.userId === null) {
                 return;
             }
 
             SocketController.userSocketMap.set(tokenUser.userId, socket.id);
+            SocketController.io.emit('onlineUser', SocketController.userSocketMap.size);
         });
 
-        SocketController.io.emit('onlineUser', SocketController.io.engine.clientsCount);
-
-        socket.on("disconnect", () => this.onDisconnect());
+        socket.on("disconnect", () => this.onDisconnect(socket));
     }
 
     static addMessage(chatId, userId) {
@@ -71,9 +70,15 @@ export class SocketController {
         });
     }
 
-    static onDisconnect() {
-        setTimeout(() => {
-            SocketController.io.emit('onlineUser', SocketController.io.engine.clientsCount);
-        }, 100);
+    static onDisconnect(socket: Socket) {
+        //remove user from map
+        SocketController.userSocketMap.forEach((value, key) => {
+            if (value === socket.id) {
+                SocketController.userSocketMap.delete(key);
+                setTimeout(() => {
+                    SocketController.io.emit('onlineUser', SocketController.userSocketMap.size);
+                }, 100);
+            }
+        });
     }
 }

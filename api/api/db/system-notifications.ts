@@ -25,7 +25,7 @@ export class SystemNotification {
     static async projectAccepted(userId: string, projectId: number) {
         try {
             const project = await ProjectUtility.getProject(projectId);
-            await UserUtility.addNotification(userId, `Congratulations you got accepted!`, `You got accepted by ${project.name}.${separator}project${separator}${projectId}`);
+            await UserUtility.addNotification(userId, `Congratulations you got accepted!`, `You are now member of ${project.name}.${separator}project${separator}${projectId}`);
             SocketController.updateNotification(userId);
         } catch (e) { /* empty */ }
     }

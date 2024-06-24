@@ -278,7 +278,7 @@ export class ProjectUtility {
                 return false;
             }
 
-            if(!(await this.isUserOwnerOfProject(owId, projectId))) {
+            if((!(await this.isUserOwnerOfProject(owId, projectId))) && owId !== id) {
                 return false;
             }
 

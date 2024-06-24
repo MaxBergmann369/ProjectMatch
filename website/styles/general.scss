@@ -37,6 +37,8 @@ body {
   padding: 0;
   font-family: 'Carlito', sans-serif;
   //overflow-y: hidden;
+  touch-action: manipulation;
+
 }
 
 input, .input{
@@ -59,8 +61,8 @@ nav {
   background: #ededed;
   width: fit-content;
   box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  border-radius: 8px;
-  padding: 10px 20px;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
   position: absolute;
   // center
   left: 50%;
@@ -73,8 +75,8 @@ nav {
     flex-direction: row;
     gap: 0.6rem;
     font-family: 'Carlito', sans-serif;
-    margin: 0 10px;
-    padding: 10px 20px;
+    margin: 0 0.6rem;
+    padding: 0.6rem 1rem;
     img{
       cursor: pointer;
     }
@@ -102,4 +104,23 @@ nav {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+}
+
+@media (max-width: 1024px) and (orientation: portrait){
+  :root{
+    font-size: 2rem;
+  }
+  nav{
+    //top: 2rem;
+    //border-radius: 1.3rem;
+    //padding: 1rem 1.3rem;
+    .navButton{
+      img:not(.notification-icon){
+        width: 3vh;
+        height: 3vh;
+      }
+      //padding: 1rem;
+      //margin: 0 1.3rem;
+    }
+  }
 }

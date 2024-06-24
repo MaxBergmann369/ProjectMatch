@@ -138,5 +138,5 @@ dist
 /website/dist/*.js.map
 /api/api/**/*.js
 /api/api/**/*.js.map
-/api/public/pfp/*.jpeg
+/api/public/pfp/*
 /api/projectMatch.db

@@ -3,16 +3,16 @@ import {keycloak} from "./keycloak";
 import {Image} from 'image-js';
 
 export class HttpClient {
-    // static baseBaseUrl = "http://localhost:3000";
-    static baseBaseUrl = "https://pm.hoellerl.dev";
-    static pfpUrl = `${HttpClient.baseBaseUrl}/pfp`;
-    baseUrl = `${HttpClient.baseBaseUrl}/api`;
+    static baseUrl = "http://localhost:3000";
+    //static baseUrl = "https://pm.hoellerl.dev";
+    static pfpUrl = `${HttpClient.baseUrl}/pfp`;
+    apiUrl = `${HttpClient.baseUrl}/api`;
     bearer = `Bearer ${keycloak.token}`;
 
     /* region User */
 
     async logout() {
-        return await fetch(`${this.baseUrl}/logout`, {
+        return await fetch(`${this.apiUrl}/logout`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -34,7 +34,7 @@ export class HttpClient {
         const formData = new FormData();
         formData.append('image', resizedImage);
 
-        return await fetch(`${this.baseUrl}/user/image`, {
+        return await fetch(`${this.apiUrl}/user/image`, {
             method: 'POST',
             headers: {
                 Authorization: this.bearer
@@ -45,7 +45,7 @@ export class HttpClient {
     }
 
     async addUser(username: string, birthdate: string) {
-        return await fetch(`${this.baseUrl}/user`, {
+        return await fetch(`${this.apiUrl}/user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export class HttpClient {
     }
 
     async getUser(userId: string): Promise<User | null> {
-        return await fetch(`${this.baseUrl}/user/${userId}`, {
+        return await fetch(`${this.apiUrl}/user/${userId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -70,8 +70,22 @@ export class HttpClient {
 
     }
 
+    async getChatProfiles(userIds: string[]): Promise<[User, number][] | null> {
+        return await fetch(`${this.apiUrl}/user/profiles`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: this.bearer
+            },
+            body: JSON.stringify({
+                userIds: userIds
+            })
+        })
+            .then(response => response.ok? response.json() : null);
+    }
+
     async getFullNameByUserId(userId: string): Promise<string | null> {
-        return await fetch(`${this.baseUrl}/user/fullName/${userId}`, {
+        return await fetch(`${this.apiUrl}/user/fullName/${userId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -81,7 +95,7 @@ export class HttpClient {
     }
 
     async getTop10UserMatching(fullName: string) {
-        return await fetch(`${this.baseUrl}/user/top10/${fullName}`, {
+        return await fetch(`${this.apiUrl}/user/top10/${fullName}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -91,7 +105,7 @@ export class HttpClient {
     }
 
     async getUserId(fullName: string): Promise<string | null> {
-        return await fetch(`${this.baseUrl}/userId/${fullName}`, {
+        return await fetch(`${this.apiUrl}/userId/${fullName}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -101,7 +115,7 @@ export class HttpClient {
     }
 
     async updateUser(userId: string, username:string, bio: string) {
-        return await fetch(`${this.baseUrl}/user`, {
+        return await fetch(`${this.apiUrl}/user`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -117,7 +131,7 @@ export class HttpClient {
     }
 
     async deleteUser(userId: string) {
-        return await fetch(`${this.baseUrl}/user/${userId}`, {
+        return await fetch(`${this.apiUrl}/user/${userId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
@@ -127,7 +141,7 @@ export class HttpClient {
     }
 
     async addUserAbilities(userId: string, abilityIds: number[]) {
-        return await fetch(`${this.baseUrl}/user/${userId}/abilities`, {
+        return await fetch(`${this.apiUrl}/user/${userId}/abilities`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -141,7 +155,7 @@ export class HttpClient {
     }
 
     async updateUserAbilities(userId: string, abilityIds: number[]) {
-        return await fetch(`${this.baseUrl}/user/${userId}/abilities`, {
+        return await fetch(`${this.apiUrl}/user/${userId}/abilities`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -155,7 +169,7 @@ export class HttpClient {
     }
 
     async getUserAbilities(userId: string) : Promise<Ability[] | null> {
-        return await fetch(`${this.baseUrl}/user/${userId}/abilities`, {
+        return await fetch(`${this.apiUrl}/user/${userId}/abilities`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -165,7 +179,7 @@ export class HttpClient {
     }
 
     async getNotifications(userId: string): Promise<Notification[]> {
-        return await fetch(`${this.baseUrl}/user/${userId}/notification/`, {
+        return await fetch(`${this.apiUrl}/user/${userId}/notification/`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -175,7 +189,7 @@ export class HttpClient {
     }
 
     async markNotificationAsSeen(userId: string, notId: number) {
-        return await fetch(`${this.baseUrl}/user/notification`, {
+        return await fetch(`${this.apiUrl}/user/notification`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -190,7 +204,7 @@ export class HttpClient {
     }
 
     async deleteUserAbility(userId: string, abilityId: number) {
-        return await fetch(`${this.baseUrl}/user/${userId}/abilities/${abilityId}`, {
+        return await fetch(`${this.apiUrl}/user/${userId}/abilities/${abilityId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
@@ -200,7 +214,7 @@ export class HttpClient {
     }
 
     async getAbilities() : Promise<Ability[] | null> {
-        return await fetch(`${this.baseUrl}/user/abilities`, {
+        return await fetch(`${this.apiUrl}/user/abilities`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -214,7 +228,7 @@ export class HttpClient {
     /* region Project */
 
     async addProject(project: Project) {
-        return await fetch(`${this.baseUrl}/projects`, {
+        return await fetch(`${this.apiUrl}/projects`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -226,7 +240,7 @@ export class HttpClient {
     }
 
     async getProject(projectId: number): Promise<Project | null> {
-        return await fetch(`${this.baseUrl}/projects/id/${projectId}`, {
+        return await fetch(`${this.apiUrl}/projects/id/${projectId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -240,7 +254,7 @@ export class HttpClient {
         if (showOldProjects === undefined) {
             showOldProjects = false;
         }
-        return await fetch(`${this.baseUrl}/projects/${showOldProjects}`, {
+        return await fetch(`${this.apiUrl}/projects/${showOldProjects}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -251,7 +265,7 @@ export class HttpClient {
     }
 
     async getTop10Projects() {
-        return await fetch(`${this.baseUrl}/projects/top10`, {
+        return await fetch(`${this.apiUrl}/projects/top10`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -261,7 +275,7 @@ export class HttpClient {
     }
 
     async deleteData() {
-        return await fetch(`${this.baseUrl}/deleteData`, {
+        return await fetch(`${this.apiUrl}/deleteData`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
@@ -271,7 +285,7 @@ export class HttpClient {
     }
 
     async updateProject(project: Project) {
-        return await fetch(`${this.baseUrl}/projects`, {
+        return await fetch(`${this.apiUrl}/projects`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -283,7 +297,7 @@ export class HttpClient {
     }
 
     async deleteProject(projectId: number) {
-        return await fetch(`${this.baseUrl}/projects/${projectId}`, {
+        return await fetch(`${this.apiUrl}/projects/${projectId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
@@ -293,18 +307,18 @@ export class HttpClient {
     }
 
     async addProjectMember(projectId: number) {
-        return await fetch(`${this.baseUrl}/projects/members/${projectId}`, {
+        return await fetch(`${this.apiUrl}/projects/members/${projectId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: this.bearer
             }
         })
-            .then(response => response.text());
+            .then(response => response.ok);
     }
 
     async getProjectMembers(projectId: number, isAccepted: boolean=true) : Promise<User[] | null> {
-        return await fetch(`${this.baseUrl}/projects/members/${projectId}/${isAccepted}`, {
+        return await fetch(`${this.apiUrl}/projects/members/${projectId}/${isAccepted}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -314,7 +328,7 @@ export class HttpClient {
     }
 
     async getProjectsWhereUserIsMember(userId: string, isAccepted:boolean=true):Promise<Project[] | null> {
-        return await fetch(`${this.baseUrl}/users/members/${userId}/${isAccepted}`, {
+        return await fetch(`${this.apiUrl}/users/members/${userId}/${isAccepted}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -324,7 +338,7 @@ export class HttpClient {
     }
 
     async getProjectsLikedByUser(userId: string):Promise<Project[] | null> {
-        return await fetch(`${this.baseUrl}/projects/liked/${userId}`, {
+        return await fetch(`${this.apiUrl}/projects/liked/${userId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -334,7 +348,7 @@ export class HttpClient {
     }
 
     async acceptProjectMember(projectId: number, userId: string) {
-            return await fetch(`${this.baseUrl}/projects/${projectId}/members/${userId}`, {
+            return await fetch(`${this.apiUrl}/projects/${projectId}/members/${userId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -345,7 +359,7 @@ export class HttpClient {
     }
 
     async deleteProjectMember(projectId: number, userId: string) {
-        return await fetch(`${this.baseUrl}/projects/${projectId}/members/${userId}`, {
+        return await fetch(`${this.apiUrl}/projects/${projectId}/members/${userId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
@@ -355,7 +369,7 @@ export class HttpClient {
     }
 
     async addView(projectId: number) {
-        return await fetch(`${this.baseUrl}/views`, {
+        return await fetch(`${this.apiUrl}/views`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -369,7 +383,7 @@ export class HttpClient {
     }
 
     async getViews(projectId: number) {
-        return await fetch(`${this.baseUrl}/views/${projectId}`, {
+        return await fetch(`${this.apiUrl}/views/${projectId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -379,7 +393,7 @@ export class HttpClient {
     }
 
     async addLike(projectId: number) {
-        return await fetch(`${this.baseUrl}/likes`, {
+        return await fetch(`${this.apiUrl}/likes`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -393,7 +407,7 @@ export class HttpClient {
     }
 
     async getLikes(projectId: number) {
-        return await fetch(`${this.baseUrl}/likes/${projectId}`, {
+        return await fetch(`${this.apiUrl}/likes/${projectId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -403,7 +417,7 @@ export class HttpClient {
     }
 
     async isLiked(projectId: number, userId: string): Promise<boolean> {
-        return await fetch(`${this.baseUrl}/isLiked/${projectId}/${userId}`, {
+        return await fetch(`${this.apiUrl}/isLiked/${projectId}/${userId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -413,7 +427,7 @@ export class HttpClient {
     }
 
     async deleteLike(projectId: number) {
-        return await fetch(`${this.baseUrl}/likes/${projectId}`, {
+        return await fetch(`${this.apiUrl}/likes/${projectId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
@@ -423,7 +437,7 @@ export class HttpClient {
     }
 
     async addProjectAbilities(projectId: number, abilityIds: number[]) {
-        return await fetch(`${this.baseUrl}/projects/${projectId}/abilities`, {
+        return await fetch(`${this.apiUrl}/projects/${projectId}/abilities`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -437,7 +451,7 @@ export class HttpClient {
     }
 
     async getProjectAbilities(projectId: number):Promise<Ability[]> {
-        return await fetch(`${this.baseUrl}/projects/${projectId}/abilities`, {
+        return await fetch(`${this.apiUrl}/projects/${projectId}/abilities`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -447,7 +461,7 @@ export class HttpClient {
     }
 
     async deleteProjectAbility(projectId: number, abilityId: number) {
-        return await fetch(`${this.baseUrl}/projects/${projectId}/abilities/${abilityId}`, {
+        return await fetch(`${this.apiUrl}/projects/${projectId}/abilities/${abilityId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
@@ -461,7 +475,7 @@ export class HttpClient {
     /* region Chat */
 
     async addDirectChat(userId: string, otherUserId: string) {
-        return await fetch(`${this.baseUrl}/chats`, {
+        return await fetch(`${this.apiUrl}/chats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -476,7 +490,7 @@ export class HttpClient {
     }
 
     async getDirectChat(userId: string, otherUserId: string) : Promise<DirectChat> {
-        return await fetch(`${this.baseUrl}/chats/${userId}/${otherUserId}`, {
+        return await fetch(`${this.apiUrl}/chats/${userId}/${otherUserId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -486,7 +500,7 @@ export class HttpClient {
     }
 
     async getDirectChats(userId: string):Promise<DirectChat[]> {
-        return await fetch(`${this.baseUrl}/chats/${userId}`, {
+        return await fetch(`${this.apiUrl}/chats/${userId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -496,7 +510,7 @@ export class HttpClient {
     }
 
     async updateDirectChat(chatId: number, userId: string) {
-        return await fetch(`${this.baseUrl}/chats/${chatId}/${userId}`, {
+        return await fetch(`${this.apiUrl}/chats/${chatId}/${userId}`, {
             method: 'PUT',
             headers: {
                 Authorization: this.bearer
@@ -506,7 +520,7 @@ export class HttpClient {
     }
 
     async deleteDirectChat(userId: string, otherUserId: string) {
-        return await fetch(`${this.baseUrl}/chats/${userId}/${otherUserId}`, {
+        return await fetch(`${this.apiUrl}/chats/${userId}/${otherUserId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer
@@ -516,7 +530,7 @@ export class HttpClient {
     }
 
     async addMessage(chatId: number, userId: string, message: string) {
-        return await fetch(`${this.baseUrl}/messages`, {
+        return await fetch(`${this.apiUrl}/messages`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -532,7 +546,7 @@ export class HttpClient {
     }
 
     async getMessages(chatId: number, min: number, max: number) :Promise<[number, Message[]]>  {
-        return await fetch(`${this.baseUrl}/messages/${chatId}/${min}/${max}`, {
+        return await fetch(`${this.apiUrl}/messages/${chatId}/${min}/${max}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -542,7 +556,7 @@ export class HttpClient {
     }
 
     async getUnreadMessages(chatId: number, userId: string): Promise<number> {
-        return await fetch(`${this.baseUrl}/messages/unread/${chatId}/${userId}`, {
+        return await fetch(`${this.apiUrl}/messages/unread/${chatId}/${userId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -552,7 +566,7 @@ export class HttpClient {
     }
 
     async hasUnreadMessages(userId: string): Promise<boolean> {
-        return await fetch(`${this.baseUrl}/messages/unread/${userId}`, {
+        return await fetch(`${this.apiUrl}/messages/unread/${userId}`, {
             method: 'GET',
             headers: {
                 Authorization: this.bearer
@@ -562,7 +576,7 @@ export class HttpClient {
     }
 
     async editMessage(messageId: number, chatId: number, userId: string, message: string) {
-        return await fetch(`${this.baseUrl}/messages/${chatId}/${messageId}`, {
+        return await fetch(`${this.apiUrl}/messages/${chatId}/${messageId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -576,8 +590,8 @@ export class HttpClient {
             .then(response => response.text());
     }
 
-    async deleteMessage(messageId: number, userId: string) {
-        return await fetch(`${this.baseUrl}/messages/${userId}/${messageId}`, {
+    async deleteMessage(messageId: number) {
+        return await fetch(`${this.apiUrl}/messages/${messageId}`, {
             method: 'DELETE',
             headers: {
                 Authorization: this.bearer

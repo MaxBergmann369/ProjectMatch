@@ -325,6 +325,32 @@ export class Database {
         });
     }
 
+    static async getUserProfiles(userIds: string[]): Promise<[User, number][] | null> {
+        return new Promise((resolve, reject) => {
+            const placeholder = userIds.map(() => "?").join(", ");
+            db.all(`SELECT User.*, COUNT(Message.id) as unreadMessages FROM User LEFT JOIN Message ON User.userId = Message.userId AND Message.isRead = 0 WHERE User.userId IN (${placeholder}) GROUP BY User.userId`, userIds, (err, rows: any[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const users: [User, number][] = rows.map(row => [{
+                        userId: row.userId,
+                        username: row.username,
+                        firstname: row.firstname,
+                        lastname: row.lastname,
+                        pfp: row.pfp,
+                        email: row.email,
+                        clazz: row.clazz,
+                        birthdate: new Date(row.birthdate),
+                        biografie: row.biografie,
+                        permissions: row.permissions,
+                        department: row.department
+                    }, row.unreadMessages]);
+                    resolve(users);
+                }
+            });
+        });
+    }
+
     static async getUserIdByFullName(firstname: string, lastname: string): Promise<string | null> {
         return new Promise((resolve, reject) => {
             db.get(`SELECT userId FROM User WHERE LOWER(firstname) = LOWER(?) AND LOWER(lastname) = LOWER(?)`, [firstname, lastname], (err, row: User) => {
@@ -448,15 +474,15 @@ export class Database {
         });
     }
 
-    static async getTop10Projects(): Promise<Project[][]> {
+    static async getTop10Projects(): Promise<[Project, number][][]> {
         const promises = [
             //get top 10 projects by views
-            new Promise<Project[]>((resolve, reject) => {
-                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM View WHERE projectId = Project.id) DESC LIMIT 10`, (err, rows: Project[]) => {
+            new Promise<[Project, number][]>((resolve, reject) => {
+                db.all(`SELECT *, (SELECT COUNT(*) FROM View WHERE projectId = Project.id) as viewCount FROM Project ORDER BY viewCount DESC LIMIT 10`, (err, rows: any[]) => {
                     if (err) {
                         reject(err);
                     } else {
-                        const projects: Project[] = rows.map(row => ({
+                        const projects: [Project, number][] = rows.map(row => [{
                             id: row.id,
                             name: row.name,
                             ownerId: row.ownerId,
@@ -465,18 +491,18 @@ export class Database {
                             dateOfCreation: new Date(row.dateOfCreation),
                             links: row.links,
                             maxMembers: row.maxMembers
-                        }));
+                        }, row.viewCount]);
                         resolve(projects);
                     }
                 });
             }),
             //get top 10 projects by likes
-            new Promise<Project[]>((resolve, reject) => {
-                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM Like WHERE projectId = Project.id) DESC LIMIT 10`, (err, rows: Project[]) => {
+            new Promise<[Project, number][]>((resolve, reject) => {
+                db.all(`SELECT *, (SELECT COUNT(*) FROM Like WHERE projectId = Project.id) as likeCount FROM Project ORDER BY likeCount DESC LIMIT 10`, (err, rows: any[]) => {
                     if (err) {
                         reject(err);
                     } else {
-                        const projects: Project[] = rows.map(row => ({
+                        const projects: [Project, number][] = rows.map(row => [{
                             id: row.id,
                             name: row.name,
                             ownerId: row.ownerId,
@@ -485,18 +511,18 @@ export class Database {
                             dateOfCreation: new Date(row.dateOfCreation),
                             links: row.links,
                             maxMembers: row.maxMembers
-                        }));
+                        }, row.likeCount]);
                         resolve(projects);
                     }
                 });
             }),
             //get top 10 projects by memberCnt and date of creation
-            new Promise<Project[]>((resolve, reject) => {
-                db.all(`SELECT * FROM Project ORDER BY (SELECT COUNT(*) FROM ProjectMember WHERE projectId = project.id) DESC, dateOfCreation DESC LIMIT 10`, (err, rows: Project[]) => {
+            new Promise<[Project, number][]>((resolve, reject) => {
+                db.all(`SELECT *, (SELECT COUNT(*) FROM ProjectMember WHERE projectId = project.id AND isAccepted = 1) as memberCount FROM Project ORDER BY memberCount DESC LIMIT 10`, (err, rows: any[]) => {
                     if (err) {
                         reject(err);
                     } else {
-                        const projects: Project[] = rows.map(row => ({
+                        const projects: [Project, number][] = rows.map(row => [{
                             id: row.id,
                             name: row.name,
                             ownerId: row.ownerId,
@@ -505,7 +531,7 @@ export class Database {
                             dateOfCreation: new Date(row.dateOfCreation),
                             links: row.links,
                             maxMembers: row.maxMembers
-                        }));
+                        }, row.memberCount]);
                         resolve(projects);
                     }
                 });
