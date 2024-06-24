@@ -325,6 +325,32 @@ export class Database {
         });
     }
 
+    static async getUserProfiles(userIds: string[]): Promise<[User, number][] | null> {
+        return new Promise((resolve, reject) => {
+            const placeholder = userIds.map(() => "?").join(", ");
+            db.all(`SELECT User.*, COUNT(Message.id) as unreadMessages FROM User LEFT JOIN Message ON User.userId = Message.userId AND Message.isRead = 0 WHERE User.userId IN (${placeholder}) GROUP BY User.userId`, userIds, (err, rows: any[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const users: [User, number][] = rows.map(row => [{
+                        userId: row.userId,
+                        username: row.username,
+                        firstname: row.firstname,
+                        lastname: row.lastname,
+                        pfp: row.pfp,
+                        email: row.email,
+                        clazz: row.clazz,
+                        birthdate: new Date(row.birthdate),
+                        biografie: row.biografie,
+                        permissions: row.permissions,
+                        department: row.department
+                    }, row.unreadMessages]);
+                    resolve(users);
+                }
+            });
+        });
+    }
+
     static async getUserIdByFullName(firstname: string, lastname: string): Promise<string | null> {
         return new Promise((resolve, reject) => {
             db.get(`SELECT userId FROM User WHERE LOWER(firstname) = LOWER(?) AND LOWER(lastname) = LOWER(?)`, [firstname, lastname], (err, row: User) => {

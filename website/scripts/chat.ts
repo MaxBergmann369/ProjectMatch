@@ -149,6 +149,7 @@ async function loadChatProfileButtons() {
                 }
 
                 await renderChatMessages(id);
+                scrollToBottom();
                 // await renderChatProfiles(true);
                 await renderChatNotificationIcon();
             }
@@ -186,7 +187,12 @@ async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
         len = sortedChats[0].length;
     }
 
+    const userIds = chats[0].map(chat => chat.userId === user.userId ? chat.otherUserId : chat.userId);
+    console.log(userIds)
 
+    const profiles = await client.getChatProfiles(userIds);
+
+    console.log(profiles);
 
     for(let i = 0; i < len; i++) {
         const userId = chats[0][i].userId === user.userId ? chats[0][i].otherUserId : chats[0][i].userId;
@@ -195,8 +201,8 @@ async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
         let unreadMessages: number = 0;
 
         if(!sortedChats) {
-            unreadMessages = await client.getUnreadMessages(chats[0][i].id, user.userId);
-            currUser = await client.getUser(userId);
+            unreadMessages = profiles[i][1];
+            currUser = profiles[i][0];
             chats[1].push(currUser);
         }
         else {
@@ -426,9 +432,6 @@ function scrollToBottom(below: boolean = true) {
 
     if(below) {
         chatWindow.scrollTop = chatWindow.scrollHeight + chatWindow.clientHeight;
-    }
-    else {
-        chatWindow.scrollTop = 0;
     }
 }
 

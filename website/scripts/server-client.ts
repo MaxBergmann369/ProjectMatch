@@ -4,7 +4,7 @@ import {Image} from 'image-js';
 
 export class HttpClient {
     static baseUrl = "http://localhost:3000";
-    // static baseUrl = "https://pm.hoellerl.dev";
+    //static baseUrl = "https://pm.hoellerl.dev";
     static pfpUrl = `${HttpClient.baseUrl}/pfp`;
     apiUrl = `${HttpClient.baseUrl}/api`;
     bearer = `Bearer ${keycloak.token}`;
@@ -68,6 +68,20 @@ export class HttpClient {
         })
             .then(response => response.ok? response.json() : null);
 
+    }
+
+    async getChatProfiles(userIds: string[]): Promise<[User, number][] | null> {
+        return await fetch(`${this.apiUrl}/user/profiles`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: this.bearer
+            },
+            body: JSON.stringify({
+                userIds: userIds
+            })
+        })
+            .then(response => response.ok? response.json() : null);
     }
 
     async getFullNameByUserId(userId: string): Promise<string | null> {

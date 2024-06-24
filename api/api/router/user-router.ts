@@ -9,6 +9,7 @@ import multer from 'multer';
 import path from "path";
 
 import * as express from 'express';
+import {Database} from "../db/db";
 
 declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -189,6 +190,33 @@ export function createUserEndpoints() {
                 res.sendStatus(404);
             }
         } catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
+    userRouter.post('/user/profiles', async (req, res) => {
+        try {
+            const ids: string[] = req.body.userIds;
+
+            const authHeader = req.headers.authorization;
+
+            const tokenUser = EndPoints.getToken(authHeader);
+
+            if (tokenUser === null) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const users = await Database.getUserProfiles(ids);
+
+            if(users !== null) {
+                res.status(200).send(users);
+            }
+            else {
+                res.sendStatus(400);
+            }
+        }
+        catch (e) {
             res.sendStatus(400);
         }
     });
