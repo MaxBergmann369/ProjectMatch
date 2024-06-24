@@ -150,7 +150,18 @@ async function loadChatProfileButtons() {
 
                 await renderChatMessages(id);
                 scrollToBottom();
-                // await renderChatProfiles(true);
+
+                //update the notification icon
+                const otherUserId = chats[0].find(chat => chat.id === id)?.otherUserId;
+                const unreadMessages = await client.getUnreadMessages(id, otherUserId);
+
+                console.log(unreadMessages);
+
+                if(unreadMessages >= 0) {
+                    const div = document.getElementById(id.toString());
+                    (div.getElementsByClassName("badge")[0] as HTMLImageElement).src = `resources/icons/badge-${unreadMessages <= 10? unreadMessages : 10}.ico`;
+                }
+
                 await renderChatNotificationIcon();
             }
         });
@@ -188,15 +199,10 @@ async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
     }
 
     const userIds = chats[0].map(chat => chat.userId === user.userId ? chat.otherUserId : chat.userId);
-    console.log(userIds)
 
     const profiles = await client.getChatProfiles(userIds);
 
-    console.log(profiles);
-
     for(let i = 0; i < len; i++) {
-        const userId = chats[0][i].userId === user.userId ? chats[0][i].otherUserId : chats[0][i].userId;
-
         let currUser: User;
         let unreadMessages: number = 0;
 
