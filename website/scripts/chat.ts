@@ -226,20 +226,12 @@ async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
 
         userDiv.appendChild(pfp);
         userDiv.appendChild(name);
-        if (badgeNum !== 0){
             const notif = document.createElement("img");
 
-            notif.src = `resources/icons/badge-${badgeNum}.ico`;
-            notif.alt = `${unreadMessages} new messages`;
-            notif.classList.add("badge");
-            userDiv.appendChild(notif);
-
-        }
-        else{
-            userDiv.appendChild(document.createElement("b"));
-
-
-        }
+        notif.src = badgeNum === 0?"" :`resources/icons/badge-${badgeNum}.ico`;
+        notif.alt = `${unreadMessages} new messages`;
+        notif.classList.add("badge");
+        userDiv.appendChild(notif);
         userDiv.classList.add("chat");
         userDiv.id = chats[0][i].id.toString();
         list.appendChild(userDiv);
