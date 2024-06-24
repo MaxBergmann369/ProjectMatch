@@ -427,9 +427,6 @@ function scrollToBottom(below: boolean = true) {
     if(below) {
         chatWindow.scrollTop = chatWindow.scrollHeight + chatWindow.clientHeight;
     }
-    else {
-        chatWindow.scrollTop = 0;
-    }
 }
 
 async function loadUsernames() {

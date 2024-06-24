@@ -11,6 +11,7 @@
     width: 100%;
   gap: 5rem;
   .container{
+    min-width: 10rem;
     h1,h2 {
         text-align: center;
       margin: 0.3rem;
@@ -153,4 +154,30 @@
   a:hover{
     background: #a5a5a5;
   }
+}
+
+#switch, .member-actions button{
+  img{
+    height: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1024px) and (orientation: portrait){
+  body{
+    margin: 1rem !important;
+  }
+
+  #switch, .member-actions button{
+    height: 2rem;
+    width: 2rem;
+    img{
+
+    }
+  }
+
+  .main .container{
+    height: unset;
+  }
+
 }
