@@ -239,7 +239,7 @@ async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
         notif.classList.add("badge");
         userDiv.appendChild(notif);
         userDiv.classList.add("chat");
-        userDiv.id = chats[0][i].id.toString();
+        userDiv.id = chats[0].find(chat => chat.otherUserId === currUser.userId || chat.userId === currUser.userId)?.id.toString();
         list.appendChild(userDiv);
     }
 
@@ -278,7 +278,15 @@ async function manageMessages() {
 
 const chatMessages = new Map<string, string[]>();
 
+let load: boolean = false;
+
 async function loadChatMessages(id: number) {
+    if(load) {
+        return;
+    }
+
+    load = true;
+
     chatMessages.clear();
 
     const maxLayer = Math.ceil(messageAmount / maxRenderAmount);
@@ -324,6 +332,8 @@ async function loadChatMessages(id: number) {
 
     let recentMessages: string[] = [];
 
+    console.log(orderedMessages);
+
     for(const message of orderedMessages) {
 
         let username = user.username;
@@ -356,6 +366,8 @@ async function loadChatMessages(id: number) {
     }
 
     chatMessages.set(date, recentMessages);
+
+    load = false;
 }
 
 async function renderChatMessages(id : number, scrollDown: boolean = false) {
