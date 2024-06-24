@@ -215,7 +215,7 @@ async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
         const fullname = `${currUser.firstname} ${currUser.lastname}`;
         name.textContent = fullname;
         pfp.alt = `${fullname}'s profile picture`;
-        pfp.id = "pfp";
+        pfp.classList.add("pfp");
         if (currUser.pfp == null) {
             pfp.src = "resources/profile/pfp/default.jpg";
         }else{
@@ -231,7 +231,7 @@ async function renderChatProfiles(sortedChats? : [DirectChat[], User[]]) {
 
             notif.src = `resources/icons/badge-${badgeNum}.ico`;
             notif.alt = `${unreadMessages} new messages`;
-            notif.id = "badge";
+            notif.classList.add("badge");
             userDiv.appendChild(notif);
 
         }
