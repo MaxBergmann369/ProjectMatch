@@ -238,6 +238,31 @@ export function createProjectEndpoints() {
         }
     });
 
+    projectRouter.get('/projects/membersCnt/:projId/:isAccepted', async (req, res) => {
+        try {
+            const projectId = req.params.projId;
+            const isAccepted = req.params.isAccepted === "true";
+
+            const id = parseInt(projectId);
+
+            if (isNaN(id)) {
+                res.sendStatus(400);
+                return;
+            }
+
+            const projectMembers = await Database.getProjectMembersCnt(id, isAccepted);
+
+            if (projectMembers !== null) {
+                res.status(200).send(projectMembers.toString());
+            } else {
+                res.sendStatus(400);
+            }
+        }
+        catch (e) {
+            res.sendStatus(400);
+        }
+    });
+
     projectRouter.get('/projects/liked/:userId', async (req, res) => {
         try {
             const userId = req.params.userId;
