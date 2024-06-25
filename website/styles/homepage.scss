@@ -54,9 +54,10 @@
 
 .background {
   position: absolute;
-  top: 20%;
-  left: 25%;
-  width: 50%;
+  // center
+left: 50%;
+  transform: translateX(50%);
+  width: 70%;
   height: 60%;
   background: white;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
@@ -341,7 +342,9 @@ body {
 
 }
 
-
+.tables-container {
+  overflow-y: auto;
+}
 
 #like.trigger,
 #dislike.trigger {
@@ -407,7 +410,5 @@ body {
     justify-content: center;
   }
 
-  .tables-container {
-    overflow-y: auto;
-  }
+
 }
