@@ -427,14 +427,19 @@ async function renderChatMessages(id : number, scrollDown: boolean = false) {
 
     scrollToBottom(check);
 }
-
+let sending = false;
 async function sendMessage(chatId: number, message: string) {
+    if (sending) {
+        return;
+    }
+    sending = true;
     await client.addMessage(chatId, user.userId, message);
     layer = 0;
 
     await renderChatMessages(chatId);
     await renderChatNotificationIcon();
     scrollToBottom();
+    sending = false;
 }
 
 function scrollToBottom(below: boolean = true) {
